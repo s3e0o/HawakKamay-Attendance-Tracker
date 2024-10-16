@@ -62,6 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         header("Location: teacher-list.php");
         exit();
     }
+
+    // PHP logout logic
+    if (isset($_GET['logout'])) {
+        // Destroy the session
+        session_destroy();
+        // Redirect to the login page
+        header("Location: multi-login.php");
+        exit(); // Exit after header redirection
+    }
 }
 
 // Display error message if set

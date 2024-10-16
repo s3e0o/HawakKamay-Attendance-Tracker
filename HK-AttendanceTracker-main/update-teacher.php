@@ -100,6 +100,15 @@ if (isset($_SESSION['error'])) {
     echo "<script>alert('" . $_SESSION['error'] . "');</script>";
     unset($_SESSION['error']); // Clear the message after displaying
 }
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    // Destroy the session
+    session_destroy();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
+}
 ?>
 
 <!DOCTYPE html>

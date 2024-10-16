@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 // PHP logout logic
 if (isset($_GET['logout'])) {
     // Destroy the session

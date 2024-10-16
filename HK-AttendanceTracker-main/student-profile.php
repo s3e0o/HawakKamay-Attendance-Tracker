@@ -1,14 +1,14 @@
 <?php
 session_start();
 
-require 'db-connection.php';
+require 'db-connection.php'; // Include the connection file
 
-$username = '';
 $name = '';
 $email = '';
-$username_error = '';
+$student_id = '';
+$username = '';
 
-// Fetch student data based on session
+// Check if the user is logged in
 if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
 
@@ -16,46 +16,52 @@ if (isset($_SESSION['username'])) {
     $sql = "SELECT s.student_id, s.name, u.email 
             FROM students s 
             JOIN users u ON s.user_id = u.id 
-            WHERE u.username = ?"; // Change to use username
+            WHERE u.username = ?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('s', $username); // Use username for binding
+    $stmt->bind_param('s', $username); // Bind username
     $stmt->execute();
     $result = $stmt->get_result();
 
     // Check if the student exists
     if ($result->num_rows > 0) {
         $student = $result->fetch_assoc();
-        $student_id = $student['student_id']; // Keep student_id for updates
+        $student_id = $student['student_id']; // Store student ID for updates
         $name = $student['name'];
         $email = $student['email'];
     } else {
-        header("Location: multi-login.php");
+        header("Location: multi-login.php"); // Redirect if student not found
         exit();
     }
 } else {
-    header("Location: multi-login.php");
+    header("Location: multi-login.php"); // Redirect if not logged in
     exit();
 }
 
-// Save changes when form is submitted
+// Save changes when the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     $name = $_POST['fullName'];
     $email = $_POST['email'];
 
     // Update the students table
-    $update_student_sql = "UPDATE students SET name = ?, email = ? WHERE student_id = ?";
-    $stmt = $conn->prepare($update_student_sql);
-    $stmt->bind_param("ssi", $name, $email, $student_id);
+    $update_sql = "UPDATE students SET name = ? WHERE student_id = ?";
+    $stmt = $conn->prepare($update_sql);
+    $stmt->bind_param("si", $name, $student_id);
 
     if ($stmt->execute()) {
-        header("Location: student-profile.php");
+        header("Location: student-profile.php"); // Reload the profile page
         exit();
     } else {
         echo "Error updating student: " . $stmt->error;
     }
 }
 
+// Logout logic
+if (isset($_GET['logout'])) {
+    session_destroy(); // Destroy the session
+    header("Location: multi-login.php"); // Redirect to login page
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -63,8 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student's Profile - UPang HK Attendance Tracker</title>
-    <link rel="icon" type="image" href="hk_logo.png">
+    <title>Student Profile - UPang HK Attendance Tracker</title>
     <style>
         body, html {
             margin: 0;
@@ -204,87 +209,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     </style>
 </head>
 <body>
-    <div class="container" id="container">
-        <div class="sidebar" id="sidebar">
-            <div alt="PHINMA Logo" class="logo"></div>
-            <h2>UPang HK <br> Attendance Tracker</h2>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo"></div>
+            <h2>UPang HK <br>Attendance Tracker</h2>
             <div class="nav-item"><a href="student-db.php">Schedule</a></div>
-            <div class="nav-item"><a href="student-profile.php">Profile</a></div>
+            <div class="nav-item active"><a href="student-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>  
         </div>
-        <div class="main-content" id="main-content">
-            <div>
-                <h1>Student Profile</h1>
-            </div>
-            <!-- <div class="profile-header">
-                <div class="profile-img" id="profilePreview">IMG</div>
-            </div> -->
-            
-            <h2>About</h2>
-            <form id="studentProfileForm" enctype="multipart/form-data" method="POST" action="student-profile.php">
-                <div class="input-group">
-                    <label for="student_id">Student ID:</label>
-                    <input type="text" id="student_id" name="student_id" value="<?php echo $student['student_id']; ?>" readonly>
-                </div>
+        <div class="main-content">
+            <h1>Student Profile</h1>
+            <form method="POST" action="student-profile.php">
                 <div class="input-group">
                     <label for="fullName">Full Name:</label>
-                    <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($student['name']); ?>" required>
+                    <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($name); ?>" required>
+                </div>
+                <div class="input-group">
+                    <label for="studentId">Student ID:</label>
+                    <input type="text" id="studentId" name="studentId" value="<?php echo $student_id; ?>" readonly>
                 </div>
                 <div class="input-group">
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" readonly>
                 </div>
-                <!-- <div class="input-group">
-                    <label for="phone">Phone No.:</label>
-                    <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($student['phone']); ?>" required>
-                </div>
-                <div class="input-group">
-                    <label for="address">Address:</label>
-                    <input type="text" id="address" name="address" value="<?php echo htmlspecialchars($student['address']); ?>" required>
-                </div>
-                <div class="input-group">
-                    <label for="profileImage">Profile Picture:</label>
-                    <input type="file" id="profileImage" name="profileImage" accept="image/*">
-                </div> -->
-                <button type="submit" class="save-button">Save</button>
+                <button type="submit" name="save" class="save-button">Save</button>
             </form>
         </div>
     </div>
-
-    <script>
-        document.getElementById('profileImage').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('profilePreview').style.backgroundImage = `url(${e.target.result})`;
-                document.getElementById('profilePreview').style.backgroundSize = 'cover';
-                document.getElementById('profilePreview').style.backgroundPosition = 'center';
-                document.getElementById('profilePreview').innerText = ''; // Clear 'IMG' text
-            };
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Sidebar toggle functionality
-        // const sidebar = document.getElementById("sidebar");
-        // const mainContent = document.getElementById("main-content");
-        // let sidebarVisible = true;
-
-        // function toggleSidebar() {
-        //     sidebar.classList.toggle("hidden");
-        //     sidebarVisible = !sidebarVisible;
-        //     mainContent.style.marginLeft = sidebarVisible ? "200px" : "0";
-        // }
-
-        // // Bind toggle functionality to the toggle button
-        // const toggleButton = document.createElement("button");
-        // toggleButton.innerText = "Toggle Menu";
-        // toggleButton.classList.add("toggle-btn");
-        // toggleButton.onclick = toggleSidebar;
-        // document.body.insertBefore(toggleButton, document.body.firstChild);
-    </script>
 </body>
 </html>

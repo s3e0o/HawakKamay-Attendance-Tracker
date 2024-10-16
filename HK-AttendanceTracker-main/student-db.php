@@ -52,11 +52,15 @@ if ($student_id) { // Proceed only if a user is logged in
 $stmt->close();
 $conn->close();
 
+// PHP logout logic
 if (isset($_GET['logout'])) {
+    // Destroy the session
     session_destroy();
-    header("Location: multi-login.php"); // Redirect to login page or your desired page
-    exit();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
 }
+
 ?>
 
 

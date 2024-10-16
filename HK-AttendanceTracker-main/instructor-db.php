@@ -2,13 +2,19 @@
 // Start session at the very beginning of the file
 session_start();
 
+require 'db-connection.php';
+if ($_SESSION['role'] !== 'teacher') {
+    header("Location: multi-login.php"); // Redirect if not an admin
+    exit();
+}
+
 // PHP logout logic
 if (isset($_GET['logout'])) {
     // Destroy the session
     session_destroy();
     // Redirect to the login page
     header("Location: multi-login.php");
-    exit(); // Exit after header redirection to prevent further script execution
+    exit(); // Exit after header redirection
 }
 
 // Database connection and other logic can follow here

@@ -5,9 +5,11 @@ require 'db-connection.php';
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
+    // Destroy the session
     session_destroy();
+    // Redirect to the login page
     header("Location: multi-login.php");
-    exit();
+    exit(); // Exit after header redirection
 }
 
 // Check if the user is logged in

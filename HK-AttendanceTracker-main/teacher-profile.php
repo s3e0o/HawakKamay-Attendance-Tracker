@@ -53,6 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         echo "Error updating teacher: " . $stmt->error;
     }
 }
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    // Destroy the session
+    session_destroy();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

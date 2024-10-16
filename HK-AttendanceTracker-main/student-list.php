@@ -62,11 +62,13 @@ if (isset($_GET['searchQuery'])) {
     $searchResults = isset($_SESSION['searchResults']) ? $_SESSION['searchResults'] : [];
 }
 
-// Handle logout
+// PHP logout logic
 if (isset($_GET['logout'])) {
+    // Destroy the session
     session_destroy();
-    header("Location: multi-login.php"); // Redirect to login page or your desired page
-    exit();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
 }
 
 // Close the database connection
