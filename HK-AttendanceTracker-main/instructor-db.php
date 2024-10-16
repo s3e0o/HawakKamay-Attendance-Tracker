@@ -318,7 +318,7 @@ $conn->close();
     <div class="sidebar" id="sidebar">
         <div class="logo"></div>
         <h2>UPang HK <br> Attendance Tracker</h2> 
-        <div class="nav-item"><a href="instructor-db.php">Dashboard</a></div>
+        <div class="nav-item active"><a href="instructor-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="schedule-assign.php">Student Assign</a></div>
             <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>
         <div class="nav-item">

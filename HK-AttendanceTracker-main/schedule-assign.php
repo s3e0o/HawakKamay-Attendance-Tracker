@@ -112,6 +112,10 @@ $conn->close();
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
         a {
             text-decoration: none;
             color: white;
@@ -171,7 +175,7 @@ $conn->close();
             <div class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="instructor-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="schedule-assign.php">Student Assign</a></div>
+            <div class="nav-item active"><a href="schedule-assign.php">Student Assign</a></div>
             <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>
             <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>

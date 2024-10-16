@@ -1,60 +1,62 @@
 <?php
 session_start();
-include 'db-connection.php'; // Include the connection file
 
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    // Destroy the session
-    session_destroy();
-    // Redirect to the login page
-    header("Location: multi-login.php");
-    exit(); // Exit after header redirection
-}
+require 'db-connection.php';
 
-// Check if the user is logged in
-if (!isset($_SESSION['username'])) {
+$username = '';
+$name = '';
+$email = '';
+$username_error = '';
+
+// Fetch student data based on session
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+
+    // Query to fetch student details based on username
+    $sql = "SELECT s.student_id, s.name, u.email 
+            FROM students s 
+            JOIN users u ON s.user_id = u.id 
+            WHERE u.username = ?"; // Change to use username
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('s', $username); // Use username for binding
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Check if the student exists
+    if ($result->num_rows > 0) {
+        $student = $result->fetch_assoc();
+        $student_id = $student['student_id']; // Keep student_id for updates
+        $name = $student['name'];
+        $email = $student['email'];
+    } else {
+        header("Location: multi-login.php");
+        exit();
+    }
+} else {
     header("Location: multi-login.php");
     exit();
 }
 
-
-$host = 'localhost'; // Change if needed
-$username = 'root';  // Change to your database username
-$password = '';      // Change to your database password
-$dbname = 'hk-management'; // Your database name
-
-// Create a connection to the database
-$conn = new mysqli($host, $username, $password, $dbname);
-
-// Check the connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Check if form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $fullName = $_POST['fullName'];
+// Save changes when form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+    $name = $_POST['fullName'];
     $email = $_POST['email'];
-    $profilePic = $_FILES['profilePic']['name'] ? $_FILES['profilePic']['name'] : $student['profile_pic'];
 
-    // Handle image upload
-    if (isset($_FILES['profilePic']) && $_FILES['profilePic']['error'] == 0) {
-        $targetDir = "uploads/";
-        $targetFile = $targetDir . basename($_FILES["profilePic"]["name"]);
-        move_uploaded_file($_FILES["profilePic"]["tmp_name"], $targetFile);
+    // Update the students table
+    $update_student_sql = "UPDATE students SET name = ?, email = ? WHERE student_id = ?";
+    $stmt = $conn->prepare($update_student_sql);
+    $stmt->bind_param("ssi", $name, $email, $student_id);
+
+    if ($stmt->execute()) {
+        header("Location: student-profile.php");
+        exit();
+    } else {
+        echo "Error updating student: " . $stmt->error;
     }
-
-    // Update student data
-    $updateSql = "UPDATE students SET name = ?, email = ?, profile_pic = ?, updated_at = NOW() WHERE student_id = ?";
-    $updateStmt = $conn->prepare($updateSql);
-    $updateStmt->bind_param("sssi", $fullName, $email, $profilePic, $studentId);
-    $updateStmt->execute();
-
-    // Redirect after successful update
-    header("Location: student-profile.php");
 }
-?>
 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .container {
             display: flex;
-            height: auto;
+            height: 100%;
             transition: margin-left .5s; 
         }
         .sidebar {
@@ -143,7 +145,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 20px;
             color: white;
             margin-left: 0px; 
-            height: 100%;
         }
         .toggle-btn {
             background-color: #A98D00;
@@ -207,8 +208,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="sidebar" id="sidebar">
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
-            <div class="nav-item "><a href="student-db.php">Dashboard</a></div>
-            <div class="nav-item "><a href="student-profile.php">Profile</a></div>
+            <div class="nav-item"><a href="student-db.php">Schedule</a></div>
+            <div class="nav-item"><a href="student-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>  
@@ -217,53 +218,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div>
                 <h1>Student Profile</h1>
             </div>
-            <div class="profile-header">
+            <!-- <div class="profile-header">
                 <div class="profile-img" id="profilePreview">IMG</div>
-            </div>
+            </div> -->
             
             <h2>About</h2>
             <form id="studentProfileForm" enctype="multipart/form-data" method="POST" action="student-profile.php">
-    <div class="input-group">
-        <label for="fullName">Full Name:</label>
-        <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($student['name']); ?>" required>
-    </div>
-    <div class="input-group">
-        <label for="student_id">Student ID:</label>
-        <input type="text" id="student_id" name="student_id" value="<?php echo $student_id['student_id']; ?>" readonly>
-    </div>
-    <div class="input-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
-    </div>
-    <div class="input-group">
-        <label for="phone">Phone No.:</label>
-        <input type="tel" id="phone" name="phone" required>
-    </div>
-    <div class="input-group">
-        <label for="address">Address:</label>
-        <input type="text" id="address" name="address" required>
-    </div>
-    <div class="input-group">
-        <label for="profileImage">Profile Picture:</label>
-        <input type="file" id="profileImage" name="profileImage" accept="image/*">
-    </div>
-    <button type="submit" class="save-button">Save</button>
-</form>
-
+                <div class="input-group">
+                    <label for="student_id">Student ID:</label>
+                    <input type="text" id="student_id" name="student_id" value="<?php echo $student['student_id']; ?>" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($student['name']); ?>" required>
+                </div>
+                <div class="input-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
+                </div>
+                <!-- <div class="input-group">
+                    <label for="phone">Phone No.:</label>
+                    <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($student['phone']); ?>" required>
+                </div>
+                <div class="input-group">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" value="<?php echo htmlspecialchars($student['address']); ?>" required>
+                </div>
+                <div class="input-group">
+                    <label for="profileImage">Profile Picture:</label>
+                    <input type="file" id="profileImage" name="profileImage" accept="image/*">
+                </div> -->
+                <button type="submit" class="save-button">Save</button>
+            </form>
         </div>
     </div>
 
     <script>
         document.getElementById('profileImage').addEventListener('change', function(event) {
             const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profilePreview').style.backgroundImage = `url(${e.target.result})`;
+                document.getElementById('profilePreview').style.backgroundSize = 'cover';
+                document.getElementById('profilePreview').style.backgroundPosition = 'center';
+                document.getElementById('profilePreview').innerText = ''; // Clear 'IMG' text
+            };
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profilePreview').innerHTML = `<img src="${e.target.result}" alt="Profile Image" style="width:100%;height:100%;border-radius:50%;">`;
-                }
                 reader.readAsDataURL(file);
             }
         });
+
+        // Sidebar toggle functionality
+        // const sidebar = document.getElementById("sidebar");
+        // const mainContent = document.getElementById("main-content");
+        // let sidebarVisible = true;
+
+        // function toggleSidebar() {
+        //     sidebar.classList.toggle("hidden");
+        //     sidebarVisible = !sidebarVisible;
+        //     mainContent.style.marginLeft = sidebarVisible ? "200px" : "0";
+        // }
+
+        // // Bind toggle functionality to the toggle button
+        // const toggleButton = document.createElement("button");
+        // toggleButton.innerText = "Toggle Menu";
+        // toggleButton.classList.add("toggle-btn");
+        // toggleButton.onclick = toggleSidebar;
+        // document.body.insertBefore(toggleButton, document.body.firstChild);
     </script>
 </body>
 </html>

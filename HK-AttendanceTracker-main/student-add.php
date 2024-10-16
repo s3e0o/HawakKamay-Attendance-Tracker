@@ -5,11 +5,9 @@ require 'db-connection.php';
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
-    // Destroy the session
     session_destroy();
-    // Redirect to the login page
     header("Location: multi-login.php");
-    exit(); // Exit after header redirection
+    exit();
 }
 
 // Check if the user is logged in
@@ -23,16 +21,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     // Collect form data
     $studentId = $_POST['student_id'];
     $name = $_POST['name'];
-    $course = $_POST['course'];
+    $course = strtoupper($_POST['course']); // Capitalize course field
     $level = $_POST['level'];
     $hk_status = $_POST['hk_status'];
     $email = $_POST['email'];
+
+    // Validate name: letters only
+    if (!preg_match("/^[a-zA-Z ]*$/", $name)) {
+        $_SESSION['error'] = "Name can only contain letters.";
+        header("Location: student-add.php");
+        exit();
+    }
+
+    // Validate level: numbers from 1 to 5
+    if (!preg_match("/^[1-5]$/", $level)) {
+        $_SESSION['error'] = "Level must be a number between 1 and 5.";
+        header("Location: student-add.php");
+        exit();
+    }
 
     // Calculate total hours based on HK status
     $total_hours = 0;
     switch ($hk_status) {
         case 'HK25':
-            $total_hours = 45;
+            $total_hours = 25; // Corrected to 25 hours
             break;
         case 'HK50':
             $total_hours = 90;
@@ -46,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     }
 
     // Database connection
-    $conn = new mysqli("localhost", "root", "", "hk-management"); 
+    $conn = new mysqli("localhost", "root", "", "hk-management");
 
     // Check for connection error
     if ($conn->connect_error) {
@@ -90,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         // Insert the student data into the 'students' table
         $insert_student_sql = "INSERT INTO students (student_id, name, email, course, level, hk_status, total_hours, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_student = $conn->prepare($insert_student_sql);
-        $stmt_student->bind_param("ssssssii", $studentId, $name, $email, $course, $level, $hk_status, $total_hours, $user_id); // Note the corrected binding
+        $stmt_student->bind_param("ssssssii", $studentId, $name, $email, $course, $level, $hk_status, $total_hours, $user_id);
         $stmt_student->execute();
 
         // Redirect back to the student list page after saving
@@ -318,6 +330,7 @@ if (isset($_SESSION['error'])) {
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item active"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>
@@ -332,23 +345,32 @@ if (isset($_SESSION['error'])) {
                     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                         <div class="form-group">
                             <label for="student_id">StudentID:</label>
-                            <input type="text" id="student_id" name="student_id" required autocomplete="off">
+                            <input type="text" id="student_id" name="student_id" required
+                            placeholder="Enter StudentID">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>
-                            <input type="text" id="name" name="name" required autocomplete="off">
+                            <input type="text" id="name" name="name" required 
+                                pattern="[A-Za-z\s]+" title="Please enter letters only." 
+                                placeholder="Enter name of student(e.g., John Doe)">
                         </div>
                         <div class="form-group">
                             <label for="course">Course:</label>
-                            <input type="text" id="course" name="course" required autocomplete="off">
+                            <input type="text" id="course" name="course" required
+                                pattern="[A-Za-z\s]+" title="Please enter letters only." 
+                                placeholder="Enter course of student(e.g., BSIT)">
                         </div>
                         <div class="form-group">
                             <label for="level">Level:</label>
-                            <input type="text" id="level" name="level" required autocomplete="off">
+                            <input type="number" id="level" name="level" required
+                                min="1" max="5" 
+                                title="Please enter a number between 1 and 5."
+                                placeholder="Enter level of student">
                         </div>
                         <div class="form-group">
                             <label for="hk_status">HK Status:</label>
-                            <select id="hk_status" name="hk_status" onchange="updateTotalHours()" required>
+                            <select id="hk_status" name="hk_status" onchange="updateTotalHours()" required
+                                placeholder="Enter hk status of student">
                                 <option value="HK25">HK25</option>
                                 <option value="HK50">HK50</option>
                                 <option value="HK75">HK75</option>
@@ -357,7 +379,8 @@ if (isset($_SESSION['error'])) {
                         </div>
                         <div class="form-group">
                             <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required autocomplete="off">
+                            <input type="email" id="email" name="email" required
+                                placeholder="Enter email of student">
                         </div>
                         <button type="submit" class="submit-button" name="save">Save</button>
                     </form>

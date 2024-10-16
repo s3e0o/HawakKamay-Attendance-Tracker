@@ -1,68 +1,65 @@
 <?php
 session_start();
-include 'db-connection.php'; // Include the connection file
+require 'db-connection.php'; // Include the connection file
+$username = '';
+$name = '';
+$email = '';
+$username_error = '';
 
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    // Destroy the session
-    session_destroy();
-    // Redirect to the login page
-    header("Location: multi-login.php");
-    exit(); // Exit after header redirection
-}
+// Fetch teacher data based on session
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
 
-// Check if the user is logged in
-if (!isset($_SESSION['username'])) {
+    // Query to fetch teacher details based on username
+    $sql = "SELECT t.teacher_id, t.name, u.email 
+            FROM teachers t 
+            JOIN users u ON t.user_id = u.id 
+            WHERE u.username = ?"; // Change to use username
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('s', $username); // Use username for binding
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Check if the teacher exists
+    if ($result->num_rows > 0) {
+        $teacher = $result->fetch_assoc();
+        $teacher_id = $teacher['teacher_id']; // Keep teacher_id for updates
+        $name = $teacher['name'];
+        $email = $teacher['email'];
+    } else {
+        header("Location: multi-login.php");
+        exit();
+    }
+} else {
     header("Location: multi-login.php");
     exit();
 }
 
-
-$host = 'localhost'; // Change if needed
-$username = 'root';  // Change to your database username
-$password = '';      // Change to your database password
-$dbname = 'hk-management'; // Your database name
-
-// Create a connection to the database
-$conn = new mysqli($host, $username, $password, $dbname);
-
-// Check the connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Check if form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $fullName = $_POST['fullName'];
+// Save changes when form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+    $name = $_POST['fullName'];
     $email = $_POST['email'];
-    $profilePic = $_FILES['profilePic']['name'] ? $_FILES['profilePic']['name'] : $teacher['profile_pic'];
 
-    // Handle image upload
-    if (isset($_FILES['profilePic']) && $_FILES['profilePic']['error'] == 0) {
-        $targetDir = "uploads/";
-        $targetFile = $targetDir . basename($_FILES["profilePic"]["name"]);
-        move_uploaded_file($_FILES["profilePic"]["tmp_name"], $targetFile);
+    // Update the teachers table
+    $update_teacher_sql = "UPDATE teachers SET name = ?, email = ? WHERE teacher_id = ?";
+    $stmt = $conn->prepare($update_teacher_sql);
+    $stmt->bind_param("ssi", $name, $email, $teacher_id);
+
+    if ($stmt->execute()) {
+        header("Location: teacher-profile.php");
+        exit();
+    } else {
+        echo "Error updating teacher: " . $stmt->error;
     }
-
-    // Update teacher data
-    $updateSql = "UPDATE teachers SET name = ?, email = ?, profile_pic = ?, updated_at = NOW() WHERE teacher_id = ?";
-    $updateStmt = $conn->prepare($updateSql);
-    $updateStmt->bind_param("sssi", $fullName, $email, $profilePic, $teacher);
-    $updateStmt->execute();
-
-    // Redirect after successful update
-    header("Location: teacher-profile.php");
 }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher's Profile - UPang HK Attendance Tracker</title>
-    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -127,15 +124,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: medium;
         }
         .sidebar .logout-btn {
-            text-decoration: none;
             color: white;
-            display: block;
-            padding: 10px;
-            margin: 5px 0;
             background-color: #ff4c4c;
-            border-radius: 10px;
             text-align: center;
-            font-weight: bold;
+            padding: 10px;
+            margin-top: 10px;
+            display: block;
+            border-radius: 10px;
         }
         .sidebar .logout-btn:hover {
             background-color: #ff3333;
@@ -208,56 +203,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="sidebar" id="sidebar">
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
-            <div class="nav-item"><a href="instructor-db.php">Dashboard</a></div>
+            <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="schedule-assign.php">Student Assign</a></div>
-            <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>   
+            <div class="nav-item active"><a href="teacher-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>  
         </div>
         <div class="main-content" id="main-content">
             <div>
-                <h1>Instructor Profile</h1>
-            </div>
-            <div class="profile-header">
-                <div class="profile-img" id="profilePreview">IMG</div>
+                <h1>Teacher Profile</h1>
             </div>
             
             <h2>About</h2>
-            <form id="teacherProfileForm" enctype="multipart/form-data" method="POST" action="teacher-profile.php">
-    <div class="input-group">
-        <label for="fullName">Full Name:</label>
-        <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($teacher['name']); ?>" required>
-    </div>
-    <div class="input-group">
-        <label for="teacherId">Teacher ID:</label>
-        <input type="text" id="teacherId" name="teacherId" value="<?php echo $teacher['teacher_Id']; ?>" readonly>
-    </div>
-    <div class="input-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($teacher['email']); ?>" required>
-    </div>
-    <div class="input-group">
-        <label for="profileImage">Profile Picture:</label>
-        <input type="file" id="profileImage" name="profileImage" accept="image/*">
-    </div>
-    <button type="submit" class="save-button">Save</button>
-</form>
-
+            <form id="teacherProfileForm" method="POST" action="teacher-profile.php">
+                <div class="input-group">
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($teacher['name']); ?>" required>
+                </div>
+                <div class="input-group">
+                    <label for="teacherId">Teacher ID:</label>
+                    <input type="text" id="teacherId" name="teacherId" value="<?php echo $teacher['teacher_id']; ?>" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($teacher['email']); ?>" required>
+                </div>
+                <button type="submit" class="save-button">Save</button>
+            </form>
         </div>
     </div>
-
-    <script>
-        document.getElementById('profileImage').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profilePreview').innerHTML = `<img src="${e.target.result}" alt="Profile Image" style="width:100%;height:100%;border-radius:50%;">`;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
 </body>
 </html>

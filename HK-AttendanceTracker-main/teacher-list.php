@@ -5,13 +5,21 @@ require 'db-connection.php';
 
 $conn = new mysqli("localhost", "root", "", "hk-management");
 
-// Fetch teachers from the database
+// Handle search
+$searchTerm = isset($_POST['search']) ? $_POST['search'] : '';
+
+// Fetch teachers from the database with search functionality
 $sql = "SELECT t.id, t.teacher_id, t.name, t.department, u.email 
         FROM teachers t
         JOIN users u ON t.user_id = u.id
+        WHERE t.name LIKE ? OR t.teacher_id LIKE ? OR t.department LIKE ? OR u.email LIKE ?
         ORDER BY t.id DESC"; // Order by the latest updated record
 
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+$searchWildcard = "%$searchTerm%"; // Adding wildcards for partial matching
+$stmt->bind_param("ssss", $searchWildcard, $searchWildcard, $searchWildcard, $searchWildcard);
+$stmt->execute();
+$result = $stmt->get_result();
 $teachers = [];
 
 if ($result->num_rows > 0) {
@@ -191,7 +199,7 @@ if (isset($_GET['logout'])) {
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
+            <div class="nav-item active"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item"><a href="student-list.php">Student</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
@@ -201,9 +209,19 @@ if (isset($_GET['logout'])) {
         <main>
             <div class="content-box">
                 <div class="header">
-                    <h2>TEACHERS/COORDINATORS</h2>
+                    <h1>TEACHERS/COORDINATORS</h1>
                     <button class="add-new" onclick="location.href='teacher-add.php';">Add New</button>
                 </div>
+                <form method="POST" action="teacher-list.php">
+                    <input type="text" name="search" placeholder="Search by Name, ID, Department, or Email" value="<?php echo htmlspecialchars($searchTerm); ?>">
+                    <input type="submit" value="Search">
+                    <button type="button" onclick="clearSearch()">Clear</button>
+                </form>
+                
+                <?php if (empty($teachers)): ?>
+                    <div class="no-results">No results found for your search.</div>
+                <?php endif; ?>
+                <h4 class="section-title">RECENT USER ACTIVITIES</h4>
                 <table>
                     <thead>
                         <tr>
@@ -224,11 +242,11 @@ if (isset($_GET['logout'])) {
                                 <td><?php echo htmlspecialchars($teacher['department']); ?></td>
                                 <td><?php echo htmlspecialchars($teacher['email']); ?></td>
                                 <td>
-                    <form action="update-teacher.php" method="GET">
-                        <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
-                        <input class="update-button" type="submit" value="Update">
-                    </form>
-                </td>
+                                    <form action="update-teacher.php" method="GET">
+                                        <input type="hidden" name="userId" value="<?php echo htmlspecialchars($teacher['id']); ?>">
+                                        <input class="update-button" type="submit" value="Update">
+                                    </form>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -236,5 +254,13 @@ if (isset($_GET['logout'])) {
             </div>
         </main>
     </div>
+
+    <script>
+        function clearSearch() {
+            // Clear the search input and reload the page
+            document.querySelector("input[name='search']").value = ""; // Clear the input field
+            window.location.href = "teacher-list.php"; // Redirect to the same page
+        }
+    </script>
 </body>
 </html>

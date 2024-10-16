@@ -1,7 +1,13 @@
 <?php
 session_start(); // Start the session at the very beginning
+// include 'session-check.php';
 
 require 'db-connection.php';
+
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: multi-login.php"); // Redirect if not an admin
+    exit();
+}
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
@@ -230,7 +236,7 @@ $conn->close(); // Close the database connection
         <div class="sidebar" id="sidebar">
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
-            <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
+            <div class="nav-item active"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item"><a href="student-list.php">Student</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
@@ -239,7 +245,8 @@ $conn->close(); // Close the database connection
             </div>  
         </div> 
         <div class="main-content" id="main-content">
-            <button class="toggle-btn" onclick="toggleSidebar()">&#9776;</button>
+            <!-- <button class="toggle-btn" onclick="toggleSidebar()">&#9776;</button> -->
+            <!-- <h1>Welcome, <?php echo htmlspecialchars($username); ?></h1> Display logged-in user's name -->
             <h1 class="dashboard-title">ADMIN DASHBOARD</h1>
             <div class="info-grid">
                 <div class="info-box">

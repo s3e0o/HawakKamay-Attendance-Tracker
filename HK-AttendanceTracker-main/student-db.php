@@ -1,6 +1,13 @@
 <?php
 session_start();
 
+require 'db-connection.php';
+
+if ($_SESSION['role'] !== 'student') {
+    header("Location: multi-login.php"); // Redirect if not an admin
+    exit();
+}
+
 // Database connection
 $conn = new mysqli('localhost', 'root', '', 'hk-management');
 
@@ -114,6 +121,7 @@ if (isset($_GET['logout'])) {
         .sidebar h2 {
             text-align: center;
             font-size: medium;
+            color: #4a5d29;
         }
         .sidebar .logout-btn {
             text-decoration: none;

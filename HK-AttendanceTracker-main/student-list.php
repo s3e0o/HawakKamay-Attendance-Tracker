@@ -33,6 +33,12 @@ if ($result->num_rows > 0) {
 // Initialize a variable for storing search results
 $searchResults = [];
 
+if (isset($_GET['clearSearch'])) {
+    unset($_SESSION['searchResults']); // Clear the search results from the session
+    header("Location: student-list.php"); // Redirect to the same page
+    exit(); // Stop further execution
+}
+
 // Handle search request
 if (isset($_GET['searchQuery'])) {
     $searchQuery = $conn->real_escape_string($_GET['searchQuery']);
@@ -159,7 +165,7 @@ $conn->close();
             /* background-color: #556b2f; */
             padding: 20px;
             color: white;
-            display: flex;
+            /* display: flex; */
         }
         h1 {
             margin-top: 0;
@@ -302,18 +308,19 @@ $conn->close();
         <main>
             <div class="content-box">
                 <div class="header">
-                    <h2>STUDENTS</h2>
+                    <h1>STUDENTS</h1>
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
                 </div>
                 <!-- Search Bar -->
-            <form class="search-bar" action="student-list.php" method="GET" onsubmit="showResults()">
-                <input type="text" name="searchQuery" placeholder="Search by name or email" required>
-                <input type="submit" value="Search">
-            </form>
+                <form method="GET" action="student-list.php">
+                    <input type="text" name="searchQuery" placeholder="Search by Name or Email" value="<?php echo isset($_GET['searchQuery']) ? htmlspecialchars($_GET['searchQuery']) : ''; ?>">
+                    <input type="submit" value="Search">
+                    <button type="button" onclick="clearSearch()">Clear</button> <!-- Clear button -->
+                </form>
 
             <!-- Display Search Results -->
             <div class="search-results-container" id="searchResults">
-                <button class="close-results" onclick="hideResults()">X</button>
+                <!-- <button class="close-results" onclick="hideResults()">X</button> -->
                 <?php if (!empty($searchResults)): ?>
     <h2 class="section-title">SEARCH RESULTS</h2>
     <table>
@@ -349,7 +356,7 @@ $conn->close();
     <div class="no-results">No results found for your search.</div>
 <?php endif; ?>
             </div>
-            <h2 class="section-title">RECENT USER ACTIVITIES</h2>
+            <h4 class="section-title">RECENT USER ACTIVITIES</h4>
             <table>
     <tr>
         <th>Id</th>
@@ -407,6 +414,29 @@ $conn->close();
                 hours = 150;
             }
             total_hours=
+
+            function hideResults() {
+        document.getElementById("searchResults").style.display = "none"; // Hide search results
+        document.querySelector("input[name='searchQuery']").value = ""; // Clear the search input
+    }
+
+    function showResults() {
+        if (document.getElementById("searchResults").style.display === "none") {
+            document.getElementById("searchResults").style.display = "block"; // Show search results if hidden
+        }
+    }
+
+    // Call showResults() on page load if there are existing results
+    window.onload = function() {
+        <?php if (!empty($searchResults)): ?>
+            showResults();
+        <?php endif; ?>
+    };
+
+    function clearSearch() {
+        // Redirect to clear search results
+        window.location.href = "student-list.php?clearSearch=true";
+    };
 </script>
 
 
