@@ -2,6 +2,22 @@
 session_start();
 include 'db-connection.php'; // Include the connection file
 
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    // Destroy the session
+    session_destroy();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: multi-login.php");
+    exit();
+}
+
+
 $host = 'localhost'; // Change if needed
 $username = 'root';  // Change to your database username
 $password = '';      // Change to your database password
@@ -46,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin's Profile - UPang HK Attendance Tracker</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;

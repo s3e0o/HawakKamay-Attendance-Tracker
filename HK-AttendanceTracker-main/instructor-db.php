@@ -171,7 +171,8 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instructor Dashboard</title>
+     <title>Instructor Dashnoard</title>    
+     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -316,9 +317,10 @@ $conn->close();
 <div class="container">
     <div class="sidebar" id="sidebar">
         <div class="logo"></div>
-        <h2>Instructor Dashboard</h2> 
-        <div class="nav-item"><a href="schedule-assign.php">Assign Schedule</a></div>
-        <div class="nav-item"><a href="#">Profile</a></div>
+        <h2>UPang HK <br> Attendance Tracker</h2> 
+        <div class="nav-item"><a href="instructor-db.php">Dashboard</a></div>
+            <div class="nav-item"><a href="schedule-assign.php">Student Assign</a></div>
+            <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>
         <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div> 

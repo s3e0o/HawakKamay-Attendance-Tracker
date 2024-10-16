@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insert User</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;

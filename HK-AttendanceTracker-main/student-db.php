@@ -59,6 +59,7 @@ if (isset($_GET['logout'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPang HK Attendance Tracker - Student Dashboard</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         /* Your CSS styles */
         body, html {

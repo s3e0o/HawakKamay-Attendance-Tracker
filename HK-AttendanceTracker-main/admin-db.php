@@ -74,17 +74,18 @@ $conn->close(); // Close the database connection
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
+            transition: margin-left .5s; 
         }
         .container {
             display: flex;
@@ -165,8 +166,7 @@ $conn->close(); // Close the database connection
             flex-grow: 1;
             padding: 20px;
             color: white;
-            transition: margin-left .5s; /* Animation for main content */
-            margin-left: 0px; /*Initial margin for main content */
+            margin-left: 0px; 
         }
         .main-content.hidden {
             margin-left: 0; /* Adjust margin when sidebar is hidden */
@@ -230,9 +230,10 @@ $conn->close(); // Close the database connection
         <div class="sidebar" id="sidebar">
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
-            <div class="nav-item active"><a href="admin-db.php">Dashboard</a></div>
+            <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>  

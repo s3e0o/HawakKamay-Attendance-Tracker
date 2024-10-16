@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-include 'session-check.php';
 require 'db-connection.php';
 
 $conn = new mysqli("localhost", "root", "", "hk-management");
@@ -35,6 +34,7 @@ if (isset($_GET['logout'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPang HK Attendance Tracker - Admin</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -125,7 +125,7 @@ if (isset($_GET['logout'])) {
             font-size: 24px;
         }
         .content-box {
-            background-color: #4a5d29;
+            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
         }
@@ -179,6 +179,10 @@ if (isset($_GET['logout'])) {
         .delete-icon {
             color: #e24a4a;
         }
+        .search-results-container {
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -187,7 +191,7 @@ if (isset($_GET['logout'])) {
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item active"><a href="teacher-list.php">Teacher</a></div>
+            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item"><a href="student-list.php">Student</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">

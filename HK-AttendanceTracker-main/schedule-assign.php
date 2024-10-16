@@ -59,6 +59,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instructor Dashboard</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -124,9 +125,10 @@ $conn->close();
             font-size: 24px;
         }
         .content-box {
-            background-color: #4a5d29;
+            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
+            width: 80%;
         }
         form {
             display: grid;
@@ -140,10 +142,11 @@ $conn->close();
             margin-bottom: 5px;
         }
         .form-group input, select {
-            padding: 8px;
+            padding: 12px;
+            border: none;
             border-radius: 4px;
             background-color: white;
-            border: none;
+            color: black;
         }
         .submit-button {
             background-color: #b8860b;
@@ -166,9 +169,10 @@ $conn->close();
     <div class="container">
         <div class="sidebar">
             <div class="logo"></div>
-            <h2>Instructor Panel</h2>
+            <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="instructor-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="#">Profile</a></div>
+            <div class="nav-item"><a href="schedule-assign.php">Student Assign</a></div>
+            <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>
             <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>

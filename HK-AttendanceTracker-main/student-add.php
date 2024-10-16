@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-include 'session-check.php';
 require 'db-connection.php';
 
 // PHP logout logic
@@ -114,6 +113,7 @@ if (isset($_SESSION['error'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPang HK Attendance Tracker - Admin</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         .message {
             padding: 10px;
@@ -211,9 +211,10 @@ if (isset($_SESSION['error'])) {
             font-size: 24px;
         }
         .content-box {
-            background-color: #4a5d29;
-            border-radius: 10px;
+            /*background-color: #4a5d29;*/
+            border-radius: 20px;
             padding: 5px 10px 5px 10px;
+            width: 80%
         }
         .header {
             display: flex;
@@ -257,7 +258,7 @@ if (isset($_SESSION['error'])) {
             margin-bottom: 5px;
         }
         .form-group input {
-            padding: 8px;
+            padding: 12px;
             border: none;
             border-radius: 4px;
             background-color: white;

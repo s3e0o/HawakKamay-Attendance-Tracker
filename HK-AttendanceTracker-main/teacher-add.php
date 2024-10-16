@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-include 'session-check.php';
 require 'db-connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
@@ -77,6 +76,7 @@ if (isset($_SESSION['error'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPang HK Attendance Tracker - Admin</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -167,9 +167,10 @@ if (isset($_SESSION['error'])) {
             font-size: 24px;
         }
         .content-box {
-            background-color: #4a5d29;
+            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
+            width: 80%;
         }
         .header {
             display: flex;
@@ -201,11 +202,6 @@ if (isset($_SESSION['error'])) {
         th {
             background-color: #3e4d22;
         }
-        .content-box {
-            background-color: #4a5d29;
-            border-radius: 10px;
-            padding: 20px;
-        }
         form {
             display: grid;
             gap: 15px;
@@ -218,7 +214,7 @@ if (isset($_SESSION['error'])) {
             margin-bottom: 5px;
         }
         .form-group input {
-            padding: 8px;
+            padding: 12px;
             border: none;
             border-radius: 4px;
             background-color: white;

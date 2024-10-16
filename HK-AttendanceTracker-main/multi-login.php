@@ -80,6 +80,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HKAT Login Page</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -149,14 +150,6 @@ $conn->close();
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-        }
-        .forgot-password {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .forgot-password a {
-            color: #FFD700;
-            text-decoration: none;
         }
         .error-message {
             color: red;

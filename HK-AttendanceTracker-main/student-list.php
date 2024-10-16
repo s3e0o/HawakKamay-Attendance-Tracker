@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-include 'session-check.php';
 require 'db-connection.php';
 
 $host = "localhost"; // Define $host
@@ -75,6 +74,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPang HK Attendance Tracker - Admin</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -159,13 +159,14 @@ $conn->close();
             /* background-color: #556b2f; */
             padding: 20px;
             color: white;
+            display: flex;
         }
         h1 {
             margin-top: 0;
             font-size: 24px;
         }
         .content-box {
-            background-color: #4a5d29;
+            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
         }
@@ -180,6 +181,7 @@ $conn->close();
             font-size: 20px;
         }
         .add-new {
+            display: flex;
             background-color: #b8860b;
             color: white;
             border: none;
@@ -223,6 +225,65 @@ $conn->close();
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
             margin-top: 20px;
         }
+        .search-bar {
+            display: flex;
+            max-width: 750px;
+            margin: 5 auto;
+            height: 45px;
+            background-color: #ffffff;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .search-bar input[type="text"] {
+            flex-grow: 1;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            outline: none;
+            }
+
+            /* Submit button styles */
+            .search-bar input[type="submit"] {
+            background-color: #4a5d29;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            }
+
+            .search-bar input[type="submit"]:hover {
+            background-color: #45a049;
+            }
+
+            /* Responsive design */
+            @media (max-width: 600px) {
+            .search-bar {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+
+            .search-bar input[type="text"] {
+                border-bottom: 1px solid #e0e0e0;
+                border-radius: 15px 15px 0 0;
+            }
+
+            .search-bar input[type="submit"] {
+                border-radius: 0 0 15px 15px;
+            }
+            }
+
+            /* Placeholder text color */
+            .search-bar input[type="text"]::placeholder {
+            color: #999;
+            }
+
+            /* Focus styles */
+            .search-bar input[type="text"]:focus {
+            box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
+            }
     </style>
 </head>
 <body>
@@ -233,6 +294,7 @@ $conn->close();
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item active"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>
