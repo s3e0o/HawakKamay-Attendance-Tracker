@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-include 'session-check.php';
 require 'db-connection.php';
 
 // Initialize variables for the form fields
@@ -100,7 +99,6 @@ if (isset($_SESSION['error'])) {
     echo "<script>alert('" . $_SESSION['error'] . "');</script>";
     unset($_SESSION['error']); // Clear the message after displaying
 }
-
 // PHP logout logic
 if (isset($_GET['logout'])) {
     // Destroy the session
@@ -110,6 +108,7 @@ if (isset($_GET['logout'])) {
     exit(); // Exit after header redirection
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -199,10 +198,10 @@ if (isset($_GET['logout'])) {
             font-size: 24px;
         }
         .content-box {
-            background-color: #4a5d29;
+            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Added shadow for depth */
+            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Added shadow for depth */
         }
         .header {
             display: flex;
@@ -232,7 +231,7 @@ if (isset($_GET['logout'])) {
         }
         input[type="text"],
         input[type="email"] {
-            width: 100%;
+            width: 70%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -303,6 +302,7 @@ if (isset($_GET['logout'])) {
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item active"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>

@@ -190,8 +190,8 @@ if (isset($_GET['logout'])) {
             padding: 10px;
             border: none;
             border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
+            background-color: white;
+            color: black;
             margin-top: 5px;
         }
         .save-button {
