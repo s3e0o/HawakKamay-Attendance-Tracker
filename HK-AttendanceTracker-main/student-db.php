@@ -149,7 +149,7 @@ if (isset($_GET['logout'])) {
             color: white;
         }
         .content-box {
-            background-color: #4a5d29;
+            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
         }

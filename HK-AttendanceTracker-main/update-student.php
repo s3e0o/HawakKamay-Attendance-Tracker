@@ -163,7 +163,6 @@ $conn->close();
         }
         .main-content {
             flex-grow: 1;
-            background-color: #556b2f;
             padding: 20px;
             color: white;
         }
@@ -174,16 +173,19 @@ $conn->close();
             padding-bottom: 10px;
         }
         form {
-            background-color: #b8860b;
+            /*background-color: #b8860b;*/
             padding: 20px;
             border-radius: 5px;
         }
-        input[type="text"], input[type="email"], select {
-            width: 98%;
+        input[type="text"], input[type="email"],select {
+            width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: none;
+            border: 1px solid #ccc;
             border-radius: 5px;
+            background-color: #f9f9f9; /* Light background for input */
+            transition: border-color 0.3s ease;
+            
         }
         .toggle-btn {
             background-color: #A98D00; /* Color of the toggle button */
@@ -267,6 +269,9 @@ $conn->close();
             <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
             <input type="text" name="course" placeholder="Course" value="<?php echo htmlspecialchars($student['course']); ?>" required>
             <input type="text" name="year_level" placeholder="Year Level" value="<?php echo htmlspecialchars($student['level']); ?>" required>
+
+            <input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> 
+
             
             <select name="hk_status" onchange="updateTotalHours()" required>
                 <option value="HK25" <?php echo ($student['hk_status'] == 'HK25') ? 'selected' : ''; ?>>HK25</option>
@@ -275,12 +280,12 @@ $conn->close();
                 <option value="HK100" <?php echo ($student['hk_status'] == 'HK100') ? 'selected' : ''; ?>>HK100</option>
             </select>
 
-            <input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> <!-- Make it a readonly input -->
-
             <select name="status" required>
                 <option value="Active" <?php echo ($student['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
                 <option value="Inactive" <?php echo ($student['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
             </select>
+            
+            <!-- \<input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> Make it a readonly input -->
 
             <input type="submit" value="Update User">
         </form>
