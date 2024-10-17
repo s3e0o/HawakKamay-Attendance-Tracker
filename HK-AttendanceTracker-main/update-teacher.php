@@ -1,111 +1,104 @@
 <?php
 session_start();
+require 'db-connection.php'; // Ensure this includes a working DB connection setup
 
-require 'db-connection.php';
+// Initialize variables
+$teacherId = $name = $department = $email = "";
 
-// Initialize variables for the form fields
-$teacherId = $name = $department = $email = '';
-
-// Check if a teacher_id is provided for updating
+// Check if a teacher is being updated
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
-    // Collect form data
     $teacherId = $_POST['teacher_id'];
     $name = $_POST['name'];
     $department = $_POST['department'];
     $email = $_POST['email'];
-    
+
     // Database connection
     $conn = new mysqli("localhost", "root", "", "hk-management");
-
-    // Check for connection error
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Check if the teacher exists
-    $check_teacher_sql = "SELECT * FROM teachers WHERE teacher_id = ?";
-    $stmt_check_teacher = $conn->prepare($check_teacher_sql);
-    $stmt_check_teacher->bind_param("s", $teacherId);
-    $stmt_check_teacher->execute();
-    $result_teacher = $stmt_check_teacher->get_result();
+    // Check if teacher exists
+    $stmt = $conn->prepare("SELECT * FROM teachers WHERE teacher_id = ?");
+    $stmt->bind_param("s", $teacherId);
+    $stmt->execute();
+    $teacherExists = $stmt->get_result();
 
-    if ($result_teacher->num_rows === 0) {
+    if ($teacherExists->num_rows === 0) {
         $_SESSION['error'] = "No teacher found with this ID.";
         header("Location: teacher-list.php");
         exit();
     }
 
-    // Check if the email already exists in the users table
-    $check_email_sql = "SELECT * FROM users WHERE email = ? AND email != (SELECT email FROM users WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?))";
-    $stmt_check_email = $conn->prepare($check_email_sql);
-    $stmt_check_email->bind_param("ss", $email, $teacherId);
-    $stmt_check_email->execute();
-    $result_email = $stmt_check_email->get_result();
+    // Check if email already exists
+    $stmt = $conn->prepare(
+        "SELECT * FROM users WHERE email = ? 
+         AND email != (SELECT email FROM users WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?))"
+    );
+    $stmt->bind_param("ss", $email, $teacherId);
+    $stmt->execute();
+    $emailExists = $stmt->get_result();
 
-    if ($result_email->num_rows > 0) {
+    if ($emailExists->num_rows > 0) {
         $_SESSION['error'] = "This email is already registered.";
         header("Location: teacher-list.php");
         exit();
     }
 
-    // Update the user in the 'users' table
-    $update_user_sql = "UPDATE users SET email = ? WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?)";
-    $stmt_user = $conn->prepare($update_user_sql);
-    $stmt_user->bind_param("ss", $email, $teacherId);
-    $stmt_user->execute();
+    // Update email in users table
+    $stmt = $conn->prepare(
+        "UPDATE users SET email = ? 
+         WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?)"
+    );
+    $stmt->bind_param("ss", $email, $teacherId);
+    $stmt->execute();
 
-    // Update the teacher details in the 'teachers' table
-    $update_teacher_sql = "UPDATE teachers SET name = ?, department = ? WHERE teacher_id = ?";
-    $stmt_teacher = $conn->prepare($update_teacher_sql);
-    $stmt_teacher->bind_param("sss", $name, $department, $teacherId);
-    $stmt_teacher->execute();
+    // Update teacher details
+    $stmt = $conn->prepare(
+        "UPDATE teachers SET name = ?, department = ? WHERE teacher_id = ?"
+    );
+    $stmt->bind_param("sss", $name, $department, $teacherId);
+    $stmt->execute();
 
-    // Redirect back to the teacher list page after updating
     header("Location: teacher-list.php");
     exit();
 }
 
-// If a teacher_id is provided, fetch the existing data to pre-fill the form
+// Fetch teacher details to pre-fill form
 if (isset($_GET['id'])) {
     $teacherId = $_GET['id'];
     
-    // Fetch teacher details
-    $fetch_teacher_sql = "SELECT name, department, email FROM teachers WHERE id = ?";
-    $stmt_fetch_teacher = $conn->prepare($fetch_teacher_sql);
-    $stmt_fetch_teacher->bind_param("s", $teacherId);
-    $stmt_fetch_teacher->execute();
-    $result_fetch_teacher = $stmt_fetch_teacher->get_result();
+    $conn = new mysqli("localhost", "root", "", "hk-management");
 
-    if ($result_fetch_teacher->num_rows > 0) {
-        $teacher_data = $result_fetch_teacher->fetch_assoc();
+    $stmt = $conn->prepare(
+        "SELECT t.name, t.department, u.email 
+         FROM teachers t 
+         JOIN users u ON t.user_id = u.id 
+         WHERE t.teacher_id = ?"
+    );
+    $stmt->bind_param("s", $teacherId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $teacher_data = $result->fetch_assoc();
         $name = $teacher_data['name'];
         $department = $teacher_data['department'];
-        
-        // Fetch email from the users table using the user_id
-        $fetch_email_sql = "SELECT email FROM users WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?)";
-        $stmt_fetch_email = $conn->prepare($fetch_email_sql);
-        $stmt_fetch_email->bind_param("s", $teacherId);
-        $stmt_fetch_email->execute();
-        $result_fetch_email = $stmt_fetch_email->get_result();
-
-        if ($result_fetch_email->num_rows > 0) {
-            $email = $result_fetch_email->fetch_assoc()['email'];
-        }
+        $email = $teacher_data['email'];
     }
 }
 
 // Display error message if set
 if (isset($_SESSION['error'])) {
     echo "<script>alert('" . $_SESSION['error'] . "');</script>";
-    unset($_SESSION['error']); // Clear the message after displaying
+    unset($_SESSION['error']);
 }
-// PHP logout logic
+
+// Handle logout
 if (isset($_GET['logout'])) {
-    // Destroy the session
     session_destroy();
-    // Redirect to the login page
     header("Location: multi-login.php");
-    exit(); // Exit after header redirection
+    exit();
 }
 ?>
 
@@ -231,7 +224,7 @@ if (isset($_GET['logout'])) {
         }
         input[type="text"],
         input[type="email"] {
-            width: 70%;
+            width: 58%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -292,47 +285,69 @@ if (isset($_GET['logout'])) {
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
             margin-top: 20px;
         }
+    
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: white;
+            color: black;
+        }
+        .form-group input::placeholder {
+            color: gray;
+        }
+        select {
+            width: 60%;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            background-color: white;
+            color: black;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
-            <div alt="PHINMA Logo" class="logo"></div>
-            <h2>UPang HK <br> Attendance Tracker</h2>
+            <div class="logo"></div>
+            <h2>UPang HK Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item active"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item"><a href="student-list.php">Student</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
-            <div class="nav-item">
-                <a href="?logout=true" class="logout-btn">Log Out</a>
-            </div>
+            <a href="?logout=true" class="logout-btn">Log Out</a>
         </div>
         <main>
-            <div class="content-box">
-                <div class="header">
-                    <h2>ADMIN</h2>
+            <h2>Update Teacher Information</h2>
+            <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
                 </div>
-                <h2>Update Teacher Information </h2>
-                <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-                    <!-- <div class="form-group">
-                        <label for="teacher_id">Teacher ID:</label>
-                        <input type="text" id="teacher_id" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>" readonly>
-                    </div> -->
-                    <div class="form-group">
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>" placeholder="Enter Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="department">Department:</label>
-                        <input type="text" id="department" name="department" value="<?php echo htmlspecialchars($department); ?>" placeholder="Enter Department" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" placeholder="Enter Email" required>
-                    </div>
-                    <button type="submit" name="update" class="submit-button">Update</button>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <select name="department" id="department" required>
+                        <option value="CITE" <?php echo ($department == 'CITE') ? 'selected' : ''; ?>>CITE</option>
+                        <option value="CELA" <?php echo ($department == 'CELA') ? 'selected' : ''; ?>>CELA</option>
+                        <option value="CAS" <?php echo ($department == 'CAS') ? 'selected' : ''; ?>>CAS</option>
+                        <option value="CEA" <?php echo ($department == 'CEA') ? 'selected' : ''; ?>>CEA</option>
+                        <option value="CAHS" <?php echo ($department == 'CAHS') ? 'selected' : ''; ?>>CAHS</option>
+                        <option value="CCJE" <?php echo ($department == 'CCJE') ? 'selected' : ''; ?>>CCJE</option>
+                    </select>
+                </div>
+                <button type="submit" name="update" class="submit-button">Update</button>
+            </form>
         </main>
     </div>
 </body>

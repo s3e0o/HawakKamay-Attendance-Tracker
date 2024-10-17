@@ -2,6 +2,8 @@
 session_start();
 
 require 'db-connection.php';
+// Initialize variables
+$teacherId = $name = $department = $email = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     // Collect form data
@@ -231,6 +233,15 @@ if (isset($_SESSION['error'])) {
         }
         .form-group input::placeholder {
             color: #cccccc;
+            
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: white;
+            color: black;
         }
         .submit-button {
             background-color: #b8860b;
@@ -274,13 +285,20 @@ if (isset($_SESSION['error'])) {
                             <input type="text" id="name" name="name" required>
                         </div>
                         <div class="form-group">
-                            <label for="department">Department:</label>
-                            <input type="text" id="department" name="department" required>
-                        </div>
-                        <div class="form-group">
                             <label for="email">Email:</label>
                             <input type="email" id="email" name="email" required>
                         </div>
+                        <div class="form-group">
+                    <label for="department">Department:</label>
+                    <select name="department" id="department" required>
+                        <option value="CITE" <?php echo ($department == 'CITE') ? 'selected' : ''; ?>>CITE</option>
+                        <option value="CELA" <?php  echo ($department == 'CELA') ? 'selected' : ''; ?>>CELA</option>
+                        <option value="CAS" <?php echo ($department == 'CAS') ? 'selected' : ''; ?>>CAS</option>
+                        <option value="CEA" <?php echo ($department == 'CEA') ? 'selected' : ''; ?>>CEA</option>
+                        <option value="CAHS" <?php echo ($department == 'CAHS') ? 'selected' : ''; ?>>CAHS</option>
+                        <option value="CCJE" <?php echo ($department == 'CCJE') ? 'selected' : ''; ?>>CCJE</option>
+                    </select>
+                </div>
                         <button type="submit" name="save" class="submit-button">Add</button>
                     </form>
                 </div>

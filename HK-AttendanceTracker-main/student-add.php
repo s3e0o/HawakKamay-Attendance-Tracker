@@ -363,7 +363,7 @@ if (isset($_SESSION['error'])) {
                                 placeholder="Enter course of student(e.g., BSIT)">
                         </div>
                         <div class="form-group">
-                            <label for="level">Level:</label>
+                            <label for="level">Year Level:</label>
                             <input type="number" id="level" name="level" required
                                 min="1" max="5" 
                                 title="Please enter a number between 1 and 5."

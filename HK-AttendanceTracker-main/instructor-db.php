@@ -3,162 +3,47 @@
 session_start();
 
 require 'db-connection.php';
+
 if ($_SESSION['role'] !== 'teacher') {
-    header("Location: multi-login.php"); // Redirect if not an admin
+    header("Location: multi-login.php"); // Redirect if not a teacher
     exit();
 }
 
-// PHP logout logic
+// Logout logic
 if (isset($_GET['logout'])) {
-    // Destroy the session
     session_destroy();
-    // Redirect to the login page
     header("Location: multi-login.php");
-    exit(); // Exit after header redirection
+    exit();
 }
 
-// Database connection and other logic can follow here
-$host = "localhost"; // Change if your DB host is different
-$username = "root"; // Your DB username
-$password = ""; // Your DB password
-$dbname = "hk-management"; // Your database name
+// Database connection
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "hk-management";
 
-// Set timezone
 date_default_timezone_set('Asia/Manila');
 
-// Create a new connection
 $conn = new mysqli($host, $username, $password, $dbname);
-
-// Check if the connection is successful
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch students for the dropdown
-$students = $conn->query("SELECT user_id, name FROM students");
-
-// Initialize schedule list
-$scheduleList = [];
-
-// Set default search date to today in the Philippines timezone
 $searchDate = date('Y-m-d');
-
-// Check if the required POST parameters are set
-if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
-    $schedule_id = $_POST['schedule_id'];
-    $status = $_POST['status'];
-
-    // Fetch the schedule details including student and schedule duration
-    $stmt = $conn->prepare("
-        SELECT s.id, s.hk_status, s.total_hours, sc.start_time, sc.end_time, sc.attendance_status
-        FROM schedule sc
-        JOIN students s ON sc.student_id = s.id
-        WHERE sc.id = ?
-    ");
-    $stmt->bind_param("i", $schedule_id);
-    $stmt->execute();
-    $stmt->bind_result($user_id, $hk_status, $total_hours, $start_time, $end_time, $current_status);
-    $stmt->fetch();
-    $stmt->close();
-
-// Assume $start_time and $end_time contain the appropriate time values
-
-// Create DateTime objects for start and end times
-$start = new DateTime($start_time);
-$end = new DateTime($end_time);
-
-// Calculate the difference (duration) between start and end times
-$duration = $end->diff($start);
-
-// Extract hours and minutes from the duration
-$hours = $duration->h;   // Total hours
-$minutes = $duration->i; // Total minutes
-
-// If the duration spans across midnight (negative duration), correct it
-if ($end < $start) {
-    $hours = 24 - $hours;
-}
-
-// Total duration in minutes
-$total_duration_minutes = ($duration->h * 60) + $duration->i;
-
-// Calculate the displayed time format
-$displayed_hours = floor($total_duration_minutes / 60); // Total hours
-$displayed_minutes = $total_duration_minutes % 60; // Remaining minutes
-$formatted_time = sprintf("%02d:%02d", $displayed_hours, $displayed_minutes); // Format as H:MM
-
-if ($status === 'Approved') {
-    // Subtract the duration from the student's total hours
-    $new_total_minutes = ($total_hours * 60) - $total_duration_minutes;
-
-    // Ensure the new total hours do not go below zero
-    $new_total_minutes = max(0, $new_total_minutes);
-
-    // Convert back to hours
-    $new_total_hours = floor($new_total_minutes / 60);
-    $remaining_minutes = $new_total_minutes % 60;
-
-    // Update the student's total hours in the database
-    $update_stmt = $conn->prepare("UPDATE students SET total_hours = ? WHERE id = ?");
-    $update_stmt->bind_param("di", $new_total_hours, $student_id);
-    $update_stmt->execute();
-    $update_stmt->close();
-
-    // Update the attendance status in the schedule table
-    $stmt = $conn->prepare("UPDATE schedule SET attendance_status = ? WHERE id = ?");
-    $stmt->bind_param("si", $status, $schedule_id);
-    $stmt->execute();
-    $stmt->close();
-
-    echo json_encode([
-        "status" => "success",
-        "message" => "Attendance status updated to 'Approved'. Duration of $formatted_time deducted from the student's total hours."
-    ]);
-} elseif ($status === 'Absent') {
-    // Check if the current status is 'Approved'
-    if ($current_status === 'Approved') {
-        // If previously approved, add back the duration to the student's total hours
-        $new_total_minutes = ($total_hours * 60) + $total_duration_minutes;
-
-        // Convert back to hours
-        $new_total_hours = floor($new_total_minutes / 60);
-        $remaining_minutes = $new_total_minutes % 60;
-
-        // Update the student's total hours in the database
-        $update_stmt = $conn->prepare("UPDATE students SET total_hours = ? WHERE id = ?");
-        $update_stmt->bind_param("di", $new_total_hours, $student_id);
-        $update_stmt->execute();
-        $update_stmt->close();
-    }
-
-    // Update the attendance status in the schedule table
-    $stmt = $conn->prepare("UPDATE schedule SET attendance_status = ? WHERE id = ?");
-    $stmt->bind_param("si", $status, $schedule_id);
-    $stmt->execute();
-    $stmt->close();
-
-    echo json_encode([
-        "status" => "success",
-        "message" => "Attendance status updated to 'Absent'."
-    ]);
-}
-exit; // End the script after processing the request
-
-}
-
-// Handle search request for schedule by date
 if (isset($_GET['searchDate']) && !empty($_GET['searchDate'])) {
     $searchDate = $_GET['searchDate'];
 }
 
-// Query for the schedule on the chosen or default date, including HK details
+$scheduleList = [];
+
+// Fetch schedules
 $stmt = $conn->prepare("
-    SELECT sc.user_id as schedule_id, s.name, sc.start_time, sc.end_time, sc.attendance_status, sc.subject, sc.classroom, s.hk_status, s.total_hours
+    SELECT sc.user_id as schedule_id, s.name, sc.start_time, sc.end_time, sc.attendance_status, 
+           s.hk_status, s.total_hours, s.user_id as student_id
     FROM schedule sc
     JOIN students s ON sc.user_id = s.user_id
     WHERE sc.date = ?
 ");
-
 $stmt->bind_param("s", $searchDate);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -169,8 +54,65 @@ if ($result->num_rows > 0) {
     }
 }
 $stmt->close();
+
+// Handle attendance status update
+if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
+    $schedule_id = $_POST['schedule_id'];
+    $status = $_POST['status'];
+
+    // Fetch student details and schedule duration
+    $stmt = $conn->prepare("
+        SELECT s.user_id as student_id, s.total_hours, sc.start_time, sc.end_time, sc.attendance_status
+        FROM schedule sc
+        JOIN students s ON sc.user_id = s.user_id
+        WHERE sc.user_id = ?
+    ");
+    $stmt->bind_param("i", $schedule_id);
+    $stmt->execute();
+    $stmt->bind_result($student_id, $total_hours, $start_time, $end_time, $attendance_status);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Calculate duration between start and end times
+    $start = new DateTime($start_time);
+    $end = new DateTime($end_time);
+    $duration = $end->diff($start);
+    $total_duration_minutes = ($duration->h * 60) + $duration->i;
+
+    // Adjust total hours based on status change
+    if ($status === 'Approved') {
+        $new_total_minutes = max(0, ($total_hours * 60) - $total_duration_minutes);
+    } elseif ($status === 'Absent' && $attendance_status === 'Approved') {
+        $new_total_minutes = ($total_hours * 60) + $total_duration_minutes;
+    } else {
+        $new_total_minutes = $total_hours * 60;
+    }
+
+    $new_total_hours = floor($new_total_minutes / 60);
+    $remaining_minutes = $new_total_minutes % 60;
+
+    // Update student's total hours
+    $update_stmt = $conn->prepare("UPDATE students SET total_hours = ? WHERE user_id = ?");
+    $update_stmt->bind_param("di", $new_total_hours, $student_id);
+    $update_stmt->execute();
+    $update_stmt->close();
+
+    // Update attendance status in the schedule table
+    $stmt = $conn->prepare("UPDATE schedule SET attendance_status = ? WHERE user_id = ?");
+    $stmt->bind_param("si", $status, $schedule_id);
+    $stmt->execute();
+    $stmt->close();
+
+    echo json_encode([
+        "status" => "success",
+        "message" => "Attendance status updated to '$status'."
+    ]);
+    exit();
+}
+    
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -366,7 +308,7 @@ $conn->close();
                             <td>
                                 <select class="status-select" data-schedule-id="<?php echo $schedule['schedule_id']; ?>">
                                     <option value="">Change Status</option>
-                                    <option value="Approved">Approved</option>
+                                    <option value="Approved">Present</option>
                                     <option value="Absent">Absent</option>
                                 </select>
                             </td>
@@ -380,30 +322,26 @@ $conn->close();
 
 <script>
     document.querySelectorAll('.status-select').forEach(select => {
-        select.addEventListener('change', function () {
-            const scheduleId = this.dataset.scheduleId;
-            const status = this.value;
+    select.addEventListener('change', function () {
+        const scheduleId = this.dataset.scheduleId;
+        const status = this.value;
 
-            if (scheduleId && status) {
-                fetch('', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        schedule_id: scheduleId,
-                        status: status
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message); // Notify user of success or error
-                    location.reload(); // Refresh the page to see updated statuses
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        });
+        if (scheduleId && status) {
+            fetch('', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ schedule_id: scheduleId, status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload(); // Reload to reflect changes
+            })
+            .catch(error => console.error('Error:', error));
+        }
     });
+});
+
 </script>
 
 </body>
