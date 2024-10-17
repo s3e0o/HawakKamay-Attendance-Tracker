@@ -314,10 +314,10 @@ if (isset($_GET['logout'])) {
                 </div>
                 <h2>Update Teacher Information </h2>
                 <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="teacher_id">Teacher ID:</label>
                         <input type="text" id="teacher_id" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>" readonly>
-                    </div>
+                    </div> -->
                     <div class="form-group">
                         <label for="name">Name:</label>
                         <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>" placeholder="Enter Name" required>

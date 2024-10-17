@@ -150,6 +150,19 @@ if (isset($_GET['logout'])) {
             margin: 0;
             font-size: 20px;
         }
+        input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            border-radius: 25px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+            border-radius: 0 0 0 0;
+        }
+        button[type="button"]{
+            padding: 10px;
+            border-radius: 0 0 20px;
+        }
         .add-new {
             background-color: #b8860b;
             color: white;
@@ -194,6 +207,87 @@ if (isset($_GET['logout'])) {
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
             margin-top: 20px;
         }
+        .search-results-container {
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            margin-top: 20px;
+        }
+        .search-results-container {
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            margin-top: 20px;
+        }
+        .btn-clear{
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"].update-button {
+            border-radius: 25px;
+        }
+        .search-bar {
+            display: flex;
+            max-width: 100%;
+            margin: 5 auto;
+            height: 45px;
+            background-color: #ffffff;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .search-bar input[type="text"] {
+            flex-grow: 1;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            outline: none;
+            }
+
+            /* Submit button styles */
+            .search-bar input[type="submit"] {
+                background-color: #4a5d29;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            .search-bar input[type="submit"]:hover {
+            background-color: #45a049;
+            }
+
+
+            /* Responsive design */
+            @media (max-width: 600px) {
+            .search-bar {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+
+            .search-bar input[type="text"] {
+                border-bottom: 1px solid #e0e0e0;
+                border-radius: 15px 15px 0 0;
+            }
+
+            .search-bar input[type="submit"] {
+                border-radius: 0 0 15px 15px;
+            }
+
+            }
+
+            /* Placeholder text color */
+            .search-bar input[type="text"]::placeholder {
+            color: #999;
+            }
+
+            /* Focus styles */
+            .search-bar input[type="text"]:focus {
+            box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
+            }
     </style>
 </head>
 <body>
@@ -215,10 +309,10 @@ if (isset($_GET['logout'])) {
                     <h1>TEACHERS/COORDINATORS</h1>
                     <button class="add-new" onclick="location.href='teacher-add.php';">Add New</button>
                 </div>
-                <form method="POST" action="teacher-list.php">
+                <form class="search-bar" method="post" action="teacher-list.php">
                     <input type="text" name="search" placeholder="Search by Name, ID, Department, or Email" value="<?php echo htmlspecialchars($searchTerm); ?>">
                     <input type="submit" value="Search">
-                    <button type="button" onclick="clearSearch()">Clear</button>
+                    <button class="btn-clear" type="button" onclick="clearSearch()">Clear</button>
                 </form>
                 
                 <?php if (empty($teachers)): ?>

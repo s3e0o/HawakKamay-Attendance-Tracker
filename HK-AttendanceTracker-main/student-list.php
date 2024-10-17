@@ -233,9 +233,25 @@ $conn->close();
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
             margin-top: 20px;
         }
+        .search-results-container {
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            margin-top: 20px;
+        }
+        .btn-clear{
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"].update-button {
+            border-radius: 25px;
+        }
         .search-bar {
             display: flex;
-            max-width: 750px;
+            max-width: 100%;
             margin: 5 auto;
             height: 45px;
             background-color: #ffffff;
@@ -314,12 +330,12 @@ $conn->close();
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
                 </div>
                 <!-- Search Bar -->
-                <form method="GET" action="student-list.php">
-                    <input type="text" name="searchQuery" placeholder="Search by Name or Email" value="<?php echo isset($_GET['searchQuery']) ? htmlspecialchars($_GET['searchQuery']) : ''; ?>">
+                <form class="search-bar" action="student-list.php" method="GET" onsubmit="showResults()">
+                    <input type="text" name="searchQuery" placeholder="Search by name or email" required>
                     <input type="submit" value="Search">
-                    <button type="button" onclick="clearSearch()">Clear</button> <!-- Clear button -->
+                    <button class="btn-clear" type="button" onclick="clearSearch()">Clear</button> <!-- Clear button -->
                 </form>
-
+                
             <!-- Display Search Results -->
             <div class="search-results-container" id="searchResults">
                 <!-- <button class="close-results" onclick="hideResults()">X</button> -->
@@ -435,10 +451,11 @@ $conn->close();
         <?php endif; ?>
     };
 
-    function clearSearch() {
-        // Redirect to clear search results
-        window.location.href = "student-list.php?clearSearch=true";
-    };
+        function clearSearch() {
+            // Clear the search input and reload the page
+            document.querySelector("input[name='search']").value = ""; // Clear the input field
+            window.location.href = "teacher-list.php"; // Redirect to the same page
+        }
 </script>
 
 
