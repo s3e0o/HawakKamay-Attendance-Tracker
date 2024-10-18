@@ -265,7 +265,7 @@ $conn->close();
         </div>
     </div>
 
-    <script>
+<!--<script>
         function validateTimeInputs() {
     const startTimeInput = document.querySelector('input[name="start_time"]');
     const endTimeInput = document.querySelector('input[name="end_time"]');
@@ -278,6 +278,6 @@ $conn->close();
         endTimeInput.value = ""; // Reset end time if invalid
     }
 }
-    </script>
+</script>-->
 </body>
 </html>

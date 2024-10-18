@@ -1,7 +1,20 @@
 <?php
 session_start();
+require 'db-connection.php'; // Your database connection
+require 'vendor/autoload.php'; // Ensure PHPSpreadsheet is available
 
-require 'db-connection.php';
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    session_destroy(); // Destroy the session
+    header("Location: multi-login.php"); // Redirect to login page
+    exit(); // Exit after redirection
+}
+
+// Initialize the $result variable
+$result = null;
 
 // Fetch all schedules along with student names
 $sql = "
@@ -19,15 +32,65 @@ $sql = "
     INNER JOIN students st ON s.user_id = st.user_id
     ORDER BY s.date, s.start_time";
 
+// Execute the query
 $result = $conn->query($sql);
 
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    session_destroy(); // Destroy the session
-    header("Location: multi-login.php"); // Redirect to login page
-    exit(); // Exit after redirection
+// Check if the export button was clicked
+if (isset($_POST['export'])) {
+    // If the export button was clicked, check if the query was successful
+    if ($result) {
+        // Create a new spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set the header row
+        $sheet->setCellValue('A1', 'Schedule ID');
+        $sheet->setCellValue('B1', 'Student Name');
+        $sheet->setCellValue('C1', 'Date');
+        $sheet->setCellValue('D1', 'Start Time');
+        $sheet->setCellValue('E1', 'End Time');
+        $sheet->setCellValue('F1', 'Subject');
+        $sheet->setCellValue('G1', 'Classroom');
+        $sheet->setCellValue('H1', 'Attendance Status');
+        $sheet->setCellValue('I1', 'Assigned By');
+
+        // Populate the spreadsheet with data
+        $row = 2; // Start from the second row
+        while ($schedule = $result->fetch_assoc()) {
+            $sheet->setCellValue('A' . $row, $schedule['schedule_id']);
+            $sheet->setCellValue('B' . $row, $schedule['student_name']);
+            $sheet->setCellValue('C' . $row, $schedule['date']);
+            $sheet->setCellValue('D' . $row, $schedule['start_time']);
+            $sheet->setCellValue('E' . $row, $schedule['end_time']);
+            $sheet->setCellValue('F' . $row, $schedule['subject']);
+            $sheet->setCellValue('G' . $row, $schedule['classroom']);
+            $sheet->setCellValue('H' . $row, $schedule['attendance_status']);
+            $sheet->setCellValue('I' . $row, $schedule['assigned_by']);
+            $row++;
+        }
+
+        // Set the filename for the export
+        $filename = 'schedules_export_' . date('YmdHis') . '.xlsx';
+
+        // Create a writer and save the spreadsheet to the output
+        $writer = new Xlsx($spreadsheet);
+        
+        // Set the appropriate headers for the download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Save the file to the output stream
+        $writer->save('php://output');
+        exit(); // Exit to prevent further output
+    } else {
+        // Handle query error
+        echo "Error executing query: " . $conn->error;
+        exit();
+    }
 }
 
+// Close the database connection
 $conn->close();
 ?>
 
@@ -138,6 +201,20 @@ $conn->close();
             text-align: center;
             font-size: medium;
         }
+        button {
+            background-color: #b8860b;
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s; /* Smooth transition */
+    padding: 10px 20px; /* Button padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
     </style>
 </head>
 <body>
@@ -156,6 +233,11 @@ $conn->close();
         </div>
         <div class="main-content">
             <h1>All Student Schedules</h1>
+            <form action="schedules-list.php" method="post">
+                <button type="submit" name="export" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+                    Export Schedules
+                </button>
+            </form>
             <table>
                 <thead>
                     <tr>
@@ -171,7 +253,7 @@ $conn->close();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($result->num_rows > 0): ?>
+                    <?php if ($result && $result->num_rows > 0): ?>
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
                                 <td><?php echo $row['schedule_id']; ?></td>
@@ -197,17 +279,17 @@ $conn->close();
 
     <script>
         function validateTimeInputs() {
-    const startTimeInput = document.querySelector('input[name="start_time"]');
-    const endTimeInput = document.querySelector('input[name="end_time"]');
+            const startTimeInput = document.querySelector('input[name="start_time"]');
+            const endTimeInput = document.querySelector('input[name="end_time"]');
 
-    const startTime = startTimeInput.value;
-    const endTime = endTimeInput.value;
+            const startTime = startTimeInput.value;
+            const endTime = endTimeInput.value;
 
-    if (startTime && endTime && startTime >= endTime) {
-        alert("Error: Start time must be earlier than end time.");
-        endTimeInput.value = ""; // Reset end time if invalid
-    }
-}
+            if (startTime && endTime && startTime >= endTime) {
+                alert("Error: Start time must be earlier than end time.");
+                endTimeInput.value = ""; // Reset end time if invalid
+            }
+        }
     </script>
 </body>
 </html>
