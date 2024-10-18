@@ -251,10 +251,11 @@ $conn->close();
         <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
         <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
         <div class="nav-item active"><a href="student-list.php">Student</a></div>
+        <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
         <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
         <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>
-        </div>  
+        </div>   
     </div> 
     
     <div class="main-content">
