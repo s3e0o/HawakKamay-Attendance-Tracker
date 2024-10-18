@@ -223,13 +223,17 @@ if (isset($_GET['logout'])) {
             <h1>Student Profile</h1>
             <form method="POST" action="student-profile.php">
                 <div class="input-group">
-                    <label for="fullName">Full Name:</label>
-                    <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($name); ?>" required>
-                </div>
-                <div class="input-group">
                     <label for="studentId">Student ID:</label>
                     <input type="text" id="studentId" name="studentId" value="<?php echo $student_id; ?>" readonly>
                 </div>
+
+                <div class="input-group">
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($name); ?>" required
+                    pattern="[A-Za-z\s]+" 
+                    title="Only letters and spaces are allowed.">
+                </div>
+                
                 <div class="input-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" readonly>

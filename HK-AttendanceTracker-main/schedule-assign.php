@@ -15,6 +15,28 @@ if ($conn->connect_error) {
 // Fetch students for the dropdown
 $students = $conn->query("SELECT user_id, name FROM students");
 
+// Fetch the assigned teacher for the logged-in student
+$student_id = $_SESSION['id']; // Assuming you store the student ID in the session
+$teacher = null;
+
+if ($student_id) {
+    $sqlTeacher = "SELECT u.username AS teacher_name 
+                   FROM users u 
+                   INNER JOIN schedule s ON u.id = s.assigned_by 
+                   WHERE s.user_id = ? LIMIT 1";
+
+    $stmt = $conn->prepare($sqlTeacher);
+    $stmt->bind_param("i", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $teacher = $result->fetch_assoc();
+    }
+
+    $stmt->close();
+}
+
 // Handle schedule assignment
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date = $_POST['date'];

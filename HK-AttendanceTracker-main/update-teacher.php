@@ -1,27 +1,61 @@
 <?php
 session_start();
+
 require 'db-connection.php'; // Ensure this includes a working DB connection setup
+
 
 // Initialize variables
 $teacherId = $name = $department = $email = "";
 
+// Check if an ID was provided
+if (isset($_GET['id'])) {
+    $teacherId = $_GET['id']; // Use a consistent variable name
+
+    // Query to get the user data
+    $stmt = $conn->prepare(
+        "SELECT t.id, t.name, t.department, u.email 
+         FROM teachers t 
+         JOIN users u ON t.user_id = u.id 
+         WHERE t.id = ?"
+    );
+    $stmt->bind_param("i", $teacherId);
+    if (!$stmt->execute()) {
+        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        header("Location: teacher-list.php");
+        exit();
+    }
+    $result = $stmt->get_result();
+
+    // Fetch the user data
+    if ($result->num_rows > 0) {
+        $teacher_data = $result->fetch_assoc();
+        $name = $teacher_data['name'];
+        $department = $teacher_data['department'];
+        $email = $teacher_data['email'];
+    } else {
+        $_SESSION['error'] = "No data found for this teacher.";
+        header("Location: teacher-list.php");
+        exit();
+    }
+} else {
+    die("User ID not provided.");
+}
+
 // Check if a teacher is being updated
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
-    $teacherId = $_POST['teacher_id'];
+    $teacherId = $_POST['teacher_id']; // Ensure this matches the hidden field
     $name = $_POST['name'];
     $department = $_POST['department'];
     $email = $_POST['email'];
 
-    // Database connection
-    $conn = new mysqli("localhost", "root", "", "hk-management");
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
     // Check if teacher exists
-    $stmt = $conn->prepare("SELECT * FROM teachers WHERE teacher_id = ?");
-    $stmt->bind_param("s", $teacherId);
-    $stmt->execute();
+    $stmt = $conn->prepare("SELECT * FROM teachers WHERE id = ?");
+    $stmt->bind_param("i", $teacherId);
+    if (!$stmt->execute()) {
+        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        header("Location: teacher-list.php");
+        exit();
+    }
     $teacherExists = $stmt->get_result();
 
     if ($teacherExists->num_rows === 0) {
@@ -33,10 +67,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     // Check if email already exists
     $stmt = $conn->prepare(
         "SELECT * FROM users WHERE email = ? 
-         AND email != (SELECT email FROM users WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?))"
+         AND email != (SELECT email FROM users WHERE id = (SELECT user_id FROM teachers WHERE id = ?))"
     );
-    $stmt->bind_param("ss", $email, $teacherId);
-    $stmt->execute();
+    $stmt->bind_param("si", $email, $teacherId);
+    if (!$stmt->execute()) {
+        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        header("Location: teacher-list.php");
+        exit();
+    }
     $emailExists = $stmt->get_result();
 
     if ($emailExists->num_rows > 0) {
@@ -48,44 +86,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     // Update email in users table
     $stmt = $conn->prepare(
         "UPDATE users SET email = ? 
-         WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?)"
+         WHERE id = (SELECT user_id FROM teachers WHERE id = ?)"
     );
-    $stmt->bind_param("ss", $email, $teacherId);
-    $stmt->execute();
+    $stmt->bind_param("si", $email, $teacherId);
+    if (!$stmt->execute()) {
+        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        header("Location: teacher-list.php");
+        exit();
+    }
 
     // Update teacher details
     $stmt = $conn->prepare(
-        "UPDATE teachers SET name = ?, department = ? WHERE teacher_id = ?"
+        "UPDATE teachers SET name = ?, department = ? WHERE id = ?"
     );
-    $stmt->bind_param("sss", $name, $department, $teacherId);
-    $stmt->execute();
+    $stmt->bind_param("ssi", $name, $department, $teacherId);
+    if (!$stmt->execute()) {
+        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        header("Location: teacher-list.php");
+        exit();
+    }
 
+    $_SESSION['success'] = "Teacher information updated successfully.";
     header("Location: teacher-list.php");
     exit();
-}
-
-// Fetch teacher details to pre-fill form
-if (isset($_GET['id'])) {
-    $teacherId = $_GET['id'];
-    
-    $conn = new mysqli("localhost", "root", "", "hk-management");
-
-    $stmt = $conn->prepare(
-        "SELECT t.name, t.department, u.email 
-         FROM teachers t 
-         JOIN users u ON t.user_id = u.id 
-         WHERE t.teacher_id = ?"
-    );
-    $stmt->bind_param("s", $teacherId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $teacher_data = $result->fetch_assoc();
-        $name = $teacher_data['name'];
-        $department = $teacher_data['department'];
-        $email = $teacher_data['email'];
-    }
 }
 
 // Display error message if set
@@ -317,7 +340,7 @@ if (isset($_GET['logout'])) {
     <div class="container">
         <div class="sidebar">
             <div class="logo"></div>
-            <h2>UPang HK Attendance Tracker</h2>
+            <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item active"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item"><a href="student-list.php">Student</a></div>
@@ -326,7 +349,8 @@ if (isset($_GET['logout'])) {
         </div>
         <main>
             <h2>Update Teacher Information</h2>
-            <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . htmlspecialchars($teacherId); ?>">
+                <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>" required>

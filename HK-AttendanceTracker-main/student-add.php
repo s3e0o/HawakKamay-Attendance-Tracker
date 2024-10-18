@@ -348,7 +348,9 @@ if (isset($_SESSION['error'])) {
                         <div class="form-group">
                             <label for="student_id">StudentID:</label>
                             <input type="text" id="student_id" name="student_id" required
-                            placeholder="Enter StudentID">
+                            placeholder="Enter StudentID"
+                            pattern="^[0-9-]+$" 
+                            title="Only numbers and dashes are allowed, with no spaces.">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>

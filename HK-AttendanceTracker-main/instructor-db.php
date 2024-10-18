@@ -261,6 +261,20 @@ $conn->close();
         th {
             background-color: #4a5d29;
         }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        .actions img {
+            width: 20px;
+            height: 20px;
+        }
         input[type="date"], input[type="submit"], select {
             padding: 10px;
             border-radius: 4px;
@@ -274,20 +288,6 @@ $conn->close();
             color: white; /* Red color for no results */
             font-weight: bold;
         }
-        /* .actions {
-            display: flex;
-            gap: 10px;
-        } */
-        .actions button {
-            /* background: none; */
-            border-radius: 5px;
-            cursor: pointer;
-            padding: 5px;
-        }
-        /* .actions img {
-            width: 20px;
-            height: 20px;
-        }  */
     </style>
 </head>
 <body>

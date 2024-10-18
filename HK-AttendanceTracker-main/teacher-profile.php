@@ -47,11 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     $stmt->bind_param("ssi", $name, $email, $teacher_id);
 
     if ($stmt->execute()) {
+        $_SESSION['success_message'] = "Profile successfully saved!";
         header("Location: teacher-profile.php");
         exit();
     } else {
         echo "Error updating teacher: " . $stmt->error;
     }
+}
+
+// Check for success message
+if (isset($_SESSION['success_message'])) {
+    $success_message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']); // Clear the message after displaying
 }
 
 // PHP logout logic
@@ -229,7 +236,12 @@ if (isset($_GET['logout'])) {
             <form id="teacherProfileForm" method="POST" action="teacher-profile.php">
                 <div class="input-group">
                     <label for="fullName">Full Name:</label>
-                    <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($teacher['name']); ?>" required>
+                    <input type="text" id="fullName" name="fullName" 
+                        value="<?php echo htmlspecialchars($teacher['name']); ?>" 
+                        required 
+                        pattern="[A-Za-z\s]+" 
+                        title="Only letters and spaces are allowed." 
+                        oninput="capitalizeName(event)">
                 </div>
                 <div class="input-group">
                     <label for="teacherId">Teacher ID:</label>

@@ -59,6 +59,24 @@ if (isset($_GET['searchQuery'])) {
     }
 }
 
+// Handle delete request
+if (isset($_GET['delete_id'])) {
+    $delete_id = $_GET['delete_id'];
+    
+    // Prepare delete statement
+    $delete_stmt = $conn->prepare("DELETE FROM students WHERE user_id = ?");
+    $delete_stmt->bind_param("i", $delete_id);
+    
+    if ($delete_stmt->execute()) {
+        echo "<script>alert('Student deleted successfully.'); window.location.href = 'student-list.php';</script>";
+    } else {
+        echo "<script>alert('Failed to delete student.'); window.location.href = 'student-list.php';</script>";
+    }
+    
+    $delete_stmt->close();
+    exit();
+}
+
 // Logout logic
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -217,6 +235,7 @@ $conn->close();
         .actions {
             display: flex;
             gap: 10px;
+            cursor: pointer;
         }
         .actions button {
             background: none;
@@ -257,6 +276,7 @@ $conn->close();
         }
         input[type="submit"].update-button {
             border-radius: 25px;
+            cursor: pointer;
         }
         .search-bar {
             display: flex;
@@ -367,11 +387,25 @@ $conn->close();
                                     <td><?php echo htmlspecialchars($row["level"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
                                     <td><?php echo htmlspecialchars($row["status"]); ?></td>
-                                    <td>
+                                    <td class="actions">
                                         <form action="update-student.php" method="GET">
                                             <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
                                             <input class="update-button" type="submit" value="Update">
                                         </form>
+                                        <!-- <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button> -->
+                                        <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -402,10 +436,38 @@ $conn->close();
                                     <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
                                     <td><?php echo htmlspecialchars($row["status"]); ?></td>
                                     <td>
+                                    <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
                                         <form action="update-student.php" method="GET">
                                             <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
                                             <input class="update-button" type="submit" value="Update">
                                         </form>
+                                        <!-- <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button> -->
+                                        <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -437,6 +499,20 @@ $conn->close();
                                             <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
                                             <input class="update-button" type="submit" value="Update">
                                         </form>
+                                        <!-- <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button> -->
+                                        <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -451,6 +527,13 @@ $conn->close();
                         // Clear the search input and reload the page
                         document.querySelector("input[name='searchQuery']").value = ""; // Clear the input field
                         window.location.href = "student-list.php"; // Redirect to the same page
+                    }
+
+                    function confirmDelete(userId) {
+                        if (confirm('Are you sure you want to delete this student?')) {
+                            // Redirect to the same page with the delete_id parameter
+                            window.location.href = '?delete_id=' + encodeURIComponent(userId);
+                        }
                     }
                 </script>
             </div>
