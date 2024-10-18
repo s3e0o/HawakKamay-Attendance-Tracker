@@ -1,8 +1,8 @@
 <?php
 session_start();
-
 require 'db-connection.php';
-
+require 'vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\IOFactory;
 // Database connection parameters
 $host = "localhost"; 
 $username = "root"; 
@@ -34,7 +34,7 @@ if (isset($_GET['searchQuery'])) {
     // Prepare SQL query based on search
     $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status 
             FROM students 
-            WHERE name LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%'OR course LIKE '%$searchQuery'OR hk_status LIKE '%$searchQuery' ";
+            WHERE name LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%' OR course LIKE '%$searchQuery%' OR hk_status LIKE '%$searchQuery%'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -74,6 +74,48 @@ if (isset($_GET['delete_id'])) {
     }
     
     $delete_stmt->close();
+    exit();
+}
+
+// Export functionality
+if (isset($_POST['export'])) {
+    require 'vendor/autoload.php'; // Load PHPSpreadsheet
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setTitle('Students');
+
+    // Set header
+    $sheet->setCellValue('A1', 'User ID');
+    $sheet->setCellValue('B1', 'Name');
+    $sheet->setCellValue('C1', 'Email');
+    $sheet->setCellValue('D1', 'Course');
+    $sheet->setCellValue('E1', 'Level');
+    $sheet->setCellValue('F1', 'HK Status');
+    $sheet->setCellValue('G1', 'Total Hours');
+    $sheet->setCellValue('H1', 'Status');
+
+    // Fetch data for export
+    $data = isset($_SESSION['searchResults']) ? $_SESSION['searchResults'] : $students;
+    $rowNumber = 2;
+
+    foreach ($data as $row) {
+        $sheet->setCellValue('A' . $rowNumber, $row['user_id']);
+        $sheet->setCellValue('B' . $rowNumber, $row['name']);
+        $sheet->setCellValue('C' . $rowNumber, $row['email']);
+        $sheet->setCellValue('D' . $rowNumber, $row['course']);
+        $sheet->setCellValue('E' . $rowNumber, $row['level']);
+        $sheet->setCellValue('F' . $rowNumber, $row['hk_status']);
+        $sheet->setCellValue('G' . $rowNumber, $row['total_hours']);
+        $sheet->setCellValue('H' . $rowNumber, $row['status']);
+        $rowNumber++;
+    }
+
+    // Set headers for download
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="students.xlsx"');
+    $writer = PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save('php://output');
     exit();
 }
 
@@ -212,6 +254,14 @@ $conn->close();
             padding: 10px;
             border-radius: 0 0 20px;
         }
+        .export{
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
         .add-new {
             background-color: #b8860b;
             color: white;
@@ -348,16 +398,25 @@ $conn->close();
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
             <div class="nav-item active"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
-            </div>
+            </div>  
         </div>
         <main>
             <div class="content-box">
                 <div class="header">
                     <h1>STUDENTS</h1>
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
+                    <form method="POST" action="">
+        <button class="export" type="submit" name="export">Export to Excel</button>
+    </form> 
+    <form action="student-list.php" method="POST" enctype="multipart/form-data">
+    <label for="file">Upload Excel file:</label>
+    <input type="file" name="file" id="file" accept=".xls,.xlsx" required>
+    <button type="submit" name="import">Import Students</button>
+</form>
                 </div>
                 <!-- Search Bar -->
                 <form class="search-bar" action="student-list.php" method="GET">
@@ -392,12 +451,6 @@ $conn->close();
                                             <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
                                             <input class="update-button" type="submit" value="Update">
                                         </form>
-                                        <!-- <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                            </svg>
-                                        </button> -->
                                         <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
                                                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -454,12 +507,6 @@ $conn->close();
                                             <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
                                             <input class="update-button" type="submit" value="Update">
                                         </form>
-                                        <!-- <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                            </svg>
-                                        </button> -->
                                         <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
                                                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -499,12 +546,6 @@ $conn->close();
                                             <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
                                             <input class="update-button" type="submit" value="Update">
                                         </form>
-                                        <!-- <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                            </svg>
-                                        </button> -->
                                         <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
                                                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -514,7 +555,9 @@ $conn->close();
                                             </svg>
                                         </button>
                                     </td>
+                                
                                 </tr>
+                                
                             <?php endforeach; ?>
                         </table>
                     <?php else: ?>
