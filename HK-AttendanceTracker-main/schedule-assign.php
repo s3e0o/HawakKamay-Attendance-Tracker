@@ -1,25 +1,13 @@
 <?php
 session_start();
 
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    // Destroy the session
-    session_destroy();
-    // Redirect to the login page
-    header("Location: multi-login.php");
-    exit(); // Exit after header redirection
-}
-
 // Database connection settings
 $host = 'localhost';
-$dbname = 'hk-management'; // Use the correct database name
-$username = 'root'; // Database username
-$password = ''; // Database password
+$dbname = 'hk-management';
+$username = 'root';
+$password = '';
 
-// Create a new connection
 $conn = new mysqli($host, $username, $password, $dbname);
-
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -36,18 +24,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $subject = $_POST['subject'];
     $classroom = $_POST['classroom'];
 
-    // Prepare and execute the SQL statement
-    $stmt = $conn->prepare("INSERT INTO schedule (user_id, `date`, start_time, end_time, subject, classroom) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $user_id, $date, $start_time, $end_time, $subject, $classroom);
-
-    // Execute and check for errors
-    if ($stmt->execute()) {
-        echo "Schedule assigned successfully.";
+    if ($start_time >= $end_time) {
+        echo "Error: Start time must be earlier than end time.";
     } else {
-        echo "Error: " . $stmt->error;
-    }
+        $stmt = $conn->prepare(
+            "INSERT INTO schedule (user_id, `date`, start_time, end_time, subject, classroom) 
+             VALUES (?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("isssss", $user_id, $date, $start_time, $end_time, $subject, $classroom);
 
-    $stmt->close();
+        if ($stmt->execute()) {
+            echo "Schedule assigned successfully.";
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+}
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    // Destroy the session
+    session_destroy();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
 }
 
 $conn->close();
@@ -196,15 +197,29 @@ $conn->close();
                     </div>
                     <div class="form-group">
                         <label for="date">Select Date:</label>
-                        <input type="date" name="date" required>
+                        <input 
+                            type="date" 
+                            name="date" 
+                            required 
+                            min="<?php echo date('Y-m-d'); ?>"
+                        >
                     </div>
                     <div class="form-group">
                         <label for="start_time">Select Start Time:</label>
-                        <input type="time" name="start_time" required>
+                        <input 
+                            type="time" 
+                            name="start_time" 
+                            required 
+                            onchange="validateEndTime()"
+                        >
                     </div>
                     <div class="form-group">
                         <label for="end_time">Select End Time:</label>
-                        <input type="time" name="end_time" required>
+                        <input 
+                            type="time" 
+                            name="end_time" 
+                            required
+                        >
                     </div>
                     <div class="form-group">
                         <label for="subject">Subject:</label>
@@ -219,5 +234,27 @@ $conn->close();
             </div>
         </div>
     </div>
+
+    <script>
+        function setMinStartTime() {
+            const dateInput = document.querySelector('input[name="date"]');
+            const startTimeInput = document.querySelector('input[name="start_time"]');
+            const today = new Date().toISOString().split('T')[0];
+
+            if (dateInput.value === today) {
+                const currentTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                startTimeInput.min = currentTime;
+            } else {
+                startTimeInput.min = '00:00';
+            }
+        }
+
+        function validateEndTime() {
+            const startTimeInput = document.querySelector('input[name="start_time"]');
+            const endTimeInput = document.querySelector('input[name="end_time"]');
+
+            endTimeInput.min = startTimeInput.value;
+        }
+    </script>
 </body>
 </html>

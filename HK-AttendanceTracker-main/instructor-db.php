@@ -281,11 +281,8 @@ $conn->close();
             <input type="submit" value="Search">
         </form>
 
-        <?php if (empty($scheduleList)): ?>
-            <div class="no-results">No schedules found for this date.</div>
-        <?php else: ?>
-            <table>
-                <thead>
+        <table>
+        <thead>
                     <tr>
                         <th>Student Name</th>
                         <th>Start Time</th>
@@ -296,6 +293,11 @@ $conn->close();
                         <th>Actions</th>
                     </tr>
                 </thead>
+        </table>
+        <?php if (empty($scheduleList)): ?>
+            <div class="no-results">No schedules found for this date.</div>
+        <?php else: ?>
+            <table>
                 <tbody>
                     <?php foreach ($scheduleList as $schedule): ?>
                         <tr>
