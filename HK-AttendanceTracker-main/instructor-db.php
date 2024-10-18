@@ -238,7 +238,7 @@ $conn->close();
             margin-top: 20px;
         }
         th, td {
-            text-align: center;
+            text-align: left;
             padding: 10px;
             border-bottom: 1px solid #b8860b;
         }
@@ -247,9 +247,25 @@ $conn->close();
         }
         input[type="date"], input[type="submit"], select {
             padding: 10px;
-            border-radius: 4px;
+            border-radius: 10px;
             margin-right: 10px;
-            font-size: 16px;
+            font-size: 18px;
+            width: auto; 
+            text-align: center;
+            background-color:white;
+            cursor: pointer;
+        }
+        input[type="date"]:hover{
+            background-color: rgba(250,240,230);
+            border-radius: 10px;
+        }
+        input[type="submit"]:hover{
+            background-color: rgba(250,240,230);
+            border-radius: 10px;
+        }
+        .status-select:hover{
+            background-color: rgba(250,240,230);
+            border-radius: 10px;
         }
         .schedule-form {
             margin-top: 20px;

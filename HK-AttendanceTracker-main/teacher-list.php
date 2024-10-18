@@ -13,7 +13,7 @@ $sql = "SELECT t.id, t.teacher_id, t.name, t.department, u.email
         FROM teachers t
         JOIN users u ON t.user_id = u.id
         WHERE t.name LIKE ? OR t.teacher_id LIKE ? OR t.department LIKE ? OR u.email LIKE ?
-        ORDER BY t.id DESC"; // Order by the latest updated record
+        ORDER BY t.id ASC"; // Order by the latest updated record
 
 $stmt = $conn->prepare($sql);
 $searchWildcard = "%$searchTerm%"; // Adding wildcards for partial matching
@@ -153,7 +153,7 @@ if (isset($_GET['logout'])) {
         input[type="text"] {
             width: 50%;
             padding: 10px;
-            border-radius: 25px;
+            /*border-radius: 25px;*/
         }
         input[type="submit"] {
             padding: 10px;
@@ -276,7 +276,6 @@ if (isset($_GET['logout'])) {
             .search-bar input[type="submit"] {
                 border-radius: 0 0 15px 15px;
             }
-
             }
 
             /* Placeholder text color */
@@ -318,7 +317,7 @@ if (isset($_GET['logout'])) {
                 <?php if (empty($teachers)): ?>
                     <div class="no-results">No results found for your search.</div>
                 <?php endif; ?>
-                <h4 class="section-title">RECENT USER ACTIVITIES</h4>
+                <h2 class="section-title">RECENT USER ACTIVITIES</h2>
                 <table>
                     <thead>
                         <tr>

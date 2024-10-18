@@ -4,6 +4,20 @@ session_start();
 require 'db-connection.php';
 // Initialize variables
 $teacherId = $name = $department = $email = "";
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    // Destroy the session
+    session_destroy();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: multi-login.php");
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     // Collect form data
@@ -65,14 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         exit();
     }
 
-    // PHP logout logic
-    if (isset($_GET['logout'])) {
-        // Destroy the session
-        session_destroy();
-        // Redirect to the login page
-        header("Location: multi-login.php");
-        exit(); // Exit after header redirection
-    }
 }
 
 // Display error message if set
@@ -232,8 +238,7 @@ if (isset($_SESSION['error'])) {
             color: black;
         }
         .form-group input::placeholder {
-            color: #cccccc;
-            
+            color: gray;
         }
         select {
             width: 100%;
@@ -278,15 +283,18 @@ if (isset($_SESSION['error'])) {
                     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                         <div class="form-group">
                             <label for="teacher_id">TeacherID:</label>
-                            <input type="text" id="teacher_id" name="teacher_id" required>
+                            <input type="text" id="teacher_id" name="teacher_id" required
+                            placeholder="Enter Teacher/Instructor ID:">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>
-                            <input type="text" id="name" name="name" required>
+                            <input type="text" id="name" name="name" required
+                            placeholder="Enter Teacher/Instructor Name:">
                         </div>
                         <div class="form-group">
                             <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required>
+                            <input type="email" id="email" name="email" required
+                            placeholder="Enter Teacher/Instructor Email:">
                         </div>
                         <div class="form-group">
                     <label for="department">Department:</label>

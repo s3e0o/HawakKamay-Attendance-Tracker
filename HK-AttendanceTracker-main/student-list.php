@@ -3,10 +3,11 @@ session_start();
 
 require 'db-connection.php';
 
-$host = "localhost"; // Define $host
-$username = "root"; // Define $username
-$password = ""; // Define $password
-$dbname = "hk-management"; // Define $dbname
+// Database connection parameters
+$host = "localhost"; 
+$username = "root"; 
+$password = ""; 
+$dbname = "hk-management"; 
 
 $conn = new mysqli($host, $username, $password, $dbname);
 
@@ -15,28 +16,15 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch students from the database
-$sql = "SELECT s.user_id, s.student_id, s.name, s.course, s.level, s.hk_status, u.email 
-        FROM students s
-        JOIN users u ON s.user_id = u.id
-        ORDER BY s.user_id DESC"; // Order by the latest updated record
-
-$result = $conn->query($sql);
+// Initialize variables
+$searchResults = [];
 $students = [];
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $students[] = $row;
-    }
-}
-
-// Initialize a variable for storing search results
-$searchResults = [];
-
+// Clear search results
 if (isset($_GET['clearSearch'])) {
-    unset($_SESSION['searchResults']); // Clear the search results from the session
-    header("Location: student-list.php"); // Redirect to the same page
-    exit(); // Stop further execution
+    unset($_SESSION['searchResults']);
+    header("Location: student-list.php");
+    exit();
 }
 
 // Handle search request
@@ -44,37 +32,43 @@ if (isset($_GET['searchQuery'])) {
     $searchQuery = $conn->real_escape_string($_GET['searchQuery']);
     
     // Prepare SQL query based on search
-    $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status FROM students WHERE name LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%'";
+    $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status 
+            FROM students 
+            WHERE name LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%'OR course LIKE '%$searchQuery'OR hk_status LIKE '%$searchQuery' ";
     $result = $conn->query($sql);
 
-    // Check if there are records in the result
     if ($result->num_rows > 0) {
-        // Store search results in an array
         while ($row = $result->fetch_assoc()) {
             $searchResults[] = $row;
         }
-        $_SESSION['searchResults'] = $searchResults; // Store results in session
+        $_SESSION['searchResults'] = $searchResults;
     } else {
-        $_SESSION['searchResults'] = []; // Clear session if no results
+        $_SESSION['searchResults'] = [];
     }
 } else {
-    // Check if there are existing search results in the session
-    $searchResults = isset($_SESSION['searchResults']) ? $_SESSION['searchResults'] : [];
+    // Fetch recent users if there's no search query
+    $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status 
+            FROM students 
+            ORDER BY user_id ASC";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $students[] = $row;
+        }
+    }
 }
 
-// PHP logout logic
+// Logout logic
 if (isset($_GET['logout'])) {
-    // Destroy the session
     session_destroy();
-    // Redirect to the login page
     header("Location: multi-login.php");
-    exit(); // Exit after header redirection
+    exit();
 }
 
 // Close the database connection
 $conn->close();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -167,7 +161,6 @@ $conn->close();
             /* background-color: #556b2f; */
             padding: 20px;
             color: white;
-            /* display: flex; */
         }
         h1 {
             margin-top: 0;
@@ -188,8 +181,20 @@ $conn->close();
             margin: 0;
             font-size: 20px;
         }
+        input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            /*border-radius: 25px;*/
+        }
+        input[type="submit"] {
+            padding: 10px;
+            border-radius: 0 0 0 0;
+        }
+        button[type="button"]{
+            padding: 10px;
+            border-radius: 0 0 20px;
+        }
         .add-new {
-            display: flex;
             background-color: #b8860b;
             color: white;
             border: none;
@@ -237,6 +242,10 @@ $conn->close();
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
             margin-top: 20px;
         }
+        .search-results-container {
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            margin-top: 20px;
+        }
         .btn-clear{
             background-color: red;
             color: white;
@@ -269,18 +278,19 @@ $conn->close();
 
             /* Submit button styles */
             .search-bar input[type="submit"] {
-            background-color: #4a5d29;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+                background-color: #4a5d29;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
             }
 
             .search-bar input[type="submit"]:hover {
             background-color: #45a049;
             }
+
 
             /* Responsive design */
             @media (max-width: 600px) {
@@ -313,7 +323,7 @@ $conn->close();
 <body>
     <div class="container">
         <div class="sidebar">
-            <div alt="PHINMA Logo" class="logo"></div>
+            <div class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
@@ -330,136 +340,119 @@ $conn->close();
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
                 </div>
                 <!-- Search Bar -->
-                <form class="search-bar" action="student-list.php" method="GET" onsubmit="showResults()">
-                    <input type="text" name="searchQuery" placeholder="Search by name or email" required>
+                <form class="search-bar" action="student-list.php" method="GET">
+                    <input type="text" name="searchQuery" placeholder="Search by Name, Email, Course or HK Percent" required>
                     <input type="submit" value="Search">
-                    <button class="btn-clear" type="button" onclick="clearSearch()">Clear</button> <!-- Clear button -->
+                    <button class="btn-clear" type="button" onclick="clearSearch()">Clear</button>
                 </form>
+                <?php if (!empty($students)): ?>
+                        <h2 class="section-title">RECENT USER ACTIVITIES</h2>
+                        <table>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Year Level</th>
+                                <th>HK Percent & Total Hours</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            <?php foreach ($students as $row): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["email"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["course"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["level"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
+                                    <td><?php echo htmlspecialchars($row["status"]); ?></td>
+                                    <td>
+                                        <form action="update-student.php" method="GET">
+                                            <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
+                                            <input class="update-button" type="submit" value="Update">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
                 
-            <!-- Display Search Results -->
-            <div class="search-results-container" id="searchResults">
-                <!-- <button class="close-results" onclick="hideResults()">X</button> -->
-                <?php if (!empty($searchResults)): ?>
-    <h2 class="section-title">SEARCH RESULTS</h2>
-    <table>
-        <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Course</th>
-            <th>Year Level</th>
-            <th>HK Number & Total Hours</th> <!-- Updated header -->
-            <th>Status</th>
-            <th>Action</th> <!-- Column for Update Button -->
-        </tr>
-        <?php foreach ($searchResults as $row): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
-                <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                <td><?php echo htmlspecialchars($row["email"]); ?></td>
-                <td><?php echo htmlspecialchars($row["course"]); ?></td>
-                <td><?php echo htmlspecialchars($row["level"]); ?></td>
-                <td><?php echo htmlspecialchars($row["status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td> <!-- Combined HK Number and Total Hours -->
-                <td><?php echo htmlspecialchars($row["status"]); ?></td>
-                <td>
-                    <form action="update-student.php" method="GET">
-                        <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
-                        <input class="update-button" type="submit" value="Update">
-                    </form>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
-<?php else: ?>
-    <div class="no-results">No results found for your search.</div>
-<?php endif; ?>
-            </div>
-            <h4 class="section-title">RECENT USER ACTIVITIES</h4>
-            <table>
-    <tr>
-        <th>Id</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Course</th>
-        <th>Year Level</th>
-        <th>HK Number & Total Hours</th> <!-- Updated header -->
-        <th>Status</th>
-        <th>Action</th> <!-- Column for Update Button -->
-    </tr>
-    <?php
-    // Reconnect to the database for recent user activities
-    $conn = new mysqli($host, $username, $password, $dbname);
-    
-    // Query for recent users
-    $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status FROM students";
-    $result = $conn->query($sql);
+                <!-- Display Search Results -->
+                <div class="search-results-container" id="searchResults">
+                    <?php elseif (isset($_SESSION['searchResults']) && !empty($_SESSION['searchResults'])): ?>
+                        <h2 class="section-title">SEARCH RESULTS</h2>
+                        <table>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Year Level</th>
+                                <th>HK Number & Total Hours</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            <?php foreach ($_SESSION['searchResults'] as $row): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["email"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["course"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["level"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
+                                    <td><?php echo htmlspecialchars($row["status"]); ?></td>
+                                    <td>
+                                        <form action="update-student.php" method="GET">
+                                            <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
+                                            <input class="update-button" type="submit" value="Update">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    <?php elseif (!empty($students)): ?>
+                        <h2 class="section-title">RECENT USER ACTIVITIES</h2>
+                        <table>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Year Level</th>
+                                <th>HK Number & Total Hours</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            <?php foreach ($students as $row): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["email"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["course"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["level"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
+                                    <td><?php echo htmlspecialchars($row["status"]); ?></td>
+                                    <td>
+                                        <form action="update-student.php" method="GET">
+                                            <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
+                                            <input class="update-button" type="submit" value="Update">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    <?php else: ?>
+                        <div class="no-results">No students found.</div>
+                    <?php endif; ?>
+                </div>
 
-    // Check if there are records in the result
-    if ($result->num_rows > 0) {
-        // Output data of each row
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>
-                    <td>" . htmlspecialchars($row["user_id"]) . "</td>
-                    <td>" . htmlspecialchars($row["name"]) . "</td>
-                    <td>" . htmlspecialchars($row["email"]) . "</td>
-                    <td>" . htmlspecialchars($row["course"]) . "</td>
-                    <td>" . htmlspecialchars($row["level"]) . "</td>
-                    <td>" . htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)</td> <!-- Combined HK Number and Total Hours -->
-                    <td>" . htmlspecialchars($row["status"]) . "</td> 
-                    <td>
-                        <form action='update-student.php' method='GET'>
-                            <input type='hidden' name='userId' value='" . htmlspecialchars($row['user_id']) . "'>
-                            <input class='update-button' type='submit' value='Update'>
-                        </form>
-                    </td>
-                  </tr>";
-        }
-    } else {
-        echo "<tr><td colspan='7'>No users found.</td></tr>";
-    }
-    ?>
-</table>
-<script>
-    var hours = 0;
-
-            if (selectedHK === 'HK25') {
-                hours = 45;
-            } else if (selectedHK === 'HK50') {
-                hours = 90;
-            } else if (selectedHK === 'HK75') {
-                hours = 120;
-            } else if (selectedHK === 'HK100') {
-                hours = 150;
-            }
-            total_hours=
-
-            function hideResults() {
-        document.getElementById("searchResults").style.display = "none"; // Hide search results
-        document.querySelector("input[name='searchQuery']").value = ""; // Clear the search input
-    }
-
-    function showResults() {
-        if (document.getElementById("searchResults").style.display === "none") {
-            document.getElementById("searchResults").style.display = "block"; // Show search results if hidden
-        }
-    }
-
-    // Call showResults() on page load if there are existing results
-    window.onload = function() {
-        <?php if (!empty($searchResults)): ?>
-            showResults();
-        <?php endif; ?>
-    };
-
-        function clearSearch() {
-            // Clear the search input and reload the page
-            document.querySelector("input[name='search']").value = ""; // Clear the input field
-            window.location.href = "teacher-list.php"; // Redirect to the same page
-        }
-</script>
-
-
-        </div>
+                <script>
+                    function clearSearch() {
+                        // Clear the search input and reload the page
+                        document.querySelector("input[name='searchQuery']").value = ""; // Clear the input field
+                        window.location.href = "student-list.php"; // Redirect to the same page
+                    }
+                </script>
             </div>
         </main>
     </div>
