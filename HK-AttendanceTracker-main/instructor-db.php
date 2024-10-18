@@ -80,9 +80,9 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
     $total_duration_minutes = ($duration->h * 60) + $duration->i;
 
     // Adjust total hours based on status change
-    if ($status === 'Approved') {
+    if ($status === 'Present') {
         $new_total_minutes = max(0, ($total_hours * 60) - $total_duration_minutes);
-    } elseif ($status === 'Absent' && $attendance_status === 'Approved') {
+    } elseif ($status === 'Absent' && $attendance_status === 'Present') {
         $new_total_minutes = ($total_hours * 60) + $total_duration_minutes;
     } else {
         $new_total_minutes = $total_hours * 60;
@@ -247,25 +247,9 @@ $conn->close();
         }
         input[type="date"], input[type="submit"], select {
             padding: 10px;
-            border-radius: 10px;
+            border-radius: 4px;
             margin-right: 10px;
-            font-size: 18px;
-            width: auto; 
-            text-align: center;
-            background-color:white;
-            cursor: pointer;
-        }
-        input[type="date"]:hover{
-            background-color: rgba(250,240,230);
-            border-radius: 10px;
-        }
-        input[type="submit"]:hover{
-            background-color: rgba(250,240,230);
-            border-radius: 10px;
-        }
-        .status-select:hover{
-            background-color: rgba(250,240,230);
-            border-radius: 10px;
+            font-size: 16px;
         }
         .schedule-form {
             margin-top: 20px;
@@ -297,24 +281,21 @@ $conn->close();
             <input type="submit" value="Search">
         </form>
 
-        <table>
-        <thead>
+        <?php if (empty($scheduleList)): ?>
+            <div class="no-results">No schedules found for this date.</div>
+        <?php else: ?>
+            <table>
+                <thead>
                     <tr>
                         <th>Student Name</th>
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th>Attendance Status</th>
                         <th>HK Status</th>
-                        <th>Total Hours Rendered<th>
-                        <th>Total Hours Remaining</th>
+                        <th>Total Hours</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-        </table>
-        <?php if (empty($scheduleList)): ?>
-            <div class="no-results">No schedules found for this date.</div>
-        <?php else: ?>
-            <table>
                 <tbody>
                     <?php foreach ($scheduleList as $schedule): ?>
                         <tr>
@@ -323,13 +304,11 @@ $conn->close();
                             <td><?php echo date("H:i", strtotime($schedule['end_time'])); ?></td>
                             <td><?php echo $schedule['attendance_status']; ?></td>
                             <td><?php echo $schedule['hk_status']; ?></td>
-                            <!-- STATIC ADDITIONAL FIELD -->
-                            <td>1<td>
                             <td><?php echo number_format($schedule['total_hours'], 2); ?> hours</td> <!-- Display total hours in decimal -->
                             <td>
                                 <select class="status-select" data-schedule-id="<?php echo $schedule['schedule_id']; ?>">
                                     <option value="">Change Status</option>
-                                    <option value="Approved">Present</option>
+                                    <option value="Present">Present</option>
                                     <option value="Absent">Absent</option>
                                 </select>
                             </td>
