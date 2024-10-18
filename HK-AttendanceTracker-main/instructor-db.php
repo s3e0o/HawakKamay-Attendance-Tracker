@@ -238,7 +238,7 @@ $conn->close();
             margin-top: 20px;
         }
         th, td {
-            text-align: left;
+            text-align: center;
             padding: 10px;
             border-bottom: 1px solid #b8860b;
         }
@@ -289,7 +289,8 @@ $conn->close();
                         <th>End Time</th>
                         <th>Attendance Status</th>
                         <th>HK Status</th>
-                        <th>Total Hours</th>
+                        <th>Total Hours Rendered<th>
+                        <th>Total Hours Remaining</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -306,6 +307,8 @@ $conn->close();
                             <td><?php echo date("H:i", strtotime($schedule['end_time'])); ?></td>
                             <td><?php echo $schedule['attendance_status']; ?></td>
                             <td><?php echo $schedule['hk_status']; ?></td>
+                            <!-- STATIC ADDITIONAL FIELD -->
+                            <td>1<td>
                             <td><?php echo number_format($schedule['total_hours'], 2); ?> hours</td> <!-- Display total hours in decimal -->
                             <td>
                                 <select class="status-select" data-schedule-id="<?php echo $schedule['schedule_id']; ?>">
