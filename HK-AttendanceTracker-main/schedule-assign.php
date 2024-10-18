@@ -210,6 +210,7 @@ $conn->close();
                             type="time" 
                             name="start_time" 
                             required 
+                            min="07:00"
                             onchange="validateEndTime()"
                         >
                     </div>
@@ -219,15 +220,22 @@ $conn->close();
                             type="time" 
                             name="end_time" 
                             required
+                            max="18:30"
                         >
                     </div>
                     <div class="form-group">
                         <label for="subject">Subject:</label>
-                        <input type="text" name="subject" required>
+                        <input type="text" name="subject" required
+                        placeholder="e.g., ITE314"
+                        pattern="[A-Z0-9 ]+" 
+                        title="Only uppercase letters and numbers are allowed.">
                     </div>
                     <div class="form-group">
                         <label for="classroom">Classroom:</label>
-                        <input type="text" name="classroom" required>
+                        <input type="text" name="classroom" required
+                        placeholder="e.g., ITS201"
+                        pattern="[A-Z0-9 ]+" 
+                        title="Only uppercase letters and numbers are allowed.">
                     </div>
                     <button type="submit" class="submit-button">Assign</button>
                 </form>
@@ -236,25 +244,18 @@ $conn->close();
     </div>
 
     <script>
-        function setMinStartTime() {
-            const dateInput = document.querySelector('input[name="date"]');
-            const startTimeInput = document.querySelector('input[name="start_time"]');
-            const today = new Date().toISOString().split('T')[0];
+        function validateTimeInputs() {
+    const startTimeInput = document.querySelector('input[name="start_time"]');
+    const endTimeInput = document.querySelector('input[name="end_time"]');
 
-            if (dateInput.value === today) {
-                const currentTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-                startTimeInput.min = currentTime;
-            } else {
-                startTimeInput.min = '00:00';
-            }
-        }
+    const startTime = startTimeInput.value;
+    const endTime = endTimeInput.value;
 
-        function validateEndTime() {
-            const startTimeInput = document.querySelector('input[name="start_time"]');
-            const endTimeInput = document.querySelector('input[name="end_time"]');
-
-            endTimeInput.min = startTimeInput.value;
-        }
+    if (startTime && endTime && startTime >= endTime) {
+        alert("Error: Start time must be earlier than end time.");
+        endTimeInput.value = ""; // Reset end time if invalid
+    }
+}
     </script>
 </body>
 </html>

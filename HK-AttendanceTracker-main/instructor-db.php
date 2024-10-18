@@ -9,13 +9,6 @@ if ($_SESSION['role'] !== 'teacher') {
     exit();
 }
 
-// Logout logic
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: multi-login.php");
-    exit();
-}
-
 // Database connection
 $host = "localhost";
 $username = "root";
@@ -38,7 +31,7 @@ $scheduleList = [];
 
 // Fetch schedules
 $stmt = $conn->prepare("
-    SELECT sc.user_id as schedule_id, s.name, sc.start_time, sc.end_time, sc.attendance_status, 
+    SELECT sc.schedule_id, s.name, sc.start_time, sc.end_time, sc.attendance_status, 
            s.hk_status, s.total_hours, s.user_id as student_id
     FROM schedule sc
     JOIN students s ON sc.user_id = s.user_id
@@ -65,7 +58,7 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
         SELECT s.user_id as student_id, s.total_hours, sc.start_time, sc.end_time, sc.attendance_status
         FROM schedule sc
         JOIN students s ON sc.user_id = s.user_id
-        WHERE sc.user_id = ?
+        WHERE sc.schedule_id = ?
     ");
     $stmt->bind_param("i", $schedule_id);
     $stmt->execute();
@@ -98,18 +91,41 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
     $update_stmt->close();
 
     // Update attendance status in the schedule table
-    $stmt = $conn->prepare("UPDATE schedule SET attendance_status = ? WHERE user_id = ?");
+    $stmt = $conn->prepare("UPDATE schedule SET attendance_status = ? WHERE schedule_id = ?");
     $stmt->bind_param("si", $status, $schedule_id);
-    $stmt->execute();
+    if ($stmt->execute()) {
+        echo "Attendance status updated successfully."; // Return a success message
+    } else {
+        echo "Failed to update attendance status."; // Return an error message
+    }
     $stmt->close();
+    exit(); // Make sure to exit after returning the response
+}
 
-    echo json_encode([
-        "status" => "success",
-        "message" => "Attendance status updated to '$status'."
-    ]);
+// Handle delete request
+if (isset($_GET['delete_id'])) {
+    $delete_id = $_GET['delete_id'];
+    
+    // Prepare delete statement
+    $delete_stmt = $conn->prepare("DELETE FROM schedule WHERE schedule_id = ?");
+    $delete_stmt->bind_param("i", $delete_id);
+    
+    if ($delete_stmt->execute()) {
+        echo "<script>alert('Schedule deleted successfully.'); window.location.href = 'instructor-db.php';</script>";
+    } else {
+        echo "<script>alert('Failed to delete schedule.'); window.location.href = 'instructor-db.php';</script>";
+    }
+    
+    $delete_stmt->close();
     exit();
 }
-    
+
+    // Logout logic
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: multi-login.php");
+    exit();
+}
 $conn->close();
 ?>
 
@@ -258,6 +274,20 @@ $conn->close();
             color: white; /* Red color for no results */
             font-weight: bold;
         }
+        /* .actions {
+            display: flex;
+            gap: 10px;
+        } */
+        .actions button {
+            /* background: none; */
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        /* .actions img {
+            width: 20px;
+            height: 20px;
+        }  */
     </style>
 </head>
 <body>
@@ -280,7 +310,7 @@ $conn->close();
             <input type="date" name="searchDate" value="<?php echo $searchDate; ?>" required>
             <input type="submit" value="Search">
         </form>
-
+        
         <?php if (empty($scheduleList)): ?>
             <div class="no-results">No schedules found for this date.</div>
         <?php else: ?>
@@ -290,9 +320,9 @@ $conn->close();
                         <th>Student Name</th>
                         <th>Start Time</th>
                         <th>End Time</th>
-                        <th>Attendance Status</th>
+                        <th>Attendance <br>Status</th>
                         <th>HK Status</th>
-                        <th>Total Hours</th>
+                        <th>Total Hours <br>Remaining</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -305,12 +335,26 @@ $conn->close();
                             <td><?php echo $schedule['attendance_status']; ?></td>
                             <td><?php echo $schedule['hk_status']; ?></td>
                             <td><?php echo number_format($schedule['total_hours'], 2); ?> hours</td> <!-- Display total hours in decimal -->
-                            <td>
+                            <td class="actions">
                                 <select class="status-select" data-schedule-id="<?php echo $schedule['schedule_id']; ?>">
                                     <option value="">Change Status</option>
                                     <option value="Present">Present</option>
                                     <option value="Absent">Absent</option>
                                 </select>
+                                <button class="edit" onclick="location.href='schedule-edit.php?schedule_id=<?php echo urlencode($schedule['schedule_id']); ?>'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="delete" onclick="confirmDelete('<?php echo $schedule['schedule_id']; ?>')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -332,16 +376,55 @@ $conn->close();
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ schedule_id: scheduleId, status: status })
             })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                location.reload(); // Reload to reflect changes
+            .then(response => {
+                if (response.ok) {
+                    return response.text(); // Get the response as text
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(message => {
+                alert(message); // Show the alert with the response message
+                // Optionally, you can update the row without reloading
+                const row = select.closest('tr');
+                row.querySelector('td:nth-child(4)').textContent = status; // Update attendance status
+                // You might want to also update total hours if needed
+                // row.querySelector('td:nth-child(6)').textContent = newTotalHours + ' hours'; // Update total hours
             })
             .catch(error => console.error('Error:', error));
         }
     });
 });
 
+function confirmDelete(scheduleId) {
+    if (confirm('Are you sure you want to delete this schedule?')) {
+        // Redirect to the same page with the delete_id parameter
+        window.location.href = '?delete_id=' + encodeURIComponent(scheduleId);
+    }
+}
+
+document.querySelectorAll('.status-select').forEach(select => {
+    select.addEventListener('change', function () {
+        const scheduleId = this.dataset.scheduleId;
+        const status = this.value;
+
+        if (scheduleId && status) {
+            fetch('', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ schedule_id: scheduleId, status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                // Update the corresponding row in the table
+                const row = select.closest('tr');
+                row.querySelector('td:nth-child(4)').textContent = data.newStatus; // Update attendance status
+                row.querySelector('td:nth-child(6)').textContent = data.newTotalHours + ' hours'; // Update total hours
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+});
 </script>
 
 </body>
