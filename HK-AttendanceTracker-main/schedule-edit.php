@@ -1,15 +1,17 @@
 <?php
 session_start();
-<<<<<<< HEAD
-=======
-//update schedule
-
->>>>>>> dcfd57da20c3cab9dbba2a82aa140f1293f04233
 // Database connection settings
 $host = 'localhost';
 $dbname = 'hk-management';
 $username = 'root';
 $password = '';
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    session_destroy(); // Destroy the session
+    header("Location: multi-login.php"); // Redirect to login page
+    exit(); // Exit after redirection
+}
 
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {
@@ -36,17 +38,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $subject = $_POST['subject'];
     $classroom = $_POST['classroom'];
 
+    // Fetch the current schedule details for comparison
+    $current_schedule = $conn->query("SELECT * FROM schedule WHERE schedule_id = $schedule_id")->fetch_assoc();
+
+    // Prepare the update statement
     if ($start_time >= $end_time) {
         echo "<script>alert('Error: Start time must be earlier than end time.');</script>";
     } else {
         $stmt = $conn->prepare(
             "UPDATE schedule 
-             SET user_id = ?, `date` = ?, start_time = ?, end_time = ?, subject = ?, classroom = ?,
-             WHERE schedule_id = ?"
+            SET user_id = ?, `date` = ?, start_time = ?, end_time = ?, subject = ?, classroom = ?
+            WHERE schedule_id = ?"
         );
         $stmt->bind_param("isssssi", $user_id, $date, $start_time, $end_time, $subject, $classroom, $schedule_id);
 
+        // Execute the update and check for success
         if ($stmt->execute()) {
+            // Log the changes
+            logChanges($conn, $schedule_id, $current_schedule, $user_id, $date, $start_time, $end_time, $subject, $classroom);
+            
             // Redirect to the edit page or a summary page
             header("Location: schedule-edit.php?schedule_id=$schedule_id&success=1");
             exit();
@@ -57,12 +67,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: multi-login.php");
-    exit();
+// Function to log changes
+function logChanges($conn, $schedule_id, $current_schedule, $changed_by, $date, $start_time, $end_time, $subject, $classroom) {
+    $fields = [
+        'date' => [$current_schedule['date'], $date],
+        'start_time' => [$current_schedule['start_time'], $start_time],
+        'end_time' => [$current_schedule['end_time'], $end_time],
+        'subject' => [$current_schedule['subject'], $subject],
+        'classroom' => [$current_schedule['classroom'], $classroom]
+    ];
+
+    foreach ($fields as $field => [$old_value, $new_value]) {
+        if ($old_value !== $new_value) {
+            $stmt = $conn->prepare(
+                "INSERT INTO schedule_logs (schedule_id, changed_by, changed_field, old_value, new_value)
+                VALUES (?, ?, ?, ?, ?)"
+            );
+            $stmt->bind_param("iisss", $schedule_id, $changed_by, $field, $old_value, $new_value);
+            $stmt->execute();
+            $stmt->close();
+        }
+    }
 }
+
 
 $conn->close();
 ?>
