@@ -1,5 +1,6 @@
 <?php
 session_start();
+//update schedule
 
 // Database connection settings
 $host = 'localhost';
