@@ -142,7 +142,7 @@ $conn->close();
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: 100%;
+            height: auto;
             background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
             background-size: cover;
             background-position: center;

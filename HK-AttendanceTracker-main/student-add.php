@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     // Collect form data
     $studentId = $_POST['student_id'];
     $name = $_POST['name'];
-    $course = strtoupper($_POST['course']); // Capitalize course field
+    $course = ($_POST['course']); // Capitalize course field strtoupper
     $level = $_POST['level'];
     $hk_status = $_POST['hk_status'];
     $email = $_POST['email'];
@@ -349,28 +349,30 @@ if (isset($_SESSION['error'])) {
                         <div class="form-group">
                             <label for="student_id">StudentID:</label>
                             <input type="text" id="student_id" name="student_id" required
-                            placeholder="Enter StudentID"
+                            placeholder="Enter StudentID (e.g., 03-1234-5678)"
                             pattern="^[0-9-]+$" 
                             title="Only numbers and dashes are allowed, with no spaces.">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>
                             <input type="text" id="name" name="name" required 
-                                pattern="[A-Za-z\s]+" title="Please enter letters only." 
-                                placeholder="Enter name of student(e.g., John Doe)">
+                                placeholder="Enter name of student(e.g., John Doe)"
+                                pattern="[A-Za-z\s]+" title="Please enter letters only." >
                         </div>
                         <div class="form-group">
                             <label for="course">Course:</label>
                             <input type="text" id="course" name="course" required
-                                pattern="[A-Za-z\s]+" title="Please enter letters only." 
-                                placeholder="Enter course of student(e.g., BSIT)">
+                            placeholder="Enter course of student(e.g., BSIT)"
+                            pattern="[A-Za-z\s]+" title="Please enter letters only." 
+                            >
                         </div>
                         <div class="form-group">
                             <label for="level">Year Level:</label>
                             <input type="number" id="level" name="level" required
                                 min="1" max="5" 
+                                placeholder="Enter year level of student"
                                 title="Please enter a number between 1 and 5."
-                                placeholder="Enter level of student">
+                                >
                         </div>
                         <div class="form-group">
                             <label for="hk_status">HK Status:</label>

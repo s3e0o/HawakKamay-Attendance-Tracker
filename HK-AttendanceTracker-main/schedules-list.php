@@ -102,15 +102,17 @@ $conn->close();
     <title>Instructor Dashboard</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            height: 100%;
+        body {
             background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: auto;
             transition: margin-left .5s; 
         }
         .container {

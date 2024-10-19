@@ -142,7 +142,7 @@ $conn->close();
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: 100%;
+            height: auto;
             background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
             background-size: cover;
             background-position: center;
@@ -410,13 +410,13 @@ $conn->close();
                     <h1>STUDENTS</h1>
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
                     <form method="POST" action="">
-        <button class="export" type="submit" name="export">Export to Excel</button>
-    </form> 
-    <form action="student-list.php" method="POST" enctype="multipart/form-data">
-    <label for="file">Upload Excel file:</label>
-    <input type="file" name="file" id="file" accept=".xls,.xlsx" required>
-    <button type="submit" name="import">Import Students</button>
-</form>
+                        <button class="export" type="submit" name="export">Export to Excel</button>
+                    </form> 
+                    <!-- <form action="student-list.php" method="POST" enctype="multipart/form-data">
+                        <label for="file">Upload Excel file:</label>
+                        <input type="file" name="file" id="file" accept=".xls,.xlsx" required>
+                        <button type="submit" name="import">Import Students</button>
+                    </form> -->
                 </div>
                 <!-- Search Bar -->
                 <form class="search-bar" action="student-list.php" method="GET">
