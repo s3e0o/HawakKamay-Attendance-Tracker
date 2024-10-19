@@ -47,18 +47,6 @@ if ($logged_in_user_id) {
     $stmt->close();
 }
 
-// Fetch students assigned by the logged-in teacher
-$students = $conn->prepare("
-    SELECT s.user_id, s.name 
-    FROM students s
-    INNER JOIN schedule sc ON sc.user_id = s.user_id
-    WHERE sc.assigned_by = ?
-");
-
-$students->bind_param("s", $teacher_name); // Use the logged-in teacher's name to filter students
-$students->execute();
-$students_result = $students->get_result();
-
 // Handle schedule assignment
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date = $_POST['date'];
@@ -231,7 +219,7 @@ $conn->close();
                     <div class="form-group">
                         <label for="student">Select Student:</label>
                         <select name="student" required>
-                        <?php while ($row = $students_result->fetch_assoc()): ?>
+                        <?php while ($row = $students->fetch_assoc()): ?>
                             <option value="<?php echo $row['user_id']; ?>"><?php echo $row['name']; ?></option>
                         <?php endwhile; ?>
                         </select>

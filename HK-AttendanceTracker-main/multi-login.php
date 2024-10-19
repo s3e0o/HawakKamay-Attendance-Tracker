@@ -27,57 +27,51 @@ if (isset($_SESSION['username'])) {
     }
 }
 
-// Initialize error message
-$error_message = "";
-
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']); // Trim whitespace
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
     // Prepare SQL query to fetch user with the provided username
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
-    if ($stmt === false) {
-        die("Prepare failed: " . $conn->error);
-    }
     $stmt->bind_param("s", $username);
-    
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
 
-            // Check password
-            if (password_verify($password, $user['password'])) {
-                // Set session variables
-                $_SESSION['username'] = htmlspecialchars($user['username']);
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['id'] = $user['id'];
-                $_SESSION['user_id'] = $user['user_id']; // Assign the user ID to the session
+    // If user exists
+    if ($user) {
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            // Password is correct, store session variables
+            $_SESSION['username'] = htmlspecialchars($user['username']); // Escaping output
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['id'] = $user['id']; 
                 
-                // Redirect based on role
-                if ($_SESSION['role'] == 'admin') {
-                    header("Location: admin-db.php");
-                } elseif ($_SESSION['role'] == 'teacher') {
-                    header("Location: instructor-db.php");
-                } else {
-                    header("Location: student-db.php");
-                }
-                exit(); // Ensure no further code is executed
+            // Redirect based on role
+            if ($user['role'] == 'admin') {
+                header("Location: admin-db.php");
+            } elseif ($user['role'] == 'teacher') {
+                header("Location: instructor-db.php");
             } else {
-                $error_message = "Password is incorrect!";
+                header("Location: student-db.php");
             }
+            exit();
         } else {
-            $error_message = "No user found with this username.";
+            // Incorrect password
+            $error_message = "Incorrect Username or Password";
         }
     } else {
-        $error_message = "Error in SQL query execution: " . $stmt->error;
+        // User not found
+        $error_message = "Invalid Username or Password";
     }
 
+    // Close the statement
     $stmt->close();
 }
 
-$conn->close();
+// // Close the database connection
+// $conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -181,13 +175,14 @@ $conn->close();
             <h1>Login to continue.</h1>
             <hr>
             <form action="" method="POST" autocomplete="off" id="loginForm">                
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="text" name="username" placeholder="Username" autocomplete="off" required>
+                <input type="password" name="password" placeholder="Password" autocomplete="new-password" required>
                 <input type="submit" value="LOGIN">
-                <?php if (!empty($error_message)): ?>
+                <?php if (isset($error_message)): ?>
                     <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div> <!-- Display error message -->
                 <?php endif; ?>
-            </form>
+</div>
+
         </div>
     </div>
 

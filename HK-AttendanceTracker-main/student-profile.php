@@ -13,7 +13,7 @@ if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
 
     // Query to fetch student details based on username
-    $sql = "SELECT s.student_id, s.name, u.email 
+    $sql = "SELECT s.student_id, s.name, u.email, u.password 
             FROM students s 
             JOIN users u ON s.user_id = u.id 
             WHERE u.username = ?";
@@ -29,6 +29,7 @@ if (isset($_SESSION['username'])) {
         $student_id = $student['student_id']; // Store student ID for updates
         $name = $student['name'];
         $email = $student['email'];
+        $hashed_password = $student['password']; // Store the hashed password for verification
     } else {
         header("Location: multi-login.php"); // Redirect if student not found
         exit();
@@ -55,6 +56,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         echo "Error updating student: " . $stmt->error;
     }
 }
+
+// Handle password change
+// Handle password change
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
+    $current_password = $_POST['current_password'];
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    // Verify the current password
+    if (password_verify($current_password, $hashed_password)) {
+        if ($new_password === $confirm_password) {
+            // Hash the new password
+            $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+            // Update the password in the database
+            $update_password_sql = "UPDATE users SET password = ? WHERE username = ?";
+            $stmt = $conn->prepare($update_password_sql);
+            $stmt->bind_param("ss", $hashed_new_password, $username); // Assuming you want to update based on the username
+
+            if ($stmt->execute()) {
+                echo "Password changed successfully.";
+            } else {
+                echo "Error updating password: " . $stmt->error;
+            }
+        } else {
+            echo "New passwords do not match.";
+        }
+    } else {
+        echo "Current password is incorrect.";
+    }
+}
+
 
 // Logout logic
 if (isset($_GET['logout'])) {
@@ -238,7 +271,28 @@ if (isset($_GET['logout'])) {
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" readonly>
                 </div>
+
                 <button type="submit" name="save" class="save-button">Save</button>
+            </form>
+
+            <h2>Change Password</h2>
+            <form method="POST" action="student-profile.php">
+                <div class="input-group">
+                    <label for="current_password">Current Password:</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirm_password">Confirm New Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <button type="submit" name="change_password" class="save-button">Change Password</button>
             </form>
         </div>
     </div>

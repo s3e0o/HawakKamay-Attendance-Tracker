@@ -11,7 +11,7 @@ if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
 
     // Query to fetch teacher details based on username
-    $sql = "SELECT t.teacher_id, t.name, u.email 
+    $sql = "SELECT t.teacher_id, t.name, u.email, u.password 
             FROM teachers t 
             JOIN users u ON t.user_id = u.id 
             WHERE u.username = ?"; // Change to use username
@@ -27,6 +27,7 @@ if (isset($_SESSION['username'])) {
         $teacher_id = $teacher['teacher_id']; // Keep teacher_id for updates
         $name = $teacher['name'];
         $email = $teacher['email'];
+        $hashed_password = $teacher['password']; // Fetch the hashed password
     } else {
         header("Location: multi-login.php");
         exit();
@@ -55,6 +56,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     }
 }
 
+// Handle password change
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
+    $current_password = $_POST['current_password'];
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    // Verify the current password
+    if (password_verify($current_password, $hashed_password)) {
+        if ($new_password === $confirm_password) {
+            // Hash the new password
+            $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+            // Update the password in the database
+            $update_password_sql = "UPDATE users SET password = ? WHERE username = ?";
+            $stmt = $conn->prepare($update_password_sql);
+            $stmt->bind_param("ss", $hashed_new_password, $username); // Assuming you want to update based on the username
+
+            if ($stmt->execute()) {
+                $_SESSION['success_message'] = "Password changed successfully.";
+            } else {
+                echo "Error updating password: " . $stmt->error;
+            }
+        } else {
+            echo "New passwords do not match.";
+        }
+    } else {
+        echo "Current password is incorrect.";
+    }
+}
+
 // Check for success message
 if (isset($_SESSION['success_message'])) {
     $success_message = $_SESSION['success_message'];
@@ -69,8 +100,8 @@ if (isset($_GET['logout'])) {
     header("Location: multi-login.php");
     exit(); // Exit after header redirection
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -228,10 +259,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <div class="main-content" id="main-content">
-            <div>
-                <h1>Teacher Profile</h1>
-            </div>
-            
+            <h1>Teacher Profile</h1>
             <h2>About</h2>
             <form id="teacherProfileForm" method="POST" action="teacher-profile.php">
                 <div class="input-group">
@@ -251,8 +279,29 @@ if (isset($_GET['logout'])) {
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($teacher['email']); ?>" required>
                 </div>
-                <button type="submit" class="save-button">Save</button>
+                <button type="submit" name="save" class="save-button">Save</button>
             </form>
+
+            <h2>Change Password</h2>
+            <form method="POST" action="teacher-profile.php">
+                <div class="input-group">
+                    <label for="current_password">Current Password:</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                <div class="input-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
+                <div class="input-group">
+                    <label for="confirm_password">Confirm New Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+                <button type="submit" name="change_password" class="save-button">Change Password</button>
+            </form>
+
+            <?php if (isset($success_message)) : ?>
+                <div class="success-message"><?php echo $success_message; ?></div>
+            <?php endif; ?>
         </div>
     </div>
 </body>

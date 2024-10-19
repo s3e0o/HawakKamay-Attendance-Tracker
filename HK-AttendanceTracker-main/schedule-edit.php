@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 // Database connection settings
 $host = 'localhost';
 $dbname = 'hk-management';
@@ -37,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $stmt = $conn->prepare(
             "UPDATE schedule 
-             SET user_id = ?, `date` = ?, start_time = ?, end_time = ?, subject = ?, classroom = ? 
+             SET user_id = ?, `date` = ?, start_time = ?, end_time = ?, subject = ?, classroom = ?,
              WHERE schedule_id = ?"
         );
         $stmt->bind_param("isssssi", $user_id, $date, $start_time, $end_time, $subject, $classroom, $schedule_id);
@@ -62,6 +61,7 @@ if (isset($_GET['logout'])) {
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
