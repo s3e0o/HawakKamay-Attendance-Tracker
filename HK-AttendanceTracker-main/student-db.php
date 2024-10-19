@@ -153,6 +153,36 @@ if (isset($_GET['logout'])) {
             border-radius: 10px;
             padding: 20px;
         }
+        .content-box2 {
+            /*background-color: #4a5d29;*/
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .content-box h2 {
+            /*background-color: #4a5d29;*/
+            margin-top: 5px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background-color: #BFA93B;
+            padding: 8  px;
+            border-radius: 5px;
+        }
+        .info-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 25px;
+        }
+        .info-box p {
+            margin: 0;
+            font-size: 23px;
+            font-weight: bold;
+            
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -186,10 +216,32 @@ if (isset($_GET['logout'])) {
 
         <!-- Main content -->
         <main>
-            <h1>Welcome, <?php echo htmlspecialchars($username); ?></h1> <!-- Display logged-in user's name -->
 
             <div class="content-box">
-                <h2>Your Schedule</h2>
+                <h2>SCHEDULE</h2>
+                <div class="info-grid">
+                <div class="info-box">
+                    <h3>F2F Day:</h3>
+                    <td><p>Monday</p></td>
+                   <!-- <p><?php echo $total_hk25; ?></p> -->
+                </div>
+                <div class="info-box">
+                    <h3>Required Hours:</h3>
+                    <td><p>90</p></td>
+                    <!--<p><?php echo $total_students; ?></p> -->
+                </div>
+                <div class="info-box">
+                    <h3>Total Hours Rendered:</h3>
+                    <td><p>50</p></td>
+                    <!--<p><?php echo $total_teachers; ?></p> -->
+                </div>
+                <div class="info-box">
+                    <h3>Total Hours Remaining:</h3>
+                    <td><p>40</p></td>
+                   <!-- <p><?php echo $total_hk25; ?></p> -->
+                </div>
+            </div>
+            <div class="content-box2">
                 <table>
                     <thead>
                         <tr>

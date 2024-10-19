@@ -1,5 +1,10 @@
 <?php
 session_start();
+<<<<<<< HEAD
+=======
+//update schedule
+
+>>>>>>> dcfd57da20c3cab9dbba2a82aa140f1293f04233
 // Database connection settings
 $host = 'localhost';
 $dbname = 'hk-management';
