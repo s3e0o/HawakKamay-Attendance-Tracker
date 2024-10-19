@@ -266,11 +266,17 @@ $conn->close();
         <?php endif; ?>
 
         <form action="" method="POST">
-            <input type="text" name="name" placeholder="Name" value="<?php echo htmlspecialchars($student['name']); ?>" required>
+            <input type="text" name="name" placeholder="Name" value="<?php echo htmlspecialchars($student['name']); ?>" required
+                placeholder="Enter name of student(e.g., John Doe)"
+                pattern="[A-Za-z\s]+" title="Please enter letters only.">
             <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
-            <input type="text" name="course" placeholder="Course" value="<?php echo htmlspecialchars($student['course']); ?>" required>
-            <input type="text" name="year_level" placeholder="Year Level" value="<?php echo htmlspecialchars($student['level']); ?>" required>
-
+            <input type="text" name="course" placeholder="Course" value="<?php echo htmlspecialchars($student['course']); ?>" required
+                placeholder="Enter course of student(e.g., BSIT)"
+                pattern="[A-Za-z\s]+" title="Please enter letters only.">
+            <input type="text" name="year_level" placeholder="Year Level" value="<?php echo htmlspecialchars($student['level']); ?>" required
+                min="1" max="5" 
+                placeholder="Enter year level of student"
+                title="Please enter a number between 1 and 5.">
             <input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> 
 
             

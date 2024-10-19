@@ -102,22 +102,20 @@ $conn->close();
     <title>Instructor Dashboard</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
-        body {
-            background-image: url('hkat-upang.jpg'); 
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: auto;
+            height: 100%;
+            background-image: url('hkat-upang.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             transition: margin-left .5s; 
         }
         .container {
             display: flex;
-            height: 100%;
+            height: 100vh;
             transition: margin-left .5s; /* Animation for container */
         }
         .sidebar {
@@ -125,9 +123,9 @@ $conn->close();
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
-            position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
         .sidebar.hidden {
             transform: translateX(-100%); /* Move sidebar out of view */
@@ -187,17 +185,17 @@ $conn->close();
             font-size: 24px;
         }
         table {
+            margin-top: 10px;
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
         th, td {
-            padding: 10px;
-            border: 1px solid white;
             text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #6b8e23;
         }
         th {
-            background-color: #4a5d29;
+            background-color: #3e4d22;
         }
         .sidebar h2 {
             text-align: center;
@@ -205,18 +203,39 @@ $conn->close();
         }
         button {
             background-color: #b8860b;
-    color: white; /* White text */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.3s; /* Smooth transition */
-    padding: 10px 20px; /* Button padding */
-    font-size: 16px; /* Font size */
-    cursor: pointer; /* Pointer cursor on hover */
-}
+            color: white; /* White text */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            transition: background-color 0.3s; /* Smooth transition */
+            padding: 10px 20px; /* Button padding */
+            font-size: 16px; /* Font size */
+            cursor: pointer; /* Pointer cursor on hover */
+        }
 
-button:hover {
-    background-color: #45a049; /* Darker green on hover */
-}
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>

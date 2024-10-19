@@ -1,6 +1,13 @@
 <?php
 session_start();
 
+require 'db-connection.php';
+
+if ($_SESSION['role'] !== 'teacher') {
+    header("Location: multi-login.php"); // Redirect if not an admin
+    exit();
+}
+
 // Database connection settings
 $host = 'localhost';
 $dbname = 'hk-management';
@@ -15,27 +22,42 @@ if ($conn->connect_error) {
 // Fetch students for the dropdown
 $students = $conn->query("SELECT user_id, name FROM students");
 
-// Fetch the assigned teacher for the logged-in student
-$student_id = $_SESSION['id']; // Assuming you store the student ID in the session
-$teacher = null;
+// Fetch the assigned teacher's name for the logged-in user
+$teacher_name = null;
+$teacher_id = null;
 
-if ($student_id) {
-    $sqlTeacher = "SELECT u.username AS teacher_name 
+$logged_in_user_id = $_SESSION['id']; // Assuming this holds the logged-in user's ID
+if ($logged_in_user_id) {
+    $sqlTeacher = "SELECT u.id AS teacher_id, t.name AS teacher_name 
                    FROM users u 
-                   INNER JOIN schedule s ON u.id = s.assigned_by 
-                   WHERE s.user_id = ? LIMIT 1";
+                   INNER JOIN teachers t ON u.id = t.user_id 
+                   WHERE u.id = ? LIMIT 1"; // Adjust as necessary
 
     $stmt = $conn->prepare($sqlTeacher);
-    $stmt->bind_param("i", $student_id);
+    $stmt->bind_param("i", $logged_in_user_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $teacher = $result->fetch_assoc();
+        $teacher_id = $teacher['teacher_id'];
+        $teacher_name = $teacher['teacher_name'];
     }
 
     $stmt->close();
 }
+
+// Fetch students assigned by the logged-in teacher
+$students = $conn->prepare("
+    SELECT s.user_id, s.name 
+    FROM students s
+    INNER JOIN schedule sc ON sc.user_id = s.user_id
+    WHERE sc.assigned_by = ?
+");
+
+$students->bind_param("s", $teacher_name); // Use the logged-in teacher's name to filter students
+$students->execute();
+$students_result = $students->get_result();
 
 // Handle schedule assignment
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -45,15 +67,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_POST['student'];
     $subject = $_POST['subject'];
     $classroom = $_POST['classroom'];
+    $assigned_by = $teacher_name; // Use the teacher's name directly
 
     if ($start_time >= $end_time) {
         echo "Error: Start time must be earlier than end time.";
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO schedule (user_id, `date`, start_time, end_time, subject, classroom) 
-             VALUES (?, ?, ?, ?, ?, ?)"
+            "INSERT INTO schedule (user_id, `date`, start_time, end_time, subject, classroom, assigned_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("isssss", $user_id, $date, $start_time, $end_time, $subject, $classroom);
+
+        $stmt->bind_param("issssss", $user_id, $date, $start_time, $end_time, $subject, $classroom, $assigned_by);
 
         if ($stmt->execute()) {
             echo "Schedule assigned successfully.";
@@ -66,16 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
-    // Destroy the session
     session_destroy();
-    // Redirect to the login page
     header("Location: multi-login.php");
-    exit(); // Exit after header redirection
+    exit();
 }
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,7 +110,7 @@ $conn->close();
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Use the same background */
+            background-image: url('hkat-upang.jpg');
             background-size: cover;
             background-position: center;
         }
@@ -152,7 +173,6 @@ $conn->close();
             font-size: 24px;
         }
         .content-box {
-            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
             width: 80%;
@@ -203,7 +223,6 @@ $conn->close();
             <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>
-            <!-- Add other menu items as needed -->
         </div>
         <div class="main-content">
             <h1>Assign Student</h1>
@@ -212,9 +231,9 @@ $conn->close();
                     <div class="form-group">
                         <label for="student">Select Student:</label>
                         <select name="student" required>
-                            <?php while ($row = $students->fetch_assoc()): ?>
-                                <option value="<?php echo $row['user_id']; ?>"><?php echo $row['name']; ?></option>
-                            <?php endwhile; ?>
+                        <?php while ($row = $students_result->fetch_assoc()): ?>
+                            <option value="<?php echo $row['user_id']; ?>"><?php echo $row['name']; ?></option>
+                        <?php endwhile; ?>
                         </select>
                     </div>
                     <div class="form-group">
@@ -235,7 +254,6 @@ $conn->close();
                             min="07:00"
                             onchange="validateEndTime()"
                         > 
-                        <!--  -->
                     </div>
                     <div class="form-group">
                         <label for="end_time">Select End Time:</label>
@@ -245,7 +263,6 @@ $conn->close();
                             required
                             max="18:30"
                         >
-                        <!--  -->
                     </div>
                     <div class="form-group">
                         <label for="subject">Subject:</label>
@@ -261,6 +278,9 @@ $conn->close();
                         pattern="[A-Z0-9 ]+" 
                         title="Only uppercase letters and numbers are allowed.">
                     </div>
+                    <div class="form-group">
+                    <input type="text" name="assigned_by_name" value="<?php echo htmlspecialchars($teacher_name); ?>" readonly>
+                    </div>
                     <button type="submit" class="submit-button">Assign</button>
                 </form>
             </div>
@@ -268,7 +288,7 @@ $conn->close();
     </div>
 
 <script>
-        function validateTimeInputs() {
+function validateTimeInputs() {
     const startTimeInput = document.querySelector('input[name="start_time"]');
     const endTimeInput = document.querySelector('input[name="end_time"]');
 

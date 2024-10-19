@@ -32,9 +32,9 @@ if (isset($_GET['searchQuery'])) {
     $searchQuery = $conn->real_escape_string($_GET['searchQuery']);
     
     // Prepare SQL query based on search
-    $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status 
+    $sql = "SELECT user_id, name, student_id, email, course, level, hk_status, total_hours, status 
             FROM students 
-            WHERE name LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%' OR course LIKE '%$searchQuery%' OR hk_status LIKE '%$searchQuery%'";
+            WHERE name LIKE '%$searchQuery%' OR student_id LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%' OR course LIKE '%$searchQuery%' OR hk_status LIKE '%$searchQuery%'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -47,7 +47,7 @@ if (isset($_GET['searchQuery'])) {
     }
 } else {
     // Fetch recent users if there's no search query
-    $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status 
+    $sql = "SELECT user_id, name, student_id, email, course, level, hk_status, total_hours, status 
             FROM students 
             ORDER BY user_id ASC";
     $result = $conn->query($sql);
@@ -78,7 +78,7 @@ if (isset($_GET['delete_id'])) {
 }
 
 // Export functionality
-if (isset($_POST['export'])) {
+/*if (isset($_POST['export'])) {
     require 'vendor/autoload.php'; // Load PHPSpreadsheet
 
     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -117,7 +117,7 @@ if (isset($_POST['export'])) {
     $writer = PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save('php://output');
     exit();
-}
+}*/
 
 // Logout logic
 if (isset($_GET['logout'])) {
@@ -219,6 +219,11 @@ $conn->close();
         main {
             flex-grow: 1;
             /* background-color: #556b2f; */
+            padding: 20px;
+            color: white;
+        }
+        .main-content {
+            flex-grow: 1;
             padding: 20px;
             color: white;
         }
@@ -409,10 +414,10 @@ $conn->close();
                 <div class="header">
                     <h1>STUDENTS</h1>
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
-                    <form method="POST" action="">
+                    <!--<form method="POST" action="">
                         <button class="export" type="submit" name="export">Export to Excel</button>
                     </form> 
-                    <!-- <form action="student-list.php" method="POST" enctype="multipart/form-data">
+                    <form action="student-list.php" method="POST" enctype="multipart/form-data">
                         <label for="file">Upload Excel file:</label>
                         <input type="file" name="file" id="file" accept=".xls,.xlsx" required>
                         <button type="submit" name="import">Import Students</button>
@@ -429,22 +434,30 @@ $conn->close();
                         <table>
                             <tr>
                                 <th>Id</th>
+                                <th>Student Id</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Course</th>
                                 <th>Year Level</th>
-                                <th>HK Percent & Total Hours</th>
+                                <th>HK Status</th>
+                                <th>Required Hours</th>
+                                <th>Total Hours Rendered</th>
+                                <th>Total Hours Remaining</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             <?php foreach ($students as $row): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["student_id"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["name"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["email"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["course"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["level"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
+                                    <td><?php echo htmlspecialchars($row["hk_status"])  ?></td>
+                                    <td><?php echo htmlspecialchars($row["total_hours"]) . " hours"; ?></td>
+                                    <td>10</td>
+                                    <td>80</td>
                                     <td><?php echo htmlspecialchars($row["status"]); ?></td>
                                     <td class="actions">
                                         <form action="update-student.php" method="GET">
@@ -471,6 +484,7 @@ $conn->close();
                         <table>
                             <tr>
                                 <th>Id</th>
+                                <th>Student Id</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Course</th>
@@ -482,6 +496,7 @@ $conn->close();
                             <?php foreach ($_SESSION['searchResults'] as $row): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["student_id"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["name"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["email"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["course"]); ?></td>
@@ -524,6 +539,7 @@ $conn->close();
                         <table>
                             <tr>
                                 <th>Id</th>
+                                <th>Student Id</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Course</th>
@@ -535,6 +551,7 @@ $conn->close();
                             <?php foreach ($students as $row): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row["student_id"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["name"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["email"]); ?></td>
                                     <td><?php echo htmlspecialchars($row["course"]); ?></td>

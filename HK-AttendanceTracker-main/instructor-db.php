@@ -4,17 +4,23 @@ session_start();
 
 require 'db-connection.php';
 
+// Database connection settings
+$host = 'localhost';
+$dbname = 'hk-management';
+$username = 'root';
+$password = '';
+
+$conn = new mysqli($host, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
 if ($_SESSION['role'] !== 'teacher') {
     header("Location: multi-login.php"); // Redirect if not a teacher
     exit();
 }
 
 // Database connection
-$host = "localhost";
-$username = "root";
-$password = "";
-$dbname = "hk-management";
-
 date_default_timezone_set('Asia/Manila');
 
 $conn = new mysqli($host, $username, $password, $dbname);
@@ -120,7 +126,7 @@ if (isset($_GET['delete_id'])) {
     exit();
 }
 
-    // Logout logic
+// Logout logic
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: multi-login.php");
@@ -142,40 +148,48 @@ $conn->close();
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: auto;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            height: 100%;
+            background-image: url('hkat-upang.jpg');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
         }
         .container {
             display: flex;
             height: 100%;
-            transition: margin-left .5s; /* Animation for container */
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
-            position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
         }
-        .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
-            opacity: 0; /* Make sidebar invisible */
+        .sidebar .logout-btn {
+            text-decoration: none;
+            color: white;
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #ff4c4c;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .sidebar .logout-btn:hover {
+            background-color: #ff3333;
+            transition: background-color 0.3s ease;
+        }
+        .sidebar h2 {
+            text-align: center;
+            color: #4a5d29;
+            font-size: medium;
         }
         .logo {
-            width: 150px;  /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover;  /* Makes sure the image covers the entire div */
+            width: 150px;
+            height: 150px;
+            background-image: url('hk_logo.png');
+            background-size: cover;
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%;
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -183,8 +197,6 @@ $conn->close();
             margin: 5px 0;
         }
         .nav-item:hover {
-            padding: 10px;
-            margin: 5px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -195,11 +207,6 @@ $conn->close();
         a {
             text-decoration: none;
             color: white;
-        }
-        .sidebar h2 {
-            text-align: center;
-            color: #4a5d29;
-            font-size: medium;
         }
         .main-content {
             flex-grow: 1;

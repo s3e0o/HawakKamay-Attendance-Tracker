@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     // Collect form data
     $studentId = $_POST['student_id'];
     $name = $_POST['name'];
-    $course = ($_POST['course']); // Capitalize course field strtoupper
+    $course = strtoupper($_POST['course']); // Capitalize course field strtoupper
     $level = $_POST['level'];
     $hk_status = $_POST['hk_status'];
     $email = $_POST['email'];
@@ -349,35 +349,39 @@ if (isset($_SESSION['error'])) {
                         <div class="form-group">
                             <label for="student_id">StudentID:</label>
                             <input type="text" id="student_id" name="student_id" required
-                            placeholder="Enter StudentID (e.g., 03-1234-5678)"
-                            pattern="^[0-9-]+$" 
-                            title="Only numbers and dashes are allowed, with no spaces.">
+                                placeholder="Enter StudentID (e.g., 03-1234-56789)"
+                                pattern="^\d{2}-\d{4}-\d{5}$" 
+                                title="Format must be: 00-0000-00000 (two digits, dash, four digits, dash, five digits)">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>
-                            <input type="text" id="name" name="name" required 
-                                placeholder="Enter name of student(e.g., John Doe)"
-                                pattern="[A-Za-z\s]+" title="Please enter letters only." >
+                            <input type="text" id="name" name="name"  
+                                placeholder="Enter name of student (e.g., John Doe)"
+                                pattern="^[A-Za-z\s]+$" 
+                                title="Please enter letters only." 
+                                maxlength="50" required
+                                oninput="capitalizeName(this)">
                         </div>
                         <div class="form-group">
                             <label for="course">Course:</label>
-                            <input type="text" id="course" name="course" required
-                            placeholder="Enter course of student(e.g., BSIT)"
-                            pattern="[A-Za-z\s]+" title="Please enter letters only." 
-                            >
+                            <input type="text" id="course" name="course" 
+                                placeholder="Enter course of student (e.g., BSIT)"
+                                pattern="^[A-Za-z\s]+$" 
+                                title="Please enter letters only." 
+                                maxlength="30" required>
                         </div>
                         <div class="form-group">
                             <label for="level">Year Level:</label>
-                            <input type="number" id="level" name="level" required
+                            <input type="number" id="level" name="level" 
                                 min="1" max="5" 
                                 placeholder="Enter year level of student"
                                 title="Please enter a number between 1 and 5."
-                                >
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="hk_status">HK Status:</label>
-                            <select id="hk_status" name="hk_status" onchange="updateTotalHours()" required
-                                placeholder="Enter hk status of student">
+                            <select id="hk_status" name="hk_status" onchange="updateTotalHours()" required>
+                                <option value="" disabled selected>Select HK Status</option>
                                 <option value="HK25">HK25</option>
                                 <option value="HK50">HK50</option>
                                 <option value="HK75">HK75</option>
@@ -387,13 +391,26 @@ if (isset($_SESSION['error'])) {
                         <div class="form-group">
                             <label for="email">Email:</label>
                             <input type="email" id="email" name="email" required
-                                placeholder="Enter email of student">
+                                placeholder="Enter email of student" 
+                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
+                                title="Please enter a valid email address.">
                         </div>
                         <button type="submit" class="submit-button" name="save">Save</button>
                     </form>
+
                 </div>
             </div>
         </main>
     </div>
+    <script>
+        function capitalizeName(input) {
+            // Split the input value by spaces, capitalize each word, and join them back together
+            input.value = input.value
+                .toLowerCase() // Convert entire string to lowercase first
+                .split(' ') // Split into words
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter
+                .join(' '); // Join words back into a string
+        }
+    </script>
 </body>
 </html>
