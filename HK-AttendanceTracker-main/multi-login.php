@@ -156,6 +156,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             text-align: center;
             margin-top: 20px;
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 90%;
+                height: auto;
+            }
+            .logo-container {
+                border-radius: 10px 10px 0 0;
+            }
+            .form-container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            input[type="submit"] {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
+            input[type="text"], input[type="password"] {
+                padding: 8px;
+            }
+        }
     </style>
     <script>
         // Prevent going back to the login page after logging in
