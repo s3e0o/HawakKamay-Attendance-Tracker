@@ -209,9 +209,11 @@ if (isset($_GET['logout'])) {
             padding: 20px;
             color: white;
         }
-        h1 {
-            margin-top: 0;
+        .title {
             font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .content-box {
             /*background-color: #4a5d29;*/
@@ -342,8 +344,8 @@ if (isset($_GET['logout'])) {
             <div class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item active"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item active"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
@@ -351,7 +353,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <main>
-            <h2>Update Teacher Information</h2>
+            <h1 class="title">Update Teacher Information</h1>
             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . htmlspecialchars($teacherId); ?>">
                 <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>">
                 <div class="form-group">

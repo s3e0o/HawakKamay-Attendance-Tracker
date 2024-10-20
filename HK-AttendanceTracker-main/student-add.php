@@ -3,15 +3,6 @@ session_start();
 
 require 'db-connection.php';
 
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    // Destroy the session
-    session_destroy();
-    // Redirect to the login page
-    header("Location: multi-login.php");
-    exit(); // Exit after header redirection
-}
-
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: multi-login.php");
@@ -47,15 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     switch ($hk_status) {
         case 'HK25':
             $total_hours = 25; // Corrected to 25 hours
+            $hk_equivalent_hours = 45; // Fixed equivalent hours for HK25
             break;
         case 'HK50':
             $total_hours = 90;
+            $hk_equivalent_hours = 90; // Fixed equivalent hours for HK50
             break;
         case 'HK75':
             $total_hours = 120;
+            $hk_equivalent_hours = 120; // Fixed equivalent hours for HK75
             break;
         case 'HK100':
             $total_hours = 150;
+            $hk_equivalent_hours = 150; // Fixed equivalent hours for HK100
             break;
     }
 
@@ -102,9 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         $user_id = $stmt_user->insert_id; // Get the ID of the inserted user
 
         // Insert the student data into the 'students' table
-        $insert_student_sql = "INSERT INTO students (student_id, name, email, course, level, hk_status, total_hours, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $insert_student_sql = "INSERT INTO students (student_id, name, email, course, level, hk_status, total_hours, hk_equivalent_hours, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_student = $conn->prepare($insert_student_sql);
-        $stmt_student->bind_param("ssssssii", $studentId, $name, $email, $course, $level, $hk_status, $total_hours, $user_id);
+        $stmt_student->bind_param("ssssssiii", $studentId, $name, $email, $course, $level, $hk_status, $total_hours, $hk_equivalent_hours, $user_id);
         $stmt_student->execute();
 
         // Redirect back to the student list page after saving
@@ -113,11 +108,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     }
 }
 
+
 // Display error message if set
 if (isset($_SESSION['error'])) {
     echo "<script>alert('" . $_SESSION['error'] . "');</script>";
     unset($_SESSION['error']); // Clear the message after displaying
 }
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    // Destroy the session
+    session_destroy();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
+}
+
 ?>
 
 
@@ -230,6 +236,12 @@ if (isset($_SESSION['error'])) {
             padding: 5px 10px 5px 10px;
             width: 80%
         }
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
+        }
         .header {
             display: flex;
             justify-content: space-between;
@@ -295,7 +307,7 @@ if (isset($_SESSION['error'])) {
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            justify-self: end;
+            justify-self: start;
             font-size: 16px;
         }
     </style>
@@ -331,7 +343,7 @@ if (isset($_SESSION['error'])) {
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
             <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item active"><a href="student-list.php">Student</a></div>
+            <div class="nav-item active"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
@@ -339,19 +351,20 @@ if (isset($_SESSION['error'])) {
             </div>  
         </div>
         <main>
-            <div class="content-box">
+            <h1 class="title">ADD STUDENT</h1>
+
+            <!-- <div class="content-box">
                 <div class="header">
                     <h2>ADMIN</h2>
-                </div>
-                <div class="content-box">
-                    <h2>ADD STUDENT</h2>
+                </div> -->
+                <div class="content-box">   
                     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                         <div class="form-group">
                             <label for="student_id">StudentID:</label>
                             <input type="text" id="student_id" name="student_id" required
                                 placeholder="Enter StudentID (e.g., 03-1234-56789)"
-                                pattern="^\d{2}-\d{4}-\d{5}$" 
-                                title="Format must be: 00-0000-00000 (two digits, dash, four digits, dash, five digits)">
+                                pattern="^\d{2}-\d{4}-\d{5-6}$" 
+                                title="Format must be: 00-0000-00000 (two digits, dash, four digits, dash, five to six digits)">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>
@@ -368,7 +381,8 @@ if (isset($_SESSION['error'])) {
                                 placeholder="Enter course of student (e.g., BSIT)"
                                 pattern="^[A-Za-z\s]+$" 
                                 title="Please enter letters only." 
-                                maxlength="30" required>
+                                maxlength="30" required
+                                oninput="uppercaseInput(this)">
                         </div>
                         <div class="form-group">
                             <label for="level">Year Level:</label>
@@ -409,6 +423,14 @@ if (isset($_SESSION['error'])) {
                 .toLowerCase() // Convert entire string to lowercase first
                 .split(' ') // Split into words
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter
+                .join(' '); // Join words back into a string
+        }
+
+        function uppercaseInput(input) {
+            // Split the input value by spaces, capitalize each word, and join them back together
+            input.value = input.value
+                .toUpperCase() // Convert entire string to lowercase first
+                .split(' ') // Split into words
                 .join(' '); // Join words back into a string
         }
     </script>

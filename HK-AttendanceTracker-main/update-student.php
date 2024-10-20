@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+require 'db-connection.php';
+
 // PHP logout logic
 if (isset($_GET['logout'])) {
     // Destroy the session
@@ -25,11 +27,11 @@ if ($conn->connect_error) {
 }
 
 // Check if an ID was provided
-if (isset($_GET['userId'])) {
-    $id = $_GET['userId'];
+if (isset($_GET['user_id'])) {
+    $id = $_GET['user_id'];
 
-    // Query to get the user data, including total_hours
-    $sql = "SELECT user_id, name, email, course, level, hk_status, total_hours, status FROM students WHERE user_id = ?";
+    // Query to get the user data, including total_hours and student_id
+    $sql = "SELECT user_id, student_id, name, email, course, level, hk_status, total_hours, status FROM students WHERE user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -43,6 +45,7 @@ if (isset($_GET['userId'])) {
 
 // Update user information on form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $student_id = $_POST['student_id'];
     $name = $_POST['name'];
     $email = $_POST['email'];
     $course = $_POST['course'];
@@ -73,7 +76,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update User</title>
+    <title>Edit Student</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         /* Your existing styles */
@@ -166,16 +169,56 @@ $conn->close();
             padding: 20px;
             color: white;
         }
-        .dashboard-title {
+        .title {
             font-size: 24px;
             margin-bottom: 20px;
             border-bottom: 2px solid #b8860b;
             padding-bottom: 10px;
         }
-        form {
-            /*background-color: #b8860b;*/
+        /* form {
+            background-color: #b8860b;
             padding: 20px;
             border-radius: 5px;
+        } */
+        form {
+            padding: 10px 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 1px;
+        }
+        .form-group input {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: white;
+            color: black;
+        }
+        .form-group select {
+            width: 103%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: white;
+            color: black;
+        }
+        .submit-button {
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            justify-self: flex-start;
+            font-size: 16px;
         }
         input[type="text"], input[type="email"],select {
             width: 100%;
@@ -249,8 +292,8 @@ $conn->close();
         <div alt="PHINMA Logo" class="logo"></div>
         <h2>UPang HK <br> Attendance Tracker</h2>
         <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-        <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
-        <div class="nav-item active"><a href="student-list.php">Student</a></div>
+        <div class="nav-item"><a href="teacher-list.php">Faculty</a></div>
+        <div class="nav-item active"><a href="student-list.php">Scholar</a></div>
         <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
         <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
         <div class="nav-item">
@@ -259,42 +302,71 @@ $conn->close();
     </div> 
     
     <div class="main-content">
-        <h2 class="dashboard-title">Update Student Information</h2>
-
+    <h1 class="title">Edit Student Information</h1>
         <?php if (isset($message)): ?>
             <div class="message"><?php echo htmlspecialchars($message); ?></div>
         <?php endif; ?>
 
         <form action="" method="POST">
-            <input type="text" name="name" placeholder="Name" value="<?php echo htmlspecialchars($student['name']); ?>" required
-                placeholder="Enter name of student(e.g., John Doe)"
-                pattern="[A-Za-z\s]+" title="Please enter letters only.">
-            <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
-            <input type="text" name="course" placeholder="Course" value="<?php echo htmlspecialchars($student['course']); ?>" required
+            <div class="form-group">
+                <label for="student_id">Student No.:</label>
+                <input type="text" name="student_id" value="<?php echo htmlspecialchars($student['student_id']); ?>" readonly> 
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" name="name" placeholder="Name" value="<?php echo htmlspecialchars($student['name']); ?>" required
+                    placeholder="Enter name of student(e.g., John Doe)"
+                    pattern="[A-Za-z\s]+" title="Please enter letters only.">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
+            </div>
+
+
+            <div class="form-group">
+                <label for="course">Course:</label>
+                <input type="text" name="course" placeholder="Course" value="<?php echo htmlspecialchars($student['course']); ?>" required
                 placeholder="Enter course of student(e.g., BSIT)"
                 pattern="[A-Za-z\s]+" title="Please enter letters only.">
-            <input type="text" name="year_level" placeholder="Year Level" value="<?php echo htmlspecialchars($student['level']); ?>" required
+            </div>
+
+            <div class="form-group">
+                <label for="year_level">Year Level:</label>
+                <input type="text" name="year_level" placeholder="Year Level" value="<?php echo htmlspecialchars($student['level']); ?>" required
                 min="1" max="5" 
                 placeholder="Enter year level of student"
                 title="Please enter a number between 1 and 5.">
-            <input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> 
+            </div>
 
-            
-            <select name="hk_status" onchange="updateTotalHours()" required>
-                <option value="HK25" <?php echo ($student['hk_status'] == 'HK25') ? 'selected' : ''; ?>>HK25</option>
-                <option value="HK50" <?php echo ($student['hk_status'] == 'HK50') ? 'selected' : ''; ?>>HK50</option>
-                <option value="HK75" <?php echo ($student['hk_status'] == 'HK75') ? 'selected' : ''; ?>>HK75</option>
-                <option value="HK100" <?php echo ($student['hk_status'] == 'HK100') ? 'selected' : ''; ?>>HK100</option>
-            </select>
+            <div class="form-group">
+                <label for="total_hours">Total Hours:</label>
+                <input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> 
+            </div>
 
-            <select name="status" required>
+
+            <div class="form-group">
+                <label for="hk_status">HK Status:</label>
+                <select name="hk_status" onchange="updateTotalHours()" required>
+                    <option value="HK25" <?php echo ($student['hk_status'] == 'HK25') ? 'selected' : ''; ?>>HK25</option>
+                    <option value="HK50" <?php echo ($student['hk_status'] == 'HK50') ? 'selected' : ''; ?>>HK50</option>
+                    <option value="HK75" <?php echo ($student['hk_status'] == 'HK75') ? 'selected' : ''; ?>>HK75</option>
+                    <option value="HK100" <?php echo ($student['hk_status'] == 'HK100') ? 'selected' : ''; ?>>HK100</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="student_status">Student Status:</label>
+                <select name="status" required>
                 <option value="Active" <?php echo ($student['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
                 <option value="Inactive" <?php echo ($student['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
             </select>
-            
+            </div>
             <!-- \<input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> Make it a readonly input -->
 
-            <input type="submit" value="Update User">
+            <button type="submit" class="submit-button">Update</button>
         </form>
     </div>
 </div>

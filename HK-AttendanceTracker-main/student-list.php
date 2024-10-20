@@ -137,44 +137,44 @@ $conn->close();
     <title>UPang HK Attendance Tracker - Admin</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
-        body, html {
+         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: auto;
-            background-image: url('hkat-upang.jpg');
+            height: 100%;
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: margin-left .5s;
+            transition: margin-left .5s; 
         }
         .container {
             display: flex;
             height: 100%;
-            transition: margin-left .5s;
+            transition: margin-left .5s; 
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2;
+            z-index: 2; 
         }
         .sidebar.hidden {
             transform: translateX(-100%); 
-            width: 0;
-            padding: 0;
-            opacity: 0;
+            width: 0; 
+            padding: 0; 
+            opacity: 0; 
         }
         .logo {
-            width: 150px;
-            height: 150px;
-            background-image: url('hk_logo.png');
-            background-size: cover; 
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
-            border-radius: 50%;
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -211,24 +211,26 @@ $conn->close();
             text-align: center;
             font-weight: bold;
         }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
-            transition: background-color 0.3s ease;
-        }
-        main {
-            flex-grow: 1;
-            /* background-color: #556b2f; */
-            padding: 20px;
-            color: white;
+        .logout-btn {
+            margin-top: auto; 
+            padding: 10px; 
+            text-align: center; 
+            color: white; 
+            background-color: #f44336; 
+            border: none; 
+            cursor: pointer; 
+            transition: background-color 0.3s ease; 
         }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
         }
-        h1 {
-            margin-top: 0;
+        .title {
             font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .content-box {
             /*background-color: #4a5d29;*/
@@ -254,9 +256,30 @@ $conn->close();
             padding: 10px;
             border-radius: 0 0 0 0;
         }
-        button[type="button"]{
+        /* button[type="button"]{
             padding: 10px;
             border-radius: 0 0 20px;
+        } */
+        .actions {
+            display: flex;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 0 20% 0;
+        }
+        .actions img {
+            width: 20px;
+            height: 20px;
+        }
+        .edit-icon {
+            color: #4a90e2;
+        }
+        .delete-icon {
+            color: #e24a4a;
         }
         .export{
             background-color: #b8860b;
@@ -277,6 +300,7 @@ $conn->close();
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
         th, td {
             text-align: left;
@@ -286,27 +310,19 @@ $conn->close();
         th {
             background-color: #3e4d22;
         }
-        .actions {
-            display: flex;
-            gap: 10px;
-            cursor: pointer;
-        }
-        .actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-        }
-        .actions img {
-            width: 20px;
-            height: 20px;
-        }
-        .edit-icon {
-            color: #4a90e2;
-        }
-        .delete-icon {
-            color: #e24a4a;
-        }
+        
+        th:nth-child(1) { width: 5%; }  /* Adjust these widths as needed */
+        th:nth-child(2) { width: 10%; }
+        th:nth-child(3) { width: 20%; }
+        th:nth-child(4) { width: 20%; }
+        th:nth-child(5) { width: 10%; }
+        th:nth-child(6) { width: 10%; }
+        th:nth-child(7) { width: 10%; }
+        th:nth-child(8) { width: 10%; }
+        th:nth-child(9) { width: 10%; }
+        th:nth-child(10) { width: 10%; }
+        th:nth-child(11) { width: 10%; }
+        th:nth-child(12) { width: 10%; }
         .search-results-container {
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>;
             margin-top: 20px;
@@ -387,18 +403,19 @@ $conn->close();
             <div class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item active"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item active"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>  
         </div>
-        <main>
-            <div class="content-box">
+        <div class="main-content">
+            <!-- <div class="content-box"> -->
+            <h1 class="title">STUDENTS</h1>
+
                 <div class="header">
-                    <h1>STUDENTS</h1>
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
                 </div>
 
@@ -413,7 +430,7 @@ $conn->close();
                     <h2 class="section-title">RECENT USER ACTIVITIES</h2>
                     <table>
                         <tr>
-                            <th>Id</th>
+                            <th>ID</th>
                             <th>Student No.</th>
                             <th>Name</th>
                             <th>Email</th>
@@ -440,12 +457,19 @@ $conn->close();
                                 <td>80</td>
                                 <td><?= htmlspecialchars($row["status"]) ?></td>
                                 <td class="actions">
-                                    <form action="update-student.php" method="GET">
+                                    <!-- <form action="update-student.php" method="GET">
                                         <input type="hidden" name="userId" value="<?= htmlspecialchars($row['user_id']) ?>">
                                         <input class="update-button" type="submit" value="Update">
-                                    </form>
+                                    </form> -->
+                                    <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </button>
+
                                     <button class="delete" onclick="confirmDelete('<?= $row['user_id'] ?>')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                             <line x1="10" y1="11" x2="10" y2="17"></line>
@@ -489,13 +513,13 @@ $conn->close();
                                 <td><?= htmlspecialchars($row["status"]) ?></td>
                                 <td class="actions">
                                     <button class="edit" onclick="location.href='update-student.php?user_id=<?= urlencode($row['user_id']) ?>'">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                         </svg>
                                     </button>
                                     <button class="delete" onclick="confirmDelete('<?= $row['user_id'] ?>')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                             <line x1="10" y1="11" x2="10" y2="17"></line>
@@ -511,7 +535,7 @@ $conn->close();
                     <div class="no-results">No students found.</div>
                 <?php endif; ?>
             </div>
-        </main>
+        </div>
     </div>
 
     <script>

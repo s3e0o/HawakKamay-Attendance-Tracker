@@ -102,7 +102,7 @@ $conn->close();
     <title>Instructor Dashboard</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
-        body, html {
+         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
@@ -115,31 +115,31 @@ $conn->close();
         }
         .container {
             display: flex;
-            height: 100vh;
-            transition: margin-left .5s; /* Animation for container */
+            height: 100%;
+            transition: margin-left .5s; 
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
+            transition: transform 0.3s ease; 
+            position: relative;
+            z-index: 2; 
         }
         .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
-            opacity: 0; /* Make sidebar invisible */
+            transform: translateX(-100%); 
+            width: 0; 
+            padding: 0; 
+            opacity: 0; 
         }
         .logo {
-            width: 150px;  /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover;  /* Makes sure the image covers the entire div */
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -176,13 +176,26 @@ $conn->close();
             text-align: center;
             font-weight: bold;
         }
+        .logout-btn {
+            margin-top: auto; 
+            padding: 10px; 
+            text-align: center; 
+            color: white; 
+            background-color: #f44336; 
+            border: none; 
+            cursor: pointer; 
+            transition: background-color 0.3s ease; 
+        }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
         }
-        h1 {
+        .title {
             font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         table {
             margin-top: 10px;
@@ -253,7 +266,7 @@ $conn->close();
             </div>  
         </div>
         <div class="main-content">
-            <h1>All Student Schedules</h1>
+            <h1 class="title">SCHEDULES</h1>
             <form action="schedules-list.php" method="post">
                 <button type="submit" name="export" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
                     Export Schedules

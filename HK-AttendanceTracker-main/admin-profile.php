@@ -72,7 +72,7 @@ if (isset($_GET['logout'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin's Profile - UPang HK Attendance Tracker</title>
     <style>
-        body, html {
+         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
@@ -90,25 +90,24 @@ if (isset($_GET['logout'])) {
         }
         .sidebar {
             width: 200px;
-            height: auto;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2;
+            z-index: 2; 
         }
         .sidebar.hidden {
-            transform: translateX(-100%);
-            width: 0;
-            padding: 0;
-            opacity: 0;
+            transform: translateX(-100%); 
+            width: 0; 
+            padding: 0; 
+            opacity: 0; 
         }
         .logo {
             width: 150px;  
             height: 150px; 
             background-image: url('hk_logo.png'); 
-            background-size: cover;
+            background-size: cover;  
             background-position: center;
             border-radius: 50%; 
             margin: 0 auto 10px;
@@ -118,6 +117,8 @@ if (isset($_GET['logout'])) {
             margin: 5px 0;
         }
         .nav-item:hover {
+            padding: 10px;
+            margin: 5px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -135,16 +136,25 @@ if (isset($_GET['logout'])) {
             font-size: medium;
         }
         .sidebar .logout-btn {
+            text-decoration: none;
             color: white;
-            background-color: #ff4c4c;
-            text-align: center;
-            padding: 10px;
-            margin-top: 10px;
             display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #ff4c4c;
             border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
         }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
+        .logout-btn {
+            margin-top: auto; 
+            padding: 10px; 
+            text-align: center; 
+            color: white; 
+            background-color: #f44336; 
+            border: none; 
+            cursor: pointer; 
+            transition: background-color 0.3s ease; 
         }
         .main-content {
             flex-grow: 1;
@@ -161,21 +171,11 @@ if (isset($_GET['logout'])) {
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .profile-header {
-            display: flex;
-            align-items: center;
+        .title {
+            font-size: 24px;
             margin-bottom: 20px;
-        }
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            background-color: #b8860b;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            margin-left: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .input-group {
             margin-bottom: 15px;
@@ -215,8 +215,8 @@ if (isset($_GET['logout'])) {
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item active"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
@@ -225,7 +225,7 @@ if (isset($_GET['logout'])) {
         </div>
         <div class="main-content" id="main-content">
             <div>
-                <h1>Admin Profile</h1>
+                <h1 class="title">ADMIN PROFILE</h1>
             </div>
 
             <h2>About</h2>

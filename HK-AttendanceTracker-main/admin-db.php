@@ -96,30 +96,30 @@ $conn->close(); // Close the database connection
         .container {
             display: flex;
             height: 100%;
-            transition: margin-left .5s; /* Animation for container */
+            transition: margin-left .5s; 
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
+            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
+            z-index: 2; 
         }
         .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
-            opacity: 0; /* Make sidebar invisible */
+            transform: translateX(-100%); 
+            width: 0; 
+            padding: 0; 
+            opacity: 0; 
         }
         .logo {
-            width: 150px;  /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover;  /* Makes sure the image covers the entire div */
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -157,17 +157,15 @@ $conn->close(); // Close the database connection
             font-weight: bold;
         }
         .logout-btn {
-        margin-top: auto; /* Push this to the bottom */
-        padding: 10px; /* Optional: Adjust padding */
-        text-align: center; /* Center text */
-        color: white; /* Button text color */
-        background-color: #f44336; /* Default button color */
-        border: none; /* Remove default border */
-        cursor: pointer; /* Pointer cursor on hover */
-        transition: background-color 0.3s ease; /* Smooth transition */
+            margin-top: auto; 
+            padding: 10px; 
+            text-align: center; 
+            color: white; 
+            background-color: #f44336; 
+            border: none; 
+            cursor: pointer; 
+            transition: background-color 0.3s ease; 
         }
-
-
         .main-content {
             flex-grow: 1;
             padding: 20px;
@@ -175,10 +173,10 @@ $conn->close(); // Close the database connection
             margin-left: 0px; 
         }
         .main-content.hidden {
-            margin-left: 0; /* Adjust margin when sidebar is hidden */
+            margin-left: 0; 
         }
         .toggle-btn {
-            background-color: #A98D00; /* Color of the toggle button */
+            background-color: #A98D00; 
             color: white;
             border: none;
             padding: 10px;
@@ -186,7 +184,7 @@ $conn->close(); // Close the database connection
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .dashboard-title {
+        .title {
             font-size: 24px;
             margin-bottom: 20px;
             border-bottom: 2px solid #b8860b;
@@ -237,8 +235,8 @@ $conn->close(); // Close the database connection
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item active"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
@@ -248,14 +246,14 @@ $conn->close(); // Close the database connection
         <div class="main-content" id="main-content">
             <!-- <button class="toggle-btn" onclick="toggleSidebar()">&#9776;</button> -->
             <!-- <h1>Welcome, <?php echo htmlspecialchars($username); ?></h1> Display logged-in user's name -->
-            <h1 class="dashboard-title">ADMIN DASHBOARD</h1>
+            <h1 class="title">ADMIN DASHBOARD</h1>
             <div class="info-grid">
                 <div class="info-box">
                     <h3>Total Scholars</h3>
                     <p><?php echo $total_students; ?></p>
                 </div>
                 <div class="info-box">
-                    <h3>Total Teachers/Coordinators</h3>
+                    <h3>Total Faculties</h3>
                     <p><?php echo $total_teachers; ?></p>
                 </div>
                 <div class="info-box">

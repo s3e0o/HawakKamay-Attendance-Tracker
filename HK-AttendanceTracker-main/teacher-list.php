@@ -149,9 +149,11 @@ if (isset($_GET['logout'])) {
             padding: 20px;
             color: white;
         }
-        h1 {
-            margin-top: 0;
+        .title {
             font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .content-box {
             /*background-color: #4a5d29;*/
@@ -315,8 +317,8 @@ if (isset($_GET['logout'])) {
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item active"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item active"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
@@ -324,9 +326,10 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <main>
-            <div class="content-box">
+            <!-- <div class="content-box"> -->
+            <h1 class="title">TEACHERS/COORDINATORS</h1>
+
                 <div class="header">
-                    <h1>TEACHERS/COORDINATORS</h1>
                     <button class="add-new" onclick="location.href='teacher-add.php';">Add New</button>
                 </div>
                 <form class="search-bar" method="post" action="teacher-list.php">
@@ -338,7 +341,7 @@ if (isset($_GET['logout'])) {
                 <?php if (empty($teachers)): ?>
                     <div class="no-results">No results found for your search.</div>
                 <?php endif; ?>
-                <h2 class="section-title">RECENT USER ACTIVITIES</h2>
+                <h3 class="section-title">RECENT USER ACTIVITIES</h3>
                 <table>
                     <thead>
                         <tr>

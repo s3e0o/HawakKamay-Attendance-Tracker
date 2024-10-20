@@ -179,9 +179,11 @@ if (isset($_SESSION['error'])) {
             padding: 20px;
             color: white;
         }
-        h1 {
-            margin-top: 0;
+        .title {
             font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .content-box {
             /*background-color: #4a5d29;*/
@@ -255,7 +257,7 @@ if (isset($_SESSION['error'])) {
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            justify-self: end;
+            justify-self: flex-start;
             font-size: 16px;
         }
     </style>
@@ -266,8 +268,8 @@ if (isset($_SESSION['error'])) {
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item active"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item active"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
@@ -275,15 +277,16 @@ if (isset($_SESSION['error'])) {
             </div>  
         </div>
         <main>
-            <div class="content-box">
+        <h1 class="title">ADD TEACHER/COORDINATOR</h1>
+
+            <!-- <div class="content-box">
                 <div class="header">
                     <h2>ADMIN</h2>
-                </div>
+                </div> -->
                 <div class="content-box">
-                    <h2>ADD TEACHER/COORDINATOR</h2>
                     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                         <div class="form-group">
-                            <label for="teacher_id">TeacherID:</label>
+                            <label for="teacher_id">FacultyID:</label>
                             <input type="text" id="teacher_id" name="teacher_id" required
                             placeholder="Enter Teacher/Instructor ID:"
                             pattern="^[0-9-]+$" 
@@ -292,7 +295,11 @@ if (isset($_SESSION['error'])) {
                         <div class="form-group">
                             <label for="name">Name:</label>
                             <input type="text" id="name" name="name" required
-                            placeholder="Enter Teacher/Instructor Name:">
+                            placeholder="Enter Teacher/Instructor Name:"
+                            pattern="^[A-Za-z\s]+$" 
+                            title="Please enter letters only." 
+                            maxlength="30" required
+                            oninput="capitalizeName(this)">
                         </div>
                         <div class="form-group">
                             <label for="email">Email:</label>
@@ -316,5 +323,16 @@ if (isset($_SESSION['error'])) {
             </div>
         </main>
     </div>
+
+    <script>
+        function capitalizeName(input) {
+            // Split the input value by spaces, capitalize each word, and join them back together
+            input.value = input.value
+                .toLowerCase() // Convert entire string to lowercase first
+                .split(' ') // Split into words
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter
+                .join(' '); // Join words back into a string
+        }
+    </script>
 </body>
 </html>
