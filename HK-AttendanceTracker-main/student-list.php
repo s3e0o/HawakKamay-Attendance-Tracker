@@ -119,14 +119,13 @@ if (isset($_GET['delete_id'])) {
     exit();
 }*/
 
-// Logout logic
+
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: multi-login.php");
     exit();
 }
 
-// Close the database connection
 $conn->close();
 ?>
 
@@ -143,39 +142,39 @@ $conn->close();
             padding: 0;
             font-family: Arial, sans-serif;
             height: auto;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            background-image: url('hkat-upang.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
+            transition: margin-left .5s;
         }
         .container {
             display: flex;
             height: 100%;
-            transition: margin-left .5s; /* Animation for container */
+            transition: margin-left .5s;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
+            transition: transform 0.3s ease;
             position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
+            z-index: 2;
         }
         .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
-            opacity: 0; /* Make sidebar invisible */
+            transform: translateX(-100%); 
+            width: 0;
+            padding: 0;
+            opacity: 0;
         }
         .logo {
-            width: 150px;  /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover;  /* Makes sure the image covers the entire div */
+            width: 150px;
+            height: 150px;
+            background-image: url('hk_logo.png');
+            background-size: cover; 
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%;
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -309,15 +308,7 @@ $conn->close();
             color: #e24a4a;
         }
         .search-results-container {
-            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
-            margin-top: 20px;
-        }
-        .search-results-container {
-            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
-            margin-top: 20px;
-        }
-        .search-results-container {
-            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>;
             margin-top: 20px;
         }
         .btn-clear{
@@ -351,48 +342,43 @@ $conn->close();
             outline: none;
             }
 
-            /* Submit button styles */
-            .search-bar input[type="submit"] {
-                background-color: #4a5d29;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                font-size: 16px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
+        .search-bar input[type="submit"] {
+            background-color: #4a5d29;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-            .search-bar input[type="submit"]:hover {
-            background-color: #45a049;
-            }
+        .search-bar input[type="submit"]:hover {
+        background-color: #45a049;
+        }
 
+        @media (max-width: 600px) {
+        .search-bar {
+            flex-direction: column;
+            border-radius: 15px;
+        }
 
-            /* Responsive design */
-            @media (max-width: 600px) {
-            .search-bar {
-                flex-direction: column;
-                border-radius: 15px;
-            }
+        .search-bar input[type="text"] {
+            border-bottom: 1px solid #e0e0e0;
+            border-radius: 15px 15px 0 0;
+        }
 
-            .search-bar input[type="text"] {
-                border-bottom: 1px solid #e0e0e0;
-                border-radius: 15px 15px 0 0;
-            }
+        .search-bar input[type="submit"] {
+            border-radius: 0 0 15px 15px;
+        }
+        }
 
-            .search-bar input[type="submit"] {
-                border-radius: 0 0 15px 15px;
-            }
-            }
+        .search-bar input[type="text"]::placeholder {
+        color: #999;
+        }
 
-            /* Placeholder text color */
-            .search-bar input[type="text"]::placeholder {
-            color: #999;
-            }
-
-            /* Focus styles */
-            .search-bar input[type="text"]:focus {
-            box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
-            }
+        .search-bar input[type="text"]:focus {
+        box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -414,190 +400,131 @@ $conn->close();
                 <div class="header">
                     <h1>STUDENTS</h1>
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
-                    <!--<form method="POST" action="">
-                        <button class="export" type="submit" name="export">Export to Excel</button>
-                    </form> 
-                    <form action="student-list.php" method="POST" enctype="multipart/form-data">
-                        <label for="file">Upload Excel file:</label>
-                        <input type="file" name="file" id="file" accept=".xls,.xlsx" required>
-                        <button type="submit" name="import">Import Students</button>
-                    </form> -->
                 </div>
+
                 <!-- Search Bar -->
                 <form class="search-bar" action="student-list.php" method="GET">
-                    <input type="text" name="searchQuery" placeholder="Search by Name, Email, Course or HK Percent" required>
+                    <input type="text" name="searchQuery" placeholder="Search by Name, Email, Course, or HK Percent" required>
                     <input type="submit" value="Search">
                     <button class="btn-clear" type="button" onclick="clearSearch()">Clear</button>
                 </form>
+
                 <?php if (!empty($students)): ?>
-                        <h2 class="section-title">RECENT USER ACTIVITIES</h2>
-                        <table>
+                    <h2 class="section-title">RECENT USER ACTIVITIES</h2>
+                    <table>
+                        <tr>
+                            <th>Id</th>
+                            <th>Student No.</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Course</th>
+                            <th>Year Level</th>
+                            <th>HK Status</th>
+                            <th>Required Hours</th>
+                            <th>Total Hours Rendered</th>
+                            <th>Total Hours Remaining</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <?php foreach ($students as $row): ?>
                             <tr>
-                                <th>Id</th>
-                                <th>Student Id</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Course</th>
-                                <th>Year Level</th>
-                                <th>HK Status</th>
-                                <th>Required Hours</th>
-                                <th>Total Hours Rendered</th>
-                                <th>Total Hours Remaining</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <td><?= htmlspecialchars($row["user_id"]) ?></td>
+                                <td><?= htmlspecialchars($row["student_id"]) ?></td>
+                                <td><?= htmlspecialchars($row["name"]) ?></td>
+                                <td><?= htmlspecialchars($row["email"]) ?></td>
+                                <td><?= htmlspecialchars($row["course"]) ?></td>
+                                <td><?= htmlspecialchars($row["level"]) ?></td>
+                                <td><?= htmlspecialchars($row["hk_status"]) ?></td>
+                                <td><?= htmlspecialchars($row["total_hours"]) ?> hours</td>
+                                <td>10</td>
+                                <td>80</td>
+                                <td><?= htmlspecialchars($row["status"]) ?></td>
+                                <td class="actions">
+                                    <form action="update-student.php" method="GET">
+                                        <input type="hidden" name="userId" value="<?= htmlspecialchars($row['user_id']) ?>">
+                                        <input class="update-button" type="submit" value="Update">
+                                    </form>
+                                    <button class="delete" onclick="confirmDelete('<?= $row['user_id'] ?>')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                        </svg>
+                                    </button>
+                                </td>
                             </tr>
-                            <?php foreach ($students as $row): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["student_id"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["email"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["course"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["level"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["hk_status"])  ?></td>
-                                    <td><?php echo htmlspecialchars($row["total_hours"]) . " hours"; ?></td>
-                                    <td>10</td>
-                                    <td>80</td>
-                                    <td><?php echo htmlspecialchars($row["status"]); ?></td>
-                                    <td class="actions">
-                                        <form action="update-student.php" method="GET">
-                                            <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
-                                            <input class="update-button" type="submit" value="Update">
-                                        </form>
-                                        <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
-                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                <line x1="10" y1="11" x2="10" y2="17"></line>
-                                                <line x1="14" y1="11" x2="14" y2="17"></line>
-                                            </svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </table>
-                
-                <!-- Display Search Results -->
-                <div class="search-results-container" id="searchResults">
-                    <?php elseif (isset($_SESSION['searchResults']) && !empty($_SESSION['searchResults'])): ?>
-                        <h2 class="section-title">SEARCH RESULTS</h2>
-                        <table>
-                            <tr>
-                                <th>Id</th>
-                                <th>Student Id</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Course</th>
-                                <th>Year Level</th>
-                                <th>HK Number & Total Hours</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                            <?php foreach ($_SESSION['searchResults'] as $row): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["student_id"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["email"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["course"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["level"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
-                                    <td><?php echo htmlspecialchars($row["status"]); ?></td>
-                                    <td>
-                                    <button class="edit" onclick="location.href='update-student.php?user_id=<?php echo urlencode($row['user_id']); ?>'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit-icon">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                </button>
-                                <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                                    </svg>
-                                </button>
-                                        <form action="update-student.php" method="GET">
-                                            <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
-                                            <input class="update-button" type="submit" value="Update">
-                                        </form>
-                                        <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
-                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                <line x1="10" y1="11" x2="10" y2="17"></line>
-                                                <line x1="14" y1="11" x2="14" y2="17"></line>
-                                            </svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </table>
-                    <?php elseif (!empty($students)): ?>
-                        <h2 class="section-title">RECENT USER ACTIVITIES</h2>
-                        <table>
-                            <tr>
-                                <th>Id</th>
-                                <th>Student Id</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Course</th>
-                                <th>Year Level</th>
-                                <th>HK Number & Total Hours</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                            <?php foreach ($students as $row): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row["user_id"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["student_id"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["email"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["course"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["level"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row["hk_status"]) . " (" . htmlspecialchars($row["total_hours"]) . " hours)"; ?></td>
-                                    <td><?php echo htmlspecialchars($row["status"]); ?></td>
-                                    <td>
-                                        <form action="update-student.php" method="GET">
-                                            <input type="hidden" name="userId" value="<?php echo htmlspecialchars($row['user_id']); ?>">
-                                            <input class="update-button" type="submit" value="Update">
-                                        </form>
-                                        <button class="delete" onclick="confirmDelete('<?php echo $row['user_id']; ?>')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="delete-icon">
-                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                <line x1="10" y1="11" x2="10" y2="17"></line>
-                                                <line x1="14" y1="11" x2="14" y2="17"></line>
-                                            </svg>
-                                        </button>
-                                    </td>
-                                
-                                </tr>
-                                
-                            <?php endforeach; ?>
-                        </table>
-                    <?php else: ?>
-                        <div class="no-results">No students found.</div>
-                    <?php endif; ?>
-                </div>
+                        <?php endforeach; ?>
+                    </table>
 
-                <script>
-                    function clearSearch() {
-                        // Clear the search input and reload the page
-                        document.querySelector("input[name='searchQuery']").value = ""; // Clear the input field
-                        window.location.href = "student-list.php"; // Redirect to the same page
-                    }
+                <?php elseif (isset($_SESSION['searchResults']) && !empty($_SESSION['searchResults'])): ?>
+                    <h2 class="section-title">SEARCH RESULTS</h2>
+                    <table>
+                        <tr>
+                        <th>Id</th>
+                            <th>Student No.</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Course</th>
+                            <th>Year Level</th>
+                            <th>HK Status</th>
+                            <th>Required Hours</th>
+                            <th>Total Hours Rendered</th>
+                            <th>Total Hours Remaining</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <?php foreach ($_SESSION['searchResults'] as $row): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row["user_id"]) ?></td>
+                                <td><?= htmlspecialchars($row["student_id"]) ?></td>
+                                <td><?= htmlspecialchars($row["name"]) ?></td>
+                                <td><?= htmlspecialchars($row["email"]) ?></td>
+                                <td><?= htmlspecialchars($row["course"]) ?></td>
+                                <td><?= htmlspecialchars($row["level"]) ?></td>
+                                <td><?= htmlspecialchars($row["hk_status"]) ?></td>
+                                <td><?= htmlspecialchars($row["total_hours"]) ?> hours</td>
+                                <td>10</td>
+                                <td>80</td>
+                                <td><?= htmlspecialchars($row["status"]) ?></td>
+                                <td class="actions">
+                                    <button class="edit" onclick="location.href='update-student.php?user_id=<?= urlencode($row['user_id']) ?>'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="delete" onclick="confirmDelete('<?= $row['user_id'] ?>')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
 
-                    function confirmDelete(userId) {
-                        if (confirm('Are you sure you want to delete this student?')) {
-                            // Redirect to the same page with the delete_id parameter
-                            window.location.href = '?delete_id=' + encodeURIComponent(userId);
-                        }
-                    }
-                </script>
+                <?php else: ?>
+                    <div class="no-results">No students found.</div>
+                <?php endif; ?>
             </div>
         </main>
     </div>
+
+    <script>
+        function clearSearch() {
+            document.querySelector("input[name='searchQuery']").value = "";
+            window.location.href = "student-list.php";
+        }
+
+        function confirmDelete(userId) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                window.location.href = '?delete_id=' + encodeURIComponent(userId);
+            }
+        }
+    </script>
 </body>
 </html>

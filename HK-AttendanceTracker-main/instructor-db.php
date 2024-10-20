@@ -390,8 +390,7 @@ $conn->close();
                 throw new Error('Network response was not ok.');
             })
             .then(message => {
-                alert(message); // Show the alert with the response message
-                // Optionally, you can update the row without reloading
+                alert(message);
                 const row = select.closest('tr');
                 row.querySelector('td:nth-child(4)').textContent = status; // Update attendance status
                 // You might want to also update total hours if needed
