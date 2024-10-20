@@ -62,7 +62,7 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPang HK Attendance Tracker - Admin</title>
+    <title>Admin Faculty List - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -192,6 +192,9 @@ if (isset($_GET['logout'])) {
             border-radius: 5px;
             cursor: pointer;
         }
+        .add-new:hover {
+            background-color: #8b6914;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -200,6 +203,9 @@ if (isset($_GET['logout'])) {
             text-align: left;
             padding: 10px;
             border-bottom: 1px solid #6b8e23;
+        }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
         th {
             background-color: #3e4d22;
@@ -318,7 +324,7 @@ if (isset($_GET['logout'])) {
         </div>
         <main>
             <!-- <div class="content-box"> -->
-            <h1 class="title">TEACHERS/COORDINATORS</h1>
+            <h1 class="title">FACULTIES</h1>
 
                 <div class="header">
                     <button class="add-new" onclick="location.href='teacher-add.php';">Add New</button>
@@ -337,7 +343,7 @@ if (isset($_GET['logout'])) {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>TeacherID</th>
+                            <th>FacultyID</th>
                             <th>Name</th>
                             <th>Department</th>
                             <th>Email</th>

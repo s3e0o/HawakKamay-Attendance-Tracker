@@ -134,7 +134,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPang HK Attendance Tracker - Admin</title>
+    <title>Admin Scholar List - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
          body, html {
@@ -265,12 +265,12 @@ $conn->close();
             display: flex;
             gap: 10px;
             cursor: pointer;
+            padding: 25px;
         }
         .actions button {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0 0 20% 0;
         }
         .actions img {
             width: 20px;
@@ -298,13 +298,16 @@ $conn->close();
             border-radius: 5px;
             cursor: pointer;
         }
+        .add-new:hover {
+            background-color: #8b6914;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             table-layout: scroll;
         }
-        tr td{
-            margin-right: 10px;
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
         th, td {
             text-align: left;
@@ -418,7 +421,7 @@ $conn->close();
         </div>
         <div class="main-content">
             <!-- <div class="content-box"> -->
-            <h1 class="title">STUDENTS</h1>
+            <h1 class="title">SCHOLARS</h1>
 
                 <div class="header">
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
@@ -432,7 +435,7 @@ $conn->close();
                 </form>
 
                 <?php if (!empty($students)): ?>
-                    <h2 class="section-title">RECENT USER ACTIVITIES</h2>
+                    <h3>RECENT USER ACTIVITIES</h3>
                     <table>
                         <tr>
                             <th>ID</th>

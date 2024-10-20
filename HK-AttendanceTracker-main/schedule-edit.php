@@ -100,7 +100,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instructor Dashboard</title>
+    <title>Faculty Edit Schedule - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -168,8 +168,11 @@ $conn->close();
             padding: 20px;
             color: white;
         }
-        h1 {
+        .title {
             font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .content-box {
             /*background-color: #4a5d29;*/
@@ -205,6 +208,9 @@ $conn->close();
             justify-self: end;
             font-size: 16px;
         }
+        .submit-button:hover {
+            background-color: #BFA93B;
+        }
         .sidebar h2 {
             text-align: center;
             color: #4a5d29;
@@ -218,7 +224,7 @@ $conn->close();
             <div class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="instructor-db.php">Dashboard</a></div>
-            <div class="nav-item active"><a href="schedule-assign.php">Student Assign</a></div>
+            <div class="nav-item active"><a href="schedule-assign.php">Scholar Assign</a></div>
             <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>
             <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>
@@ -226,7 +232,7 @@ $conn->close();
             <!-- Add other menu items as needed -->
         </div>
         <div class="main-content">
-            <h1>Edit Schedule</h1>
+            <h1 class="title">EDIT SCHOLAR ASSIGNMENT INFORMATION</h1>
             <div class="content-box">
                 <?php if ($schedule): ?>
                     <form method="POST">

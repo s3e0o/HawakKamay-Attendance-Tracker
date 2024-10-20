@@ -79,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKAT Login Page</title>
+    <title>Login Page - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body {
@@ -151,6 +151,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
+        }
+        input[type="submit"]:hover {
+            background-color: #BFA93B;
         }
         .error-message {
             color: red;

@@ -99,7 +99,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instructor Dashboard</title>
+    <title>Admin Schedule List - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
          body, html {
@@ -211,23 +211,25 @@ $conn->close();
         th {
             background-color: #3e4d22;
         }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
         .sidebar h2 {
             text-align: center;
             font-size: medium;
         }
         button {
             background-color: #b8860b;
-            color: white; /* White text */
-            border: none; /* No border */
-            border-radius: 5px; /* Rounded corners */
-            transition: background-color 0.3s; /* Smooth transition */
-            padding: 10px 20px; /* Button padding */
-            font-size: 16px; /* Font size */
-            cursor: pointer; /* Pointer cursor on hover */
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            transition: background-color 0.3s; 
+            padding: 10px 20px; 
+            font-size: 16px; 
+            cursor: pointer;
         }
-
         button:hover {
-            background-color: #45a049; /* Darker green on hover */
+            background-color: #BFA93B; 
         }
         @media (max-width: 768px) {
             .container {
@@ -258,8 +260,8 @@ $conn->close();
             <div class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item"><a href="student-list.php">Student</a></div>
+            <div class="nav-item"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item active"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">

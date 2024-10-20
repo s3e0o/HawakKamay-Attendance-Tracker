@@ -76,7 +76,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Student</title>
+    <title>Admin Edit Student - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
 
@@ -221,7 +221,7 @@ $conn->close();
             justify-self: flex-start;
             font-size: 16px;
         }
-        input[type="text"], input[type="email"],select {
+        input[type="text"], input[type="email"], input[type="number"], select {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -248,8 +248,8 @@ $conn->close();
             border-radius: 5px;
             cursor: pointer;
         }
-        input[type="submit"]:hover {
-            background-color: #4a5d29;
+        .submit-button:hover {
+            background-color: #BFA93B;
         }
         .message {
             color: yellow;
@@ -303,7 +303,7 @@ $conn->close();
     </div> 
     
     <div class="main-content">
-    <h1 class="title">Edit Student Information</h1>
+    <h1 class="title">EDIT SCHOLAR INFORMATION</h1>
         <?php if (isset($message)): ?>
             <div class="message"><?php echo htmlspecialchars($message); ?></div>
         <?php endif; ?>
@@ -311,46 +311,52 @@ $conn->close();
         <form action="" method="POST">
             <div class="form-group">
                 <label for="student_id">Student No.:</label>
-                <input type="text" name="student_id" value="<?php echo htmlspecialchars($student['student_id']); ?>" readonly> 
+                <input type="text" name="student_id" 
+                    value="<?php echo htmlspecialchars($student['student_id']); ?>" readonly>
             </div>
 
             <div class="form-group">
                 <label for="name">Name:</label>
-                <input type="text" name="name" placeholder="Name" value="<?php echo htmlspecialchars($student['name']); ?>" required
-                    placeholder="Enter name of student(e.g., John Doe)"
-                    pattern="[A-Za-z\s]+" title="Please enter letters only.">
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($student['email']); ?>" required>
+                <input type="text" name="name" 
+                    value="<?php echo htmlspecialchars($student['name']); ?>" required
+                    pattern="[A-Za-z\s]+" title="Please enter letters and spaces only."
+                    placeholder="Enter name of student (e.g., John Doe)">
             </div>
 
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" name="email" 
+                    value="<?php echo htmlspecialchars($student['email']); ?>" required
+                    placeholder="Enter student's email">
+            </div>
 
             <div class="form-group">
                 <label for="course">Course:</label>
-                <input type="text" name="course" placeholder="Course" value="<?php echo htmlspecialchars($student['course']); ?>" required
-                placeholder="Enter course of student(e.g., BSIT)"
-                pattern="[A-Za-z\s]+" title="Please enter letters only.">
+                <input type="text" name="course" 
+                    value="<?php echo htmlspecialchars($student['course']); ?>" required
+                    pattern="[A-Za-z\s]+" title="Please enter letters and spaces only."
+                    placeholder="Enter course (e.g., BSIT)"
+                    oninput="uppercaseInput(this)" maxlength="4">
             </div>
 
             <div class="form-group">
                 <label for="year_level">Year Level:</label>
-                <input type="text" name="year_level" placeholder="Year Level" value="<?php echo htmlspecialchars($student['level']); ?>" required
-                min="1" max="5" 
-                placeholder="Enter year level of student"
-                title="Please enter a number between 1 and 5.">
+                <input type="number" name="year_level" 
+                    value="<?php echo htmlspecialchars($student['level']); ?>" required
+                    min="1" max="5" 
+                    placeholder="Enter year level" 
+                    title="Please enter a number between 1 and 5.">
             </div>
 
             <div class="form-group">
                 <label for="total_hours">Total Hours:</label>
-                <input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> 
+                <input type="text" name="total_hours" 
+                    value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly>
             </div>
-
 
             <div class="form-group">
                 <label for="hk_status">HK Status:</label>
-                <select name="hk_status" onchange="updateTotalHours()" required>
+                <select name="hk_status" required>
                     <option value="HK25" <?php echo ($student['hk_status'] == 'HK25') ? 'selected' : ''; ?>>HK25</option>
                     <option value="HK50" <?php echo ($student['hk_status'] == 'HK50') ? 'selected' : ''; ?>>HK50</option>
                     <option value="HK75" <?php echo ($student['hk_status'] == 'HK75') ? 'selected' : ''; ?>>HK75</option>
@@ -361,14 +367,14 @@ $conn->close();
             <div class="form-group">
                 <label for="student_status">Student Status:</label>
                 <select name="status" required>
-                <option value="Active" <?php echo ($student['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
-                <option value="Inactive" <?php echo ($student['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
-            </select>
+                    <option value="Active" <?php echo ($student['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
+                    <option value="Inactive" <?php echo ($student['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
+                </select>
             </div>
-            <!-- \<input type="text" name="total_hours" value="<?php echo htmlspecialchars($student['total_hours']); ?>" readonly> Make it a readonly input -->
 
             <button type="submit" class="submit-button">Update</button>
         </form>
+
     </div>
 </div>
 
@@ -376,6 +382,13 @@ $conn->close();
     document.addEventListener("DOMContentLoaded", function() {
         updateTotalHours();
     });
+    function uppercaseInput(input) {
+        // Split the input value by spaces, capitalize each word, and join them back together
+        input.value = input.value
+            .toUpperCase() // Convert entire string to lowercase first
+            .split(' ') // Split into words
+            .join(' '); // Join words back into a string
+    }
 </script>
 
 </body>

@@ -165,7 +165,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Instructor Dashnoard</title>    
+     <title>Faculty Dashboard - UPang HK Attendance Tracker</title>    
      <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -303,10 +303,14 @@ $conn->close();
         th {
             background-color: #4a5d29;
         }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
         .actions {
             display: flex;
             gap: 10px;
             cursor: pointer;
+            padding: 25px;
         }
         .actions button {
             background: none;
@@ -324,17 +328,33 @@ $conn->close();
         .delete-icon {
             color: #e24a4a;
         }
-        input[type="date"], input[type="submit"], select {
+        input[type="date"]{
             padding: 10px;
             border-radius: 4px;
             margin-right: 10px;
             font-size: 16px;
+            cursor: pointer;
+        } input[type="submit"], select {
+            padding: 10px;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #A98D00;
+            color: white;
+        }
+        select {
+            background-color: #b8860b;
+        }
+        input[type="submit"]:hover {
+            background-color: #BFA93B;
         }
         .schedule-form {
             margin-top: 20px;
+            cursor: pointer;
         }
         .no-results {
-            color: white; /* Red color for no results */
+            color: white; 
             font-weight: bold;
         }
     </style>
@@ -346,14 +366,14 @@ $conn->close();
         <div class="logo"></div>
         <h2>UPang HK <br> Attendance Tracker</h2> 
         <div class="nav-item active"><a href="instructor-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="schedule-assign.php">Student Assign</a></div>
+            <div class="nav-item"><a href="schedule-assign.php">Scholar Assign</a></div>
             <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>
         <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div> 
     </div>
     <div class="main-content" id="main-content">
-        <div class="title">Schedule for <?php echo $searchDate; ?></div>
+        <h1 class="title">SCHEDULE FOR <?php echo $searchDate; ?></h1>
         
         <form method="GET" action="" class="schedule-form">
             <input type="date" name="searchDate" value="<?php echo $searchDate; ?>" required>

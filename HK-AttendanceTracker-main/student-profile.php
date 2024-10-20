@@ -102,6 +102,7 @@ if (isset($_GET['logout'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Profile - UPang HK Attendance Tracker</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -211,6 +212,12 @@ if (isset($_GET['logout'])) {
             color: black;
             margin-top: 5px;
         }
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
+        }
         form {
             display: grid;
             grid-template-columns: repeat(3, 1fr); 
@@ -232,9 +239,10 @@ if (isset($_GET['logout'])) {
             cursor: pointer;
             transition: background-color 0.3s;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
         .save-button:hover {
-            background-color: #8b6914;
+            background-color: #BFA93B;
         }
     </style>
 </head>
@@ -250,7 +258,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <div class="main-content">
-            <h1>Student Profile</h1>
+            <h1 class="title">Student Profile</h1>
             <form method="POST" action="student-profile.php">
                 <div class="input-group">
                     <label for="studentId">Student ID:</label>
@@ -272,7 +280,7 @@ if (isset($_GET['logout'])) {
                 <button type="submit" name="save" class="save-button">Save</button>
             </form>
 
-            <h2>Change Password</h2>
+            <h1 class="title">Change Password</h1>
             <form method="POST" action="student-profile.php">
                 <div class="input-group">
                     <label for="current_password">Current Password:</label>

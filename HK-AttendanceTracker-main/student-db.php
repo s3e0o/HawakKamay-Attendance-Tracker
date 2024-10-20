@@ -64,22 +64,19 @@ if ($student_id) { // Proceed only if a user is logged in
         $notifications = $notificationResult->fetch_all(MYSQLI_ASSOC);
     }
 } else {
-    // Redirect to login if no user is logged in
+    
     header("Location: multi-login.php");
     exit();
 }
 
-// Close the statement and connection
 $stmt->close();
 $conn->close();
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
-    // Destroy the session
     session_destroy();
-    // Redirect to the login page
     header("Location: multi-login.php");
-    exit(); // Exit after header redirection
+    exit(); 
 }
 ?>
 <!DOCTYPE html>
@@ -87,11 +84,10 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPang HK Attendance Tracker - Student Dashboard</title>
+    <title>Scholar Dashboard - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM5VRZ0gZlL/Z+0vD05D1xZ6cDq0jP0VqJ7hF" crossorigin="anonymous">
     <style>
-        /* Your CSS styles */
         body, html {
             margin: 0;
             padding: 0;
@@ -162,82 +158,84 @@ if (isset($_GET['logout'])) {
             flex-grow: 1;
             padding: 20px;
             color: white;
-            position: relative; /* Relative positioning for absolute elements inside */
+            position: relative; 
         }
-        h1 {
-            margin-top: 0;
+        .title {
             font-size: 24px;
-            color: white;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .content-box {
             border-radius: 10px;
-            padding: 0 20px;
-            position: relative; /* Make this container relative */
+            /* padding: 0 10px; */
+            position: relative; 
         }
-        .content-box2 {
+        /* .content-box2 {
             border-radius: 10px;
             padding: 0 20px;
-        }
-        .content-box h2 {
+        } */
+        /* .content-box h2 {
             margin-top: 50px;
-        }
+        } */
         .notification-icon {
-            position: absolute; /* Make it absolute for positioning */
-            top: 0px; /* Position it at the top */
-            right: 0px; /* Position it to the right */
-            cursor: pointer; /* Change cursor to pointer */
+            position: absolute; 
+            top: 0px; 
+            right: 0px; 
+            cursor: pointer; 
         }
 
         .notification-count {
-            background: red; /* Background color for count */
-            color: white; /* Text color */
-            border-radius: 50%; /* Make it circular */
-            padding: 1px 3px; /* Padding around the count */
-            position: absolute; /* Position it absolutely */
-            top: -5px; /* Position it above the icon */
-            right: -5px; /* Position it to the right of the icon */
-            font-size: 14px; /* Font size for count */
+            background: red; 
+            color: white; 
+            border-radius: 50%; 
+            padding: 1px 3px; 
+            position: absolute; 
+            top: -5px; 
+            right: -5px; 
+            font-size: 14px; 
         }
 
         .notification-tray {
-            display: none; /* Hide tray by default */
-            position: absolute; /* Use absolute positioning */
-            top: 20px; /* Position it below the notification icon */
-            right: 20px; /* Position it at the right */
-            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
-            backdrop-filter: blur(5px); /* Add a blur effect */
-            padding: 10px; /* Add padding */
-            border-radius: 10px; /* Rounded corners */
-            width: 300px; /* Set a width */
-            max-height: 300px; /* Set a max height */
-            overflow-y: auto; /* Allow vertical scrolling */
-            z-index: 10; /* Ensure it appears above other content */
+            display: none; 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background-color: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(5px); 
+            padding: 10px; 
+            border-radius: 10px; 
+            width: 300px; 
+            max-height: 300px; 
+            overflow-y: auto; 
+            z-index: 10; 
+            color: #333;
         }
 
-        /* Custom scrollbar styles */
+        
         .notification-tray::-webkit-scrollbar {
-            width: 8px; /* Width of the scrollbar */
+            width: 8px; 
         }
 
         .notification-tray::-webkit-scrollbar-thumb {
-            background: #6b8e23; /* Color of the scrollbar */
-            border-radius: 10px; /* Rounded corners */
+            background: #6b8e23; 
+            border-radius: 10px; 
         }
 
         .notification-tray::-webkit-scrollbar-track {
-            background: #f1f1f1; /* Background of the scrollbar track */
+            background: #f1f1f1; 
         }
 
         .notification-tray h2 {
-            margin: 0; /* Remove default margin */
-            padding: 10px; /* Add padding for spacing around the title */
-            font-size: 18px; /* Adjust font size as needed */
-            color: #333; /* Change text color if desired */
+            margin: 0; 
+            padding: 10px; 
+            font-size: 18px; 
+            color: #333; 
         }
         .notification-tray ul {
-            list-style-type: none; /* Remove bullet points */
-            padding: 0; /* Remove padding */
-            margin: 0; /* Remove margin */
+            list-style-type: none; 
+            padding: 0; 
+            margin: 0; 
         }
         .info-grid {
             display: grid;
@@ -246,9 +244,12 @@ if (isset($_GET['logout'])) {
             margin-bottom: 20px;
         }
         .info-box {
-            background-color: #BFA93B;
+            background-color: #A98D00;
             padding: 15px;
             border-radius: 5px;
+        }
+        .info-box:hover {
+            background-color: #BFA93B;
         }
         .info-box h3 {
             margin: 0 0 10px 0;
@@ -266,10 +267,10 @@ if (isset($_GET['logout'])) {
         th, td {
             text-align: left;
             padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #6b8e23;
         }
         th {
-            background-color: #A98D00;
+            background-color: #4a5d29;
             color: white;
         }
         tr:hover {
@@ -286,16 +287,16 @@ if (isset($_GET['logout'])) {
         <div class="sidebar">
             <div class="logo"></div>
             <h2>UPang HK <br>Attendance Tracker</h2>
-            <div class="nav-item"><a href="student-db.php">Dashboard</a></div>
+            <div class="nav-item active"><a href="student-db.php">Dashboard</a></div>
             <!-- <div class="nav-item"><a href="view-schedule.php">View Schedule</a></div>
             <div class="nav-item"><a href="manage-grades.php">Manage Grades</a></div>
             <div class="nav-item"><a href="check-attendance.php">Check Attendance</a></div> -->
             <div class="nav-item"><a href="student-profile.php">Profile</a></div>
-            <a class="logout-btn" href="?logout=true">Logout</a>
+            <div class="nav-item"><a class="logout-btn" href="?logout=true">Logout</a></div>
         </div>
         <main>
             <div class="content-box">
-            <h2>Welcome, <?php echo htmlspecialchars($username); ?></h2>
+            <h1 class="title">Welcome, <?php echo htmlspecialchars($username); ?></h1>
 
                 <div class="notification-icon" onclick="toggleNotificationTray()">
                     <img src="notification.png" alt="Notifications" style="width: 24px; height: 24px;">
@@ -325,7 +326,7 @@ if (isset($_GET['logout'])) {
                         <h3>HK Status</h3>
                         <p>
                             <?php 
-                            // Get HK Status from the first schedule entry
+                            
                             echo htmlspecialchars(count($scheduleList) > 0 ? $scheduleList[0]['hk_status'] : 'N/A'); 
                             ?>
                         </p>
@@ -335,7 +336,7 @@ if (isset($_GET['logout'])) {
                         <h3>HK Status Equivalent Hours</h3>
                         <p>
                             <?php 
-                            // Get HK Equivalent Hours from the first schedule entry
+                           
                             echo htmlspecialchars(count($scheduleList) > 0 ? $scheduleList[0]['hk_equivalent_hours'] : 'N/A'); 
                             ?>
                         </p>
@@ -345,7 +346,7 @@ if (isset($_GET['logout'])) {
                         <h3>Total Hours Rendered</h3>
                         <p>
                             <?php 
-                            // Calculate Total Hours Rendered
+                            
                             $totalHoursRendered = 0;
                             foreach ($scheduleList as $schedule) {
                                 $totalHoursRendered += (int)$schedule['total_hours_rendered']; // Ensure you're summing integers
@@ -359,7 +360,7 @@ if (isset($_GET['logout'])) {
                         <h3>Total Hours Remaining</h3>
                         <p>
                             <?php 
-                            // Get Total Hours from the first schedule entry
+                            
                             echo htmlspecialchars(count($scheduleList) > 0 ? $scheduleList[0]['total_hours'] : 'N/A'); 
                             ?>
                         </p>
@@ -367,7 +368,7 @@ if (isset($_GET['logout'])) {
                 </div>
 
                 <h2>SCHEDULE</h2>
-                <div class="content-box2">
+                <div class="content-box">
                     <table>
                         <thead>
                             <tr>
@@ -408,9 +409,9 @@ if (isset($_GET['logout'])) {
         function toggleNotificationTray() {
             const tray = document.getElementById('notificationTray');
             if (tray.style.display === 'none' || tray.style.display === '') {
-                tray.style.display = 'block'; // Show the notification tray
+                tray.style.display = 'block'; 
             } else {
-                tray.style.display = 'none'; // Hide the notification tray
+                tray.style.display = 'none'; 
             }
         }
     </script>

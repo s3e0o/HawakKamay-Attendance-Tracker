@@ -79,7 +79,7 @@ $conn->close(); // Close the database connection
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -198,9 +198,12 @@ $conn->close(); // Close the database connection
             margin-bottom: 20px;
         }
         .info-box {
-            background-color: #BFA93B;
+            background-color: #A98D00;
             padding: 15px;
             border-radius: 5px;
+        }
+        .info-box:hover {
+            background-color: #BFA93B;
         }
         .info-box h3 {
             margin: 0 0 10px 0;

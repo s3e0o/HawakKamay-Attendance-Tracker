@@ -117,7 +117,8 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher's Profile - UPang HK Attendance Tracker</title>
+    <title>Faculty Profile - UPang HK Attendance Tracker</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
             margin: 0;
@@ -200,17 +201,14 @@ if (isset($_GET['logout'])) {
             color: white;
             margin-left: 0px; 
         }
-        .toggle-btn {
-            background-color: #A98D00;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
+        .title {
+            font-size: 24px;
             margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: px;
             margin-right: 20px;
         }
         .input-group label {
@@ -233,8 +231,6 @@ if (isset($_GET['logout'])) {
             gap: 20px;
             margin-bottom: 20px;
         }
-
-
         .button-container {
             grid-column: span 3;  
             display: flex;
@@ -249,9 +245,10 @@ if (isset($_GET['logout'])) {
             cursor: pointer;
             transition: background-color 0.3s;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
         .save-button:hover {
-            background-color: #8b6914;
+            background-color: #BFA93B;
         }
     </style>
 </head>
@@ -261,15 +258,14 @@ if (isset($_GET['logout'])) {
             <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="schedule-assign.php">Student Assign</a></div>
+            <div class="nav-item"><a href="schedule-assign.php">Scholar Assign</a></div>
             <div class="nav-item active"><a href="teacher-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>  
         </div>
         <div class="main-content" id="main-content">
-            <h1>Teacher Profile</h1>
-            <h2>About</h2>
+            <h1 class="title">TEACHER PROFILE</h1>
             <form id="teacherProfileForm" method="POST" action="teacher-profile.php">
                 <div class="input-group">
                     <label for="fullName">Full Name:</label>
@@ -295,7 +291,7 @@ if (isset($_GET['logout'])) {
                 </div>
             </form>
 
-            <h2>Change Password</h2>
+            <h2 class="title">CHANGE PASSWORD</h2>
             <form method="POST" action="teacher-profile.php">
                 <div class="input-group">
                     <label for="current_password">Current Password:</label>
@@ -318,7 +314,7 @@ if (isset($_GET['logout'])) {
             <?php if (isset($success_message)) : ?>
                 <div class="success-message"><?php echo $success_message; ?></div>
             <?php endif; ?>
-        </div>
+        </div> 
     </div>
 </body>
 </html>

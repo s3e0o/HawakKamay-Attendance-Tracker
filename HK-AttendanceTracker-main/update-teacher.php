@@ -273,7 +273,7 @@ if (isset($_GET['logout'])) {
             font-size: 16px; 
         }
         .submit-button:hover {
-            background-color: #a57900; 
+            background-color: #BFA93B; 
         }
         table {
             width: 100%;
@@ -354,7 +354,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <main>
-            <h1 class="title">Update Teacher Information</h1>
+            <h1 class="title">EDIT TEACHER INFORMATION</h1>
             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . htmlspecialchars($teacherId); ?>">
                 <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>">
                 <div class="form-group">

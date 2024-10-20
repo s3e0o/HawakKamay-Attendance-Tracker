@@ -92,7 +92,7 @@ if (isset($_SESSION['error'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPang HK Attendance Tracker - Admin</title>
+    <title>Admin Add Faculty - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -261,6 +261,9 @@ if (isset($_SESSION['error'])) {
             justify-self: flex-start;
             font-size: 16px;
         }
+        .submit-button:hover{
+            background-color: #BFA93B;
+        }
     </style>
 </head>
 <body>
@@ -278,7 +281,7 @@ if (isset($_SESSION['error'])) {
             </div>  
         </div>
         <main>
-        <h1 class="title">ADD TEACHER/COORDINATOR</h1>
+        <h1 class="title">ADD FACULTY</h1>
 
             <!-- <div class="content-box">
                 <div class="header">

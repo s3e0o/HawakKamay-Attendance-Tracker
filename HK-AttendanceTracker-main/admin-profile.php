@@ -70,7 +70,8 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin's Profile - UPang HK Attendance Tracker</title>
+    <title>Admin Profile - UPang HK Attendance Tracker</title>
+    <link rel="icon" type="image" href="hk_logo.png">
     <style>
          body, html {
             margin: 0;
@@ -206,7 +207,7 @@ if (isset($_GET['logout'])) {
             border-radius: 5px;
         }
         .save-button:hover {
-            background-color: #8b6914;
+            background-color: #BFA93B;
         }
     </style>
 </head>
@@ -229,7 +230,6 @@ if (isset($_GET['logout'])) {
                 <h1 class="title">ADMIN PROFILE</h1>
             </div>
 
-            <h2>About</h2>
             <form id="adminProfileForm" method="POST" action="admin-profile.php">
                 <div class="input-group">
                     <label for="fullName">Full Name:</label>

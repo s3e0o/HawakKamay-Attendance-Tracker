@@ -92,7 +92,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faculty - Scholar Schedule Assignment</title>
+    <title>Faculty Scholar Assign - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -175,12 +175,14 @@ $conn->close();
             padding: 20px;
             color: white;
         }
-        h1 {
+        .title {
             font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .content-box {
             border-radius: 10px;
-            padding: 20px;
             width: 80%;
         }
         form {
@@ -213,6 +215,10 @@ $conn->close();
             justify-self: center;
             font-size: 16px;
         }
+        .submit-button:hover {
+            background-color: #BFA93B;
+
+        }
     </style>
 </head>
 <body>
@@ -221,14 +227,14 @@ $conn->close();
             <div class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="instructor-db.php">Dashboard</a></div>
-            <div class="nav-item active"><a href="schedule-assign.php">Student Assign</a></div>
+            <div class="nav-item active"><a href="schedule-assign.php">Scholar Assign</a></div>
             <div class="nav-item"><a href="teacher-profile.php">Profile</a></div>
             <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>
         </div>
         <div class="main-content">
-            <h1>Assign Student</h1>
+            <h1 class="title">ADD SCHOLAR SCHEDULE ASSIGNMENT</h1>
             <div class="content-box">
                 <form method="POST" action="">
                     <div class="form-group">

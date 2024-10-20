@@ -132,7 +132,7 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPang HK Attendance Tracker - Admin</title>
+    <title>Admin Add Scholar - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         .message {
@@ -253,14 +253,6 @@ if (isset($_GET['logout'])) {
             margin: 0;
             font-size: 20px;
         }
-        .add-new {
-            background-color: #b8860b;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -311,6 +303,9 @@ if (isset($_GET['logout'])) {
             justify-self: start;
             font-size: 16px;
         }
+        .submit-button:hover {
+            background-color: #BFA93B;
+        }
     </style>
     <script>
         function updateTotalHours() {
@@ -343,7 +338,7 @@ if (isset($_GET['logout'])) {
         <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
             <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
+            <div class="nav-item"><a href="teacher-list.php">Faculty</a></div>
             <div class="nav-item active"><a href="student-list.php">Scholar</a></div>
             <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
@@ -352,7 +347,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <main>
-            <h1 class="title">ADD STUDENT</h1>
+            <h1 class="title">ADD SCHOLAR</h1>
 
             <!-- <div class="content-box">
                 <div class="header">
