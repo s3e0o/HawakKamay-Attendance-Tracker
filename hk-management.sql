@@ -89,7 +89,6 @@ ALTER TABLE `user`
 -- Constraints for dumped tables
 --
 
---
 -- Constraints for table `schedule`
 --
 ALTER TABLE `schedule`
