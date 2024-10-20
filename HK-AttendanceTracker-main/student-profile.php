@@ -58,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
 }
 
 // Handle password change
-// Handle password change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $current_password = $_POST['current_password'];
     $new_password = $_POST['new_password'];
@@ -193,24 +192,9 @@ if (isset($_GET['logout'])) {
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            background-color: #b8860b;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            margin-left: 20px;
-        }
         .input-group {
             margin-bottom: 15px;
+            margin-right: 20px;
         }
         .input-group label {
             display: block;
@@ -218,7 +202,7 @@ if (isset($_GET['logout'])) {
             color: white;
         }
         .input-group input {
-            width: 70%;
+            width: 100%;
             padding: 10px;
             border: none;
             border-radius: 5px;
@@ -226,7 +210,19 @@ if (isset($_GET['logout'])) {
             color: black;
             margin-top: 5px;
         }
+        form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            grid-column: span 3;  
+            display: flex;
+            justify-content: flex-start; 
+        }
         .save-button {
+            width: 50%;
             background-color: #b8860b;
             color: white;
             border: none;
@@ -246,7 +242,7 @@ if (isset($_GET['logout'])) {
         <div class="sidebar">
             <div class="logo"></div>
             <h2>UPang HK <br>Attendance Tracker</h2>
-            <div class="nav-item"><a href="student-db.php">Schedule</a></div>
+            <div class="nav-item"><a href="student-db.php">Dashboard</a></div>
             <div class="nav-item active"><a href="student-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>

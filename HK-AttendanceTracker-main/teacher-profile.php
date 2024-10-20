@@ -43,18 +43,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     $email = $_POST['email'];
 
     // Update the teachers table
-    $update_teacher_sql = "UPDATE teachers SET name = ?, email = ? WHERE teacher_id = ?";
+    $update_teacher_sql = "UPDATE teachers SET name = ? WHERE teacher_id = ?";
     $stmt = $conn->prepare($update_teacher_sql);
-    $stmt->bind_param("ssi", $name, $email, $teacher_id);
+    $stmt->bind_param("si", $name, $teacher_id); // Bind only name and teacher_id
 
     if ($stmt->execute()) {
-        $_SESSION['success_message'] = "Profile successfully saved!";
-        header("Location: teacher-profile.php");
-        exit();
+        // Update the email in the users table
+        $update_email_sql = "UPDATE users SET email = ? WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?)";
+        $stmt = $conn->prepare($update_email_sql);
+        $stmt->bind_param("si", $email, $teacher_id); // Bind email and teacher_id
+
+        if ($stmt->execute()) {
+            $_SESSION['success_message'] = "Profile successfully saved!";
+            header("Location: teacher-profile.php");
+            exit();
+        } else {
+            echo "Error updating email: " . $stmt->error;
+        }
     } else {
         echo "Error updating teacher: " . $stmt->error;
     }
 }
+
 
 // Handle password change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
@@ -198,24 +208,9 @@ if (isset($_GET['logout'])) {
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            background-color: #b8860b;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            margin-left: 20px;
-        }
         .input-group {
             margin-bottom: 15px;
+            margin-right: 20px;
         }
         .input-group label {
             display: block;
@@ -223,13 +218,26 @@ if (isset($_GET['logout'])) {
             color: white;
         }
         .input-group input {
-            width: 70%;
+            width: 100%;
             padding: 10px;
             border: none;
             border-radius: 5px;
             background-color: white;
             color: black;
             margin-top: 5px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+
+        .button-container {
+            grid-column: span 3;  
+            display: flex;
+            justify-content: flex-start; 
         }
         .save-button {
             background-color: #b8860b;
@@ -279,7 +287,11 @@ if (isset($_GET['logout'])) {
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($teacher['email']); ?>" required>
                 </div>
-                <button type="submit" name="save" class="save-button">Save</button>
+
+                <!-- Isolate button inside a flex container -->
+                <div class="button-container">
+                    <button type="submit" name="save" class="save-button">Save</button>
+                </div>
             </form>
 
             <h2>Change Password</h2>
@@ -296,7 +308,10 @@ if (isset($_GET['logout'])) {
                     <label for="confirm_password">Confirm New Password:</label>
                     <input type="password" id="confirm_password" name="confirm_password" required>
                 </div>
-                <button type="submit" name="change_password" class="save-button">Change Password</button>
+                
+                <div class="button-container">
+                    <button type="submit" name="change_password" class="save-button">Change Password</button>
+                </div>
             </form>
 
             <?php if (isset($success_message)) : ?>
@@ -306,3 +321,4 @@ if (isset($_GET['logout'])) {
     </div>
 </body>
 </html>
+
