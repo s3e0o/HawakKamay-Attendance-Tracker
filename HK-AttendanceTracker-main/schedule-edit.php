@@ -110,6 +110,7 @@ $conn->close();
             height: 100%;
             background-image: url('hkat-upang.jpg'); /* Use the same background */
             background-size: cover;
+            background-attachment: fixed;
             background-position: center;
         }
         .container {

@@ -86,6 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-family: Arial, sans-serif;
             background-image: url('hkat-upang.jpg');
             background-size: cover;
+            background-attachment: fixed;
             background-position: center;
             display: flex;
             justify-content: center;

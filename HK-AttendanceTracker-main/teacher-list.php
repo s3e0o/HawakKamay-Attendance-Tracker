@@ -70,39 +70,40 @@ if (isset($_GET['logout'])) {
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
+            background-attachment: fixed;
             background-repeat: no-repeat;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
+            transition: margin-left .5s; 
         }
         .container {
             display: flex;
             height: 100%;
-            transition: margin-left .5s; /* Animation for container */
+            transition: margin-left .5s; 
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
+            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
+            z-index: 2; 
         }
         .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
-            opacity: 0; /* Make sidebar invisible */
+            transform: translateX(-100%); 
+            width: 0; 
+            padding: 0; 
+            opacity: 0; 
         }
         .logo {
-            width: 150px;  /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover;  /* Makes sure the image covers the entire div */
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -225,15 +226,7 @@ if (isset($_GET['logout'])) {
             color: #e24a4a;
         }
         .search-results-container {
-            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
-            margin-top: 20px;
-        }
-        .search-results-container {
-            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
-            margin-top: 20px;
-        }
-        .search-results-container {
-            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; 
             margin-top: 20px;
         }
         .btn-clear{
@@ -265,9 +258,7 @@ if (isset($_GET['logout'])) {
             padding: 10px 15px;
             font-size: 16px;
             outline: none;
-            }
-
-            /* Submit button styles */
+        }
             .search-bar input[type="submit"] {
                 background-color: #4a5d29;
                 color: white;
@@ -300,12 +291,12 @@ if (isset($_GET['logout'])) {
             }
             }
 
-            /* Placeholder text color */
+            
             .search-bar input[type="text"]::placeholder {
             color: #999;
             }
 
-            /* Focus styles */
+            
             .search-bar input[type="text"]:focus {
             box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
             }

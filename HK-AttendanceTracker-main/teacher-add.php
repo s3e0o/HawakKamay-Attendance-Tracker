@@ -100,39 +100,40 @@ if (isset($_SESSION['error'])) {
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
+            background-attachment: fixed;
+            transition: margin-left .5s;
         }
         .container {
             display: flex;
             height: 100%;
-            transition: margin-left .5s; /* Animation for container */
+            transition: margin-left .5s; 
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
+            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
+            z-index: 2; 
         }
         .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
-            opacity: 0; /* Make sidebar invisible */
+            transform: translateX(-100%); 
+            width: 0;
+            padding: 0; 
+            opacity: 0;
         }
         .logo {
-            width: 150px;  /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover;  /* Makes sure the image covers the entire div */
+            width: 150px;  
+            height: 150px;
+            background-image: url('hk_logo.png');
+            background-size: cover;
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {

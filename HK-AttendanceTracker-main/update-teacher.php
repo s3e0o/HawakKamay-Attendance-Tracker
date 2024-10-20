@@ -139,33 +139,34 @@ if (isset($_GET['logout'])) {
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
+            background-attachment: fixed;
+            transition: margin-left .5s; 
         }
         .container {
             display: flex;
             height: 100%;
-            transition: margin-left .5s; /* Animation for container */
+            transition: margin-left .5s; 
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
+            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
+            z-index: 2; 
         }
         .logo {
-            width: 150px; /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover; /* Makes sure the image covers the entire div */
+            width: 150px;
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover; 
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -219,7 +220,7 @@ if (isset($_GET['logout'])) {
             /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
-            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Added shadow for depth */
+            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); */
         }
         .header {
             display: flex;
@@ -253,13 +254,13 @@ if (isset($_GET['logout'])) {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #f9f9f9; /* Light background for input */
+            background-color: #f9f9f9; 
             transition: border-color 0.3s ease;
         }
         input[type="text"]:focus,
         input[type="email"]:focus {
-            border-color: #4a5d29; /* Highlight border on focus */
-            outline: none; /* Remove default outline */
+            border-color: #4a5d29; 
+            outline: none; 
         }
         .submit-button {
             background-color: #b8860b;
@@ -269,10 +270,10 @@ if (isset($_GET['logout'])) {
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            font-size: 16px; /* Increased font size */
+            font-size: 16px; 
         }
         .submit-button:hover {
-            background-color: #a57900; /* Darker shade on hover */
+            background-color: #a57900; 
         }
         table {
             width: 100%;
@@ -307,7 +308,7 @@ if (isset($_GET['logout'])) {
             color: #e24a4a;
         }
         .search-results-container {
-            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; /* Show if there are results */
+            display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; 
             margin-top: 20px;
         }
     

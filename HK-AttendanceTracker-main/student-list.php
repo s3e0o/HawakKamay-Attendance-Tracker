@@ -146,11 +146,12 @@ $conn->close();
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            background-attachment: fixed;
             transition: margin-left .5s; 
         }
         .container {
             display: flex;
-            height: 100%;
+            height: auto;
             transition: margin-left .5s; 
         }
         .sidebar {
@@ -300,7 +301,10 @@ $conn->close();
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: scroll;
+        }
+        tr td{
+            margin-right: 10px;
         }
         th, td {
             text-align: left;
@@ -323,6 +327,7 @@ $conn->close();
         th:nth-child(10) { width: 10%; }
         th:nth-child(11) { width: 10%; }
         th:nth-child(12) { width: 10%; }
+
         .search-results-container {
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>;
             margin-top: 20px;

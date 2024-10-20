@@ -151,6 +151,7 @@ if (isset($_GET['logout'])) {
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            background-attachment: fixed;
             transition: margin-left .5s; /* Animation for sidebar toggle */
         }
         .container {

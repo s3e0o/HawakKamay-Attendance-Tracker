@@ -91,6 +91,7 @@ $conn->close(); // Close the database connection
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            background-attachment: fixed;
             transition: margin-left .5s; 
         }
         .container {

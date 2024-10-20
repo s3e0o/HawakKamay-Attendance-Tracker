@@ -92,7 +92,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instructor Dashboard</title>
+    <title>Faculty - Scholar Schedule Assignment</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -104,6 +104,7 @@ $conn->close();
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            background-attachment: fixed;
             transition: margin-left .5s; 
         }
         .container {

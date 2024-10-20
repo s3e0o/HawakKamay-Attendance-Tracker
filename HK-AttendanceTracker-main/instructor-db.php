@@ -98,16 +98,18 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
     if ($status === 'Present' && $attendance_status !== 'Present') {
         // Marking as present: Add session hours to rendered
         $hours_rendered += $session_hours;
-        // Calculate new remaining hours and ensure it doesn't exceed hk_equivalent_hours
-        $remaining_hours = max(0, min($hk_equivalent_hours, $remaining_hours - $session_hours));
     } elseif ($status === 'Absent' && $attendance_status === 'Present') {
         // Reverting to absent: Subtract session hours from rendered
         $hours_rendered = max(0, $hours_rendered - $session_hours);
-        // Calculate new remaining hours and ensure it doesn't exceed hk_equivalent_hours
-        $remaining_hours = min($hk_equivalent_hours, $remaining_hours + $session_hours);
     }
 
-    // Update the schedule with new rendered and remaining hours
+    // Calculate remaining hours accurately
+    $remaining_hours = max(0, $hk_equivalent_hours - $hours_rendered);
+
+    // Ensure remaining hours never exceed the HK equivalent hours
+    $remaining_hours = min($hk_equivalent_hours, $remaining_hours);
+
+    // Update the schedule with new rendered hours and status
     $update_stmt = $conn->prepare("
         UPDATE schedule 
         SET total_hours_rendered = ?, attendance_status = ? 
@@ -117,7 +119,7 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
     $update_stmt->execute();
     $update_stmt->close();
 
-    // Update the student's total hours (remaining hours)
+    // Update the student's total hours in the students table
     $update_student_stmt = $conn->prepare("
         UPDATE students 
         SET total_hours = ? 
@@ -174,6 +176,7 @@ $conn->close();
             background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
+            background-attachment: fixed;
             background-repeat: no-repeat;
             transition: margin-left .5s; 
         }
@@ -244,13 +247,13 @@ $conn->close();
             flex-grow: 1;
             padding: 20px;
             color: white;
-            transition: margin-left .5s; /* Animation for main content */
-            margin-left: 0px; /*Initial margin for main content */
+            transition: margin-left .5s;
+            margin-left: 0px;
         }
         .main-content.hidden {
-            margin-left: 0; /* Adjust margin when sidebar is hidden */
+            margin-left: 0;
         }
-        .dashboard-title {
+        .title {
             font-size: 24px;
             margin-bottom: 20px;
             border-bottom: 2px solid #b8860b;
@@ -350,7 +353,7 @@ $conn->close();
             </div> 
     </div>
     <div class="main-content" id="main-content">
-        <div class="dashboard-title">Schedule for <?php echo $searchDate; ?></div>
+        <div class="title">Schedule for <?php echo $searchDate; ?></div>
         
         <form method="GET" action="" class="schedule-form">
             <input type="date" name="searchDate" value="<?php echo $searchDate; ?>" required>
