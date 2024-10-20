@@ -27,9 +27,15 @@ if ($student_id) { // Proceed only if a user is logged in
                        sc.end_time, 
                        sc.subject, 
                        sc.classroom, 
-                       sc.assigned_by
+                       sc.assigned_by,
+                       sc.attendance_status,
+                       sc.total_hours_rendered,
+                       s.hk_equivalent_hours,
+                       s.total_hours,
+                       s.hk_status
                 FROM schedule sc
                 INNER JOIN users u ON sc.user_id = u.id
+                INNER JOIN students s ON u.id = s.user_id
                 WHERE u.id = ?";
 
     $stmt = $conn->prepare($sqlSchedule);
@@ -164,12 +170,12 @@ if (isset($_GET['logout'])) {
         }
         .content-box {
             border-radius: 10px;
-            padding: 20px;
+            padding: 0 20px;
             position: relative; /* Make this container relative */
         }
         .content-box2 {
             border-radius: 10px;
-            padding: 20px;
+            padding: 0 20px;
         }
         .content-box h2 {
             margin-top: 50px;
@@ -240,16 +246,16 @@ if (isset($_GET['logout'])) {
         }
         .info-box {
             background-color: #BFA93B;
-            padding: 8px;
+            padding: 15px;
             border-radius: 5px;
         }
         .info-box h3 {
             margin: 0 0 10px 0;
-            font-size: 25px;
+            font-size: 14px;
         }
         .info-box p {
             margin: 0;
-            font-size: 23px;
+            font-size: 24px;
             font-weight: bold;
         }
         table {
@@ -278,17 +284,17 @@ if (isset($_GET['logout'])) {
     <div class="container">
         <div class="sidebar">
             <div class="logo"></div>
-            <h2><?php echo htmlspecialchars($username); ?></h2>
-            <div class="nav-item"><a href="student-dashboard.php">Dashboard</a></div>
-            <div class="nav-item"><a href="view-schedule.php">View Schedule</a></div>
+            <h2>UPang HK <br>Attendance Tracker</h2>
+            <div class="nav-item"><a href="student-db.php">Dashboard</a></div>
+            <!-- <div class="nav-item"><a href="view-schedule.php">View Schedule</a></div>
             <div class="nav-item"><a href="manage-grades.php">Manage Grades</a></div>
-            <div class="nav-item"><a href="check-attendance.php">Check Attendance</a></div>
-            <div class="nav-item"><a href="update-profile.php">Update Profile</a></div>
+            <div class="nav-item"><a href="check-attendance.php">Check Attendance</a></div> -->
+            <div class="nav-item"><a href="student-profile.php">Profile</a></div>
             <a class="logout-btn" href="?logout=true">Logout</a>
         </div>
         <main>
             <div class="content-box">
-                <h2>SCHEDULE</h2>
+            <h2>Welcome, <?php echo htmlspecialchars($username); ?></h2>
 
                 <div class="notification-icon" onclick="toggleNotificationTray()">
                     <img src="notification.png" alt="Notifications" style="width: 24px; height: 24px;">
@@ -315,22 +321,51 @@ if (isset($_GET['logout'])) {
 
                 <div class="info-grid">
                     <div class="info-box">
-                        <h3>F2F Day:</h3>
-                        <p>Monday</p>
+                        <h3>HK Status</h3>
+                        <p>
+                            <?php 
+                            // Get HK Status from the first schedule entry
+                            echo htmlspecialchars(count($scheduleList) > 0 ? $scheduleList[0]['hk_status'] : 'N/A'); 
+                            ?>
+                        </p>
                     </div>
+                    
                     <div class="info-box">
-                        <h3>Required Hours:</h3>
-                        <p>90</p>
+                        <h3>HK Status Equivalent Hours</h3>
+                        <p>
+                            <?php 
+                            // Get HK Equivalent Hours from the first schedule entry
+                            echo htmlspecialchars(count($scheduleList) > 0 ? $scheduleList[0]['hk_equivalent_hours'] : 'N/A'); 
+                            ?>
+                        </p>
                     </div>
+
                     <div class="info-box">
-                        <h3>Total Hours Rendered:</h3>
-                        <p></p>
+                        <h3>Total Hours Rendered</h3>
+                        <p>
+                            <?php 
+                            // Calculate Total Hours Rendered
+                            $totalHoursRendered = 0;
+                            foreach ($scheduleList as $schedule) {
+                                $totalHoursRendered += (int)$schedule['total_hours_rendered']; // Ensure you're summing integers
+                            }
+                            echo htmlspecialchars($totalHoursRendered > 0 ? $totalHoursRendered : '0'); 
+                            ?>
+                        </p>
                     </div>
+
                     <div class="info-box">
-                        <h3>Total Hours Remaining:</h3>
-                        <p>40</p>
+                        <h3>Total Hours Remaining</h3>
+                        <p>
+                            <?php 
+                            // Get Total Hours from the first schedule entry
+                            echo htmlspecialchars(count($scheduleList) > 0 ? $scheduleList[0]['total_hours'] : 'N/A'); 
+                            ?>
+                        </p>
                     </div>
                 </div>
+
+                <h2>SCHEDULE</h2>
                 <div class="content-box2">
                     <table>
                         <thead>
@@ -341,6 +376,7 @@ if (isset($_GET['logout'])) {
                                 <th>Subject</th>
                                 <th>Classroom</th>
                                 <th>Instructor</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -353,6 +389,7 @@ if (isset($_GET['logout'])) {
                                     <td><?php echo htmlspecialchars($schedule['subject']); ?></td>
                                     <td><?php echo htmlspecialchars($schedule['classroom']); ?></td>
                                     <td><?php echo htmlspecialchars($schedule['assigned_by']); ?></td>
+                                    <td><?php echo htmlspecialchars($schedule['attendance_status']); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
