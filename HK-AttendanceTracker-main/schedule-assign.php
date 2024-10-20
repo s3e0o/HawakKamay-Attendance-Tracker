@@ -46,6 +46,7 @@ if ($logged_in_user_id) {
 
     $stmt->close();
 }
+
 // Handle schedule assignment
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date = $_POST['date'];
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
-        $stmt->bind_param("issssssd", $user_id, $date, $start_time, $end_time, $subject, $classroom, $assigned_by, $total_duration);
+        $stmt->bind_param("isssssss", $user_id, $date, $start_time, $end_time, $subject, $classroom, $assigned_by, $total_duration);
 
         if ($stmt->execute()) {
             echo "Schedule assigned successfully.";
@@ -76,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-
 // PHP logout logic
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -86,6 +86,7 @@ if (isset($_GET['logout'])) {
 
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,42 +100,40 @@ $conn->close();
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg');
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
+            transition: margin-left .5s; 
         }
         .container {
             display: flex;
             height: 100%;
+            transition: margin-left .5s; 
         }
         .sidebar {
             width: 200px;
+            height: auto;
             background-color: #A98D00;
             color: white;
             padding: 20px;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 2;
         }
-        .sidebar .logout-btn {
-            text-decoration: none;
-            color: white;
-            display: block;
-            padding: 10px;
-            margin: 5px 0;
-            background-color: #ff4c4c;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
-            transition: background-color 0.3s ease;
+        .sidebar.hidden {
+            transform: translateX(-100%);
+            width: 0;
+            padding: 0;
+            opacity: 0;
         }
         .logo {
-            width: 150px;
-            height: 150px;
-            background-image: url('hk_logo.png');
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
             background-size: cover;
             background-position: center;
-            border-radius: 50%;
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -153,6 +152,23 @@ $conn->close();
             text-decoration: none;
             color: white;
         }
+        .sidebar h2 {
+            text-align: center;
+            color: #4a5d29;
+            font-size: medium;
+        }
+        .sidebar .logout-btn {
+            color: white;
+            background-color: #ff4c4c;
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+            display: block;
+            border-radius: 10px;
+        }
+        .sidebar .logout-btn:hover {
+            background-color: #ff3333;
+        }
         .main-content {
             flex-grow: 1;
             padding: 20px;
@@ -168,7 +184,9 @@ $conn->close();
         }
         form {
             display: grid;
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
         }
         .form-group {
             display: flex;
@@ -191,13 +209,8 @@ $conn->close();
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            justify-self: end;
+            justify-self: center;
             font-size: 16px;
-        }
-        .sidebar h2 {
-            text-align: center;
-            color: #4a5d29;
-            font-size: medium;
         }
     </style>
 </head>
@@ -216,113 +229,126 @@ $conn->close();
         <div class="main-content">
             <h1>Assign Student</h1>
             <div class="content-box">
-            <form method="POST" action="">
-    <div class="form-group">
-        <label for="student">Select Student:</label>
-        <select name="student" required>
-        <?php while ($row = $students->fetch_assoc()): ?>
-            <option value="<?php echo $row['user_id']; ?>"><?php echo $row['name']; ?></option>
-        <?php endwhile; ?>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="date">Select Date:</label>
-        <input 
-            type="date" 
-            name="date" 
-            required 
-            min="<?php echo date('Y-m-d'); ?>"
-        >
-    </div>
-    <div class="form-group">
-        <label for="start_time">Select Start Time:</label>
-        <input 
-            type="time" 
-            name="start_time" 
-            required 
-            min="07:00"
-            onchange="calculateDuration()" 
-        > 
-    </div>
-    <div class="form-group">
-        <label for="end_time">Select End Time:</label>
-        <input 
-            type="time" 
-            name="end_time" 
-            required
-            max="18:30"
-            onchange="calculateDuration()" 
-        >
-    </div>
-    <div class="form-group">
-        <label for="subject">Subject:</label>
-        <input type="text" name="subject" required
-        placeholder="e.g., ITE314"
-        pattern="[A-Z0-9 ]+" 
-        title="Only uppercase letters and numbers are allowed.">
-    </div>
-    <div class="form-group">
-        <label for="classroom">Classroom:</label>
-        <input type="text" name="classroom" required
-        placeholder="e.g., ITS201"
-        pattern="[A-Z0-9 ]+" 
-        title="Only uppercase letters and numbers are allowed.">
-    </div>
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="student">Select Student:</label>
+                        <select name="student" required>
+                        <?php while ($row = $students->fetch_assoc()): ?>
+                            <option value="<?php echo $row['user_id']; ?>"><?php echo $row['name']; ?></option>
+                        <?php endwhile; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Select Date:</label>
+                        <input 
+                            type="date" 
+                            name="date" 
+                            required 
+                            min="<?php echo date('Y-m-d'); ?>"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="start_time">Select Start Time:</label>
+                        <input 
+                            type="time" 
+                            name="start_time" 
+                            required 
+                            min="07:00"
+                            onchange="calculateDuration()" 
+                        > 
+                    </div>
+                    <div class="form-group">
+                        <label for="end_time">Select End Time:</label>
+                        <input 
+                            type="time" 
+                            name="end_time" 
+                            required
+                            max="18:30"
+                            onchange="calculateDuration()" 
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="classroom">HK Hours To Be Rendered:</label>
+                        <input type="text" name="total_duration" id="total_duration" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <input type="text" name="subject" required
+                        placeholder="e.g., ITE314"
+                        pattern="[A-Z0-9 ]+" 
+                        title="Only uppercase letters and numbers are allowed."
+                        oninput="uppercaseInput(this)">
+                    </div>
+                    <div class="form-group">
+                        <label for="classroom">Classroom:</label>
+                        <input type="text" name="classroom" required
+                        placeholder="e.g., ITS201"
+                        pattern="[A-Z0-9 ]+" 
+                        title="Only uppercase letters and numbers are allowed."
+                        oninput="uppercaseInput(this)">
+                    </div>
 
-    <!-- Hidden field to store calculated total duration -->
-    <input type="text" name="total_duration" id="total_duration">
+                    
+                    <div class="form-group">
+                        <label for="classroom">Assigned By:</label>
+                        <input type="text" name="assigned_by_name" value="<?php echo htmlspecialchars($teacher_name); ?>" readonly>
+                    </div>
 
-    <div class="form-group">
-    <input type="text" name="assigned_by_name" value="<?php echo htmlspecialchars($teacher_name); ?>" readonly>
-    </div>
-    <button type="submit" class="submit-button">Assign</button>
-</form>
-
-<script>
-function calculateDuration() {
-    const startTimeInput = document.querySelector('input[name="start_time"]');
-    const endTimeInput = document.querySelector('input[name="end_time"]');
-    const totalDurationInput = document.getElementById('total_duration');
-
-    const startTime = startTimeInput.value;
-    const endTime = endTimeInput.value;
-
-    if (startTime && endTime && startTime < endTime) {
-        // Parse the time strings into Date objects
-        const start = new Date('1970-01-01T' + startTime + 'Z');
-        const end = new Date('1970-01-01T' + endTime + 'Z');
-
-        // Calculate the duration in milliseconds
-        const durationMs = end - start;
-
-        // Convert milliseconds to hours (1 hour = 3600000 ms)
-        const totalHours = durationMs / 3600000;
-
-        // Set the total_duration hidden input value
-        totalDurationInput.value = totalHours.toFixed(2); // Save up to 2 decimal places
-    } else {
-        totalDurationInput.value = ''; // Clear the value if times are invalid
-    }
-}
-</script>
-
+                    <div>
+                        <button type="submit" class="submit-button">Assign</button>
+                    </div>
+                    
+                </form> 
             </div>
+          </div>
         </div>
     </div>
 
-<script>
-function validateTimeInputs() {
-    const startTimeInput = document.querySelector('input[name="start_time"]');
-    const endTimeInput = document.querySelector('input[name="end_time"]');
+    <script>
+        function validateTimeInputs() {
+            const startTimeInput = document.querySelector('input[name="start_time"]');
+            const endTimeInput = document.querySelector('input[name="end_time"]');
 
-    const startTime = startTimeInput.value;
-    const endTime = endTimeInput.value;
+            const startTime = startTimeInput.value;
+            const endTime = endTimeInput.value;
 
-    if (startTime && endTime && startTime >= endTime) {
-        alert("Error: Start time must be earlier than end time.");
-        endTimeInput.value = ""; // Reset end time if invalid
-    }
-}
-</script>
+            if (startTime && endTime && startTime >= endTime) {
+                alert("Error: Start time must be earlier than end time.");
+                endTimeInput.value = ""; // Reset end time if invalid
+            }
+        }
+        function uppercaseInput(input) {
+                    // Split the input value by spaces, capitalize each word, and join them back together
+                    input.value = input.value
+                        .toUpperCase() // Convert entire string to lowercase first
+                        .split(' ') // Split into words
+                        .join(' '); // Join words back into a string
+                }
+        function calculateDuration() {
+            const startTimeInput = document.querySelector('input[name="start_time"]');
+            const endTimeInput = document.querySelector('input[name="end_time"]');
+            const totalDurationInput = document.getElementById('total_duration');
+
+            const startTime = startTimeInput.value;
+            const endTime = endTimeInput.value;
+
+            if (startTime && endTime && startTime < endTime) {
+                // Parse the time strings into Date objects
+                const start = new Date('1970-01-01T' + startTime + 'Z');
+                const end = new Date('1970-01-01T' + endTime + 'Z');
+
+                // Calculate the duration in milliseconds
+                const durationMs = end - start;
+
+                // Convert milliseconds to hours (1 hour = 3600000 ms)
+                const totalHours = durationMs / 3600000;
+
+                // Set the total_duration hidden input value
+                totalDurationInput.value = totalHours.toFixed(2); // Save up to 2 decimal places
+            } else {
+                totalDurationInput.value = ''; // Clear the value if times are invalid
+            }
+        }
+    </script>
 </body>
 </html>

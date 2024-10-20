@@ -291,6 +291,7 @@ $conn->close();
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('success')) {
             alert('Schedule updated successfully!');
+            // window.location.href('instructor-db.php');
         }
         if (urlParams.has('error')) {
             alert('An error occurred while updating the schedule.');
