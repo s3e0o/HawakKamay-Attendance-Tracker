@@ -70,11 +70,12 @@ if (isset($_GET['logout'])) {
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
+            background-attachment: fixed;
+            overflow: hidden;
         }
         .container {
             display: flex;
@@ -86,14 +87,12 @@ if (isset($_GET['logout'])) {
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
+            transition: transform 0.3s ease, opacity 0.3s ease;
             position: relative;
             z-index: 2; /* Ensure sidebar is above main content */
         }
         .sidebar.hidden {
             transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
             opacity: 0; /* Make sidebar invisible */
         }
         .logo {
@@ -143,11 +142,19 @@ if (isset($_GET['logout'])) {
             background-color: #ff3333;
             transition: background-color 0.3s ease;
         }
-        main {
+        .main-content {
             flex-grow: 1;
-            /* background-color: #556b2f; */
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -309,6 +316,17 @@ if (isset($_GET['logout'])) {
             .search-bar input[type="text"]:focus {
             box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
             }
+            .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -325,8 +343,9 @@ if (isset($_GET['logout'])) {
                 <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>  
         </div>
-        <main>
+        <div class="main-content">
             <!-- <div class="content-box"> -->
+            <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <h1 class="title">TEACHERS/COORDINATORS</h1>
 
                 <div class="header">
@@ -388,7 +407,7 @@ if (isset($_GET['logout'])) {
                     </tbody>
                 </table>
             </div>
-        </main>
+        </div>
     </div>
 
     <script>
@@ -403,6 +422,14 @@ if (isset($_GET['logout'])) {
                 // Redirect to the same page with the delete_id parameter
                 window.location.href = '?delete_id=' + encodeURIComponent(id);
             }
+        }
+    </script>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
     </script>
 </body>

@@ -102,7 +102,7 @@ $conn->close();
     <title>Instructor Dashboard</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
-         body, html {
+        body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
@@ -111,27 +111,25 @@ $conn->close();
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            transition: margin-left .5s; 
+            background-attachment: fixed;
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; 
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
-            transform: translateX(-100%); 
-            width: 0; 
-            padding: 0; 
-            opacity: 0; 
+            transform: translateX(-100%);
+            opacity: 0;
         }
         .logo {
             width: 150px;  
@@ -147,8 +145,6 @@ $conn->close();
             margin: 5px 0;
         }
         .nav-item:hover {
-            padding: 10px;
-            margin: 5px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -166,30 +162,29 @@ $conn->close();
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px;
             margin: 5px 0;
-            background-color: #ff4c4c;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
-        }
-        .logout-btn {
-            margin-top: auto; 
-            padding: 10px; 
-            text-align: center; 
-            color: white; 
-            background-color: #f44336; 
-            border: none; 
-            cursor: pointer; 
-            transition: background-color 0.3s ease; 
         }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -210,23 +205,32 @@ $conn->close();
         th {
             background-color: #3e4d22;
         }
-        .sidebar h2 {
-            text-align: center;
-            font-size: medium;
-        }
         button {
             background-color: #b8860b;
-            color: white; /* White text */
-            border: none; /* No border */
-            border-radius: 5px; /* Rounded corners */
-            transition: background-color 0.3s; /* Smooth transition */
-            padding: 10px 20px; /* Button padding */
-            font-size: 16px; /* Font size */
-            cursor: pointer; /* Pointer cursor on hover */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-
         button:hover {
-            background-color: #45a049; /* Darker green on hover */
+            background-color: #45a049;
+        }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
         }
         @media (max-width: 768px) {
             .container {
@@ -239,8 +243,10 @@ $conn->close();
             .main-content {
                 padding: 10px;
             }
+            .toggle-btn {
+                left: 10px;
+            }
         }
-
         @media (max-width: 480px) {
             h1 {
                 font-size: 20px;
@@ -249,80 +255,68 @@ $conn->close();
                 font-size: 12px;
             }
         }
+        
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <div class="logo"></div>
+    <div class="sidebar" id="sidebar">
+            <div alt="PHINMA Logo" class="logo"></div>
             <h2>UPang HK <br> Attendance Tracker</h2>
-            <div class="nav-item"><a href="admin-db.php">Dashboard</a></div>
-            <div class="nav-item"><a href="teacher-list.php">Instructor</a></div>
-            <div class="nav-item"><a href="student-list.php">Student</a></div>
-            <div class="nav-item active"><a href="schedules-list.php">Schedule</a></div>
+            <div class="nav-item active"><a href="admin-db.php">Dashboard</a></div>
+            <div class="nav-item"><a href="teacher-list.php">Faculty</a></div>
+            <div class="nav-item"><a href="student-list.php">Scholar</a></div>
+            <div class="nav-item"><a href="schedules-list.php">Schedule</a></div>
             <div class="nav-item"><a href="admin-profile.php">Profile</a></div>
             <div class="nav-item">
                 <a href="?logout=true" class="logout-btn">Log Out</a>
-            </div>  
-        </div>
+            </div>
+            </div> 
         <div class="main-content">
-            <h1 class="title">SCHEDULES</h1>
-            <form action="schedules-list.php" method="post">
-                <button type="submit" name="export" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
-                    Export Schedules
-                </button>
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
+            <div class="title">Instructor Dashboard: Schedules List</div>
+            <form method="post">
+                <button type="submit" name="export">Export as Excel</button>
             </form>
-            <table>
-                <thead>
+            <?php if ($result && $result->num_rows > 0): ?>
+                <table>
                     <tr>
-                        <th>ID</th>
+                        <th>Schedule ID</th>
                         <th>Student Name</th>
                         <th>Date</th>
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th>Subject</th>
                         <th>Classroom</th>
-                        <th>Status</th>
+                        <th>Attendance Status</th>
                         <th>Assigned By</th>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php if ($result && $result->num_rows > 0): ?>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo $row['schedule_id']; ?></td>
-                                <td><?php echo $row['student_name']; ?></td>
-                                <td><?php echo $row['date']; ?></td>
-                                <td><?php echo $row['start_time']; ?></td>
-                                <td><?php echo $row['end_time']; ?></td>
-                                <td><?php echo $row['subject']; ?></td>
-                                <td><?php echo $row['classroom']; ?></td>
-                                <td><?php echo $row['attendance_status']; ?></td>
-                                <td><?php echo $row['assigned_by']; ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
+                    <?php while ($schedule = $result->fetch_assoc()): ?>
                         <tr>
-                            <td colspan="9">No schedules found.</td>
+                            <td><?php echo $schedule['schedule_id']; ?></td>
+                            <td><?php echo $schedule['student_name']; ?></td>
+                            <td><?php echo $schedule['date']; ?></td>
+                            <td><?php echo $schedule['start_time']; ?></td>
+                            <td><?php echo $schedule['end_time']; ?></td>
+                            <td><?php echo $schedule['subject']; ?></td>
+                            <td><?php echo $schedule['classroom']; ?></td>
+                            <td><?php echo $schedule['attendance_status']; ?></td>
+                            <td><?php echo $schedule['assigned_by']; ?></td>
                         </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    <?php endwhile; ?>
+                </table>
+            <?php else: ?>
+                <p>No schedules available.</p>
+            <?php endif; ?>
         </div>
     </div>
 
     <script>
-        function validateTimeInputs() {
-            const startTimeInput = document.querySelector('input[name="start_time"]');
-            const endTimeInput = document.querySelector('input[name="end_time"]');
-
-            const startTime = startTimeInput.value;
-            const endTime = endTimeInput.value;
-
-            if (startTime && endTime && startTime >= endTime) {
-                alert("Error: Start time must be earlier than end time.");
-                endTimeInput.value = ""; // Reset end time if invalid
-            }
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
     </script>
 </body>
