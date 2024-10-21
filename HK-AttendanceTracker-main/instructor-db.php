@@ -130,7 +130,8 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
     $update_student_stmt->close();
 
     // Return success message
-    echo json_encode(['message' => 'Attendance status and hours updated successfully.']);
+    // echo json_encode(['message' => 'Attendance status and hours updated successfully.']);
+    $_SESSION['success_message'] = "Attendance status and hours updated successfully.";
     exit(); // Prevent further execution
 }
 
@@ -142,13 +143,24 @@ if (isset($_GET['delete_id'])) {
     $delete_stmt->bind_param("i", $delete_id);
 
     if ($delete_stmt->execute()) {
-        echo "<script>alert('Schedule deleted successfully.'); window.location.href = 'instructor-db.php';</script>";
+        // echo "<script>alert('Schedule deleted successfully.'); window.location.href = 'instructor-db.php';</script>";
+        $_SESSION['success_message'] = "Schedule deleted successfully.";
+        header("Location: instructor-db.php");
+        exit();
     } else {
-        echo "<script>alert('Failed to delete schedule.'); window.location.href = 'instructor-db.php';</script>";
+        // echo "<script>alert('Failed to delete schedule.'); window.location.href = 'instructor-db.php';</script>";
+        $_SESSION['error_message'] = "Failed to delete schedule.";
+        header("Location: instructor-db.php");
+        exit();
     }
-    $delete_stmt->close();
-    exit();
+    // $delete_stmt->close();
+    // exit();
 }
+
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // Logout logic
 if (isset($_GET['logout'])) {
@@ -353,6 +365,7 @@ $conn->close();
             cursor: pointer;
         }
         .no-results {
+            margin-top: 10px;
             color: white; 
             font-weight: bold;
         }
@@ -470,6 +483,13 @@ $conn->close();
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        <?php endif; ?>
+        <?php if ($success_message): ?>
+            <div style="color: yellow;"><?php echo $success_message; ?></div>
+        <?php endif; ?>
+
+        <?php if ($error_message): ?>
+            <div style="color: red;"><?php echo $error_message; ?></div>
         <?php endif; ?>
     </div>
 </div>
