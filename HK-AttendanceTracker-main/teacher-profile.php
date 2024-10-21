@@ -254,7 +254,7 @@ if (isset($_GET['logout'])) {
             justify-content: flex-start; 
         }
         .save-button {
-            width: 50%;
+            /* width: 50%; */
             background-color: #b8860b;
             color: white;
             border: none;
