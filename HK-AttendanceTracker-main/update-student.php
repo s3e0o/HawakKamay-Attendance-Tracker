@@ -61,11 +61,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $update_stmt->execute();
 
     if ($update_stmt->affected_rows > 0) {
-        $message = "User updated successfully.";
+        // $message = "User updated successfully.";
+        $_SESSION['success_message'] = "User updated succesfully.";
+        header("Location: student-list.php");
+        exit();
     } else {
-        $message = "No changes made or update failed.";
+        // $message = "No changes made or update failed.";
+        $_SESSION['success_message'] = "No changes made or update failed.";
+        header("Location: student-list.php");
+        exit();
     }
 }
+
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // Close the database connection
 $conn->close();
@@ -354,7 +365,9 @@ $conn->close();
                 <label for="email">Email:</label>
                 <input type="email" name="email" 
                     value="<?php echo htmlspecialchars($student['email']); ?>" required
-                    placeholder="Enter student's email">
+                    placeholder="e.g., ab.cd.up@phinmaed.com" 
+                    pattern="^[a-z.]+\.up@phinmaed\.com$" 
+                    title="Please enter a valid email address ending with .up@phinmaed.com and containing only lowercase letters and dots">
             </div>
 
             <div class="form-group">

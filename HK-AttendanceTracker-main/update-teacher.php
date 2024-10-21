@@ -52,14 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $stmt = $conn->prepare("SELECT * FROM teachers WHERE id = ?");
     $stmt->bind_param("i", $teacherId);
     if (!$stmt->execute()) {
-        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        $_SESSION['error_message'] = "Error executing query: " . $stmt->error;
         header("Location: teacher-list.php");
         exit();
     }
     $teacherExists = $stmt->get_result();
 
     if ($teacherExists->num_rows === 0) {
-        $_SESSION['error'] = "No teacher found with this ID.";
+        $_SESSION['error_message'] = "No teacher found with this ID.";
         header("Location: teacher-list.php");
         exit();
     }
@@ -71,14 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     );
     $stmt->bind_param("si", $email, $teacherId);
     if (!$stmt->execute()) {
-        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        $_SESSION['error_message'] = "Error executing query: " . $stmt->error;
         header("Location: teacher-list.php");
         exit();
     }
     $emailExists = $stmt->get_result();
 
     if ($emailExists->num_rows > 0) {
-        $_SESSION['error'] = "This email is already registered.";
+        $_SESSION['success_message'] = "This email is already registered.";
         header("Location: teacher-list.php");
         exit();
     }
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     );
     $stmt->bind_param("si", $email, $teacherId);
     if (!$stmt->execute()) {
-        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        $_SESSION['error_message'] = "Error executing query: " . $stmt->error;
         header("Location: teacher-list.php");
         exit();
     }
@@ -101,21 +101,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     );
     $stmt->bind_param("ssi", $name, $department, $teacherId);
     if (!$stmt->execute()) {
-        $_SESSION['error'] = "Error executing query: " . $stmt->error;
+        $_SESSION['error_message'] = "Error executing query: " . $stmt->error;
         header("Location: teacher-list.php");
         exit();
     }
 
-    $_SESSION['success'] = "Teacher information updated successfully.";
+    $_SESSION['success_message'] = "Teacher information updated successfully.";
     header("Location: teacher-list.php");
     exit();
 }
 
 // Display error message if set
-if (isset($_SESSION['error'])) {
-    echo "<script>alert('" . $_SESSION['error'] . "');</script>";
-    unset($_SESSION['error']);
-}
+// if (isset($_SESSION['error'])) {
+//     echo "<script>alert('" . $_SESSION['error'] . "');</script>";
+//     unset($_SESSION['error']);
+// }
+
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // Handle logout
 if (isset($_GET['logout'])) {
@@ -413,7 +418,10 @@ if (isset($_GET['logout'])) {
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required
+                        placeholder="e.g., ab.cd.up@phinmaed.com" 
+                        pattern="^[a-z.]+\.up@phinmaed\.com$" 
+                        title="Please enter a valid email address ending with .up@phinmaed.com and containing only lowercase letters and dots">
                 </div>
                 <div class="form-group">
                     <label for="department">Department:</label>
@@ -428,6 +436,13 @@ if (isset($_GET['logout'])) {
                 </div>
                 <button type="submit" name="update" class="submit-button">Update</button>
             </form>
+            <?php if ($success_message): ?>
+                <div style="color: yellow;"><?php echo $success_message; ?></div>
+            <?php endif; ?>
+
+            <?php if ($error_message): ?>
+                <div style="color: red;"><?php echo $error_message; ?></div>
+            <?php endif; ?>
         </main>
     </div>
     <script>

@@ -50,11 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
 
     // If duplicates are found, set a session message and redirect back
     if ($result_teacher->num_rows > 0) {
-        $_SESSION['error'] = "A teacher with this ID or name already exists.";
+        $_SESSION['error_message'] = "A teacher with this ID or name already exists.";
         header("Location: teacher-add.php");
         exit();
     } elseif ($result_email->num_rows > 0) {
-        $_SESSION['error'] = "This email is already registered.";
+        $_SESSION['error_message'] = "This email is already registered.";
         header("Location: teacher-add.php");
         exit();
     } else {
@@ -75,17 +75,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         $stmt_teacher->execute();
 
         // Redirect back to the teacher list page after saving
+        $_SESSION['success_message'] = "Teacher added successfully.";
         header("Location: teacher-list.php");
         exit();
     }
 
 }
 
-// Display error message if set
-if (isset($_SESSION['error'])) {
-    echo "<script>alert('" . $_SESSION['error'] . "');</script>";
-    unset($_SESSION['error']); // Clear the message after displaying
-}
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -345,19 +346,21 @@ if (isset($_SESSION['error'])) {
                         <div class="form-group">
                             <label for="email">Email:</label>
                             <input type="email" id="email" name="email" required
-                            placeholder="Enter Teacher/Instructor Email:">
+                                placeholder="e.g., ab.cd.up@phinmaed.com" 
+                                pattern="^[a-z.]+\.up@phinmaed\.com$" 
+                                title="Please enter a valid email address ending with .up@phinmaed.com and containing only lowercase letters and dots">
                         </div>
                         <div class="form-group">
-                    <label for="department">Department:</label>
-                    <select name="department" id="department" required>
-                        <option value="CITE" <?php echo ($department == 'CITE') ? 'selected' : ''; ?>>CITE</option>
-                        <option value="CELA" <?php  echo ($department == 'CELA') ? 'selected' : ''; ?>>CELA</option>
-                        <option value="CAS" <?php echo ($department == 'CAS') ? 'selected' : ''; ?>>CAS</option>
-                        <option value="CEA" <?php echo ($department == 'CEA') ? 'selected' : ''; ?>>CEA</option>
-                        <option value="CAHS" <?php echo ($department == 'CAHS') ? 'selected' : ''; ?>>CAHS</option>
-                        <option value="CCJE" <?php echo ($department == 'CCJE') ? 'selected' : ''; ?>>CCJE</option>
-                    </select>
-                </div>
+                            <label for="department">Department:</label>
+                            <select name="department" id="department" required>
+                                <option value="CITE" <?php echo ($department == 'CITE') ? 'selected' : ''; ?>>CITE</option>
+                                <option value="CELA" <?php  echo ($department == 'CELA') ? 'selected' : ''; ?>>CELA</option>
+                                <option value="CAS" <?php echo ($department == 'CAS') ? 'selected' : ''; ?>>CAS</option>
+                                <option value="CEA" <?php echo ($department == 'CEA') ? 'selected' : ''; ?>>CEA</option>
+                                <option value="CAHS" <?php echo ($department == 'CAHS') ? 'selected' : ''; ?>>CAHS</option>
+                                <option value="CCJE" <?php echo ($department == 'CCJE') ? 'selected' : ''; ?>>CCJE</option>
+                            </select>
+                        </div>
                         <button type="submit" name="save" class="submit-button">Add</button>
                     </form>
                 </div>

@@ -37,14 +37,25 @@ if (isset($_GET['delete_id'])) {
     $delete_stmt->bind_param("i", $delete_id);
     
     if ($delete_stmt->execute()) {
-        echo "<script>alert('Teacher deleted successfully.'); window.location.href = 'teacher-list.php';</script>";
+        // echo "<script>alert('Teacher deleted successfully.'); window.location.href = 'teacher-list.php';</script>";
+        $_SESSION['success_message'] = "Teacher deleted successfully.";
+            header("Location: teacher-list.php");
+            exit();
     } else {
-        echo "<script>alert('Failed to delete teacher.'); window.location.href = 'teacher-list.php';</script>";
+        // echo "<script>alert('Failed to delete teacher.'); window.location.href = 'teacher-list.php';</script>";
+        $_SESSION['error_message'] = "Failed to delete teacher";
+            header("Location: teacher-list.php");
+            exit();
     }
     
-    $delete_stmt->close();
-    exit();
+    // $delete_stmt->close();
+    // exit();
 }
+
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
@@ -356,6 +367,15 @@ if (isset($_GET['logout'])) {
                 <?php if (empty($teachers)): ?>
                     <div class="no-results">No results found for your search.</div>
                 <?php endif; ?>
+
+                <?php if ($success_message): ?>
+                    <div style="color: yellow;"><?php echo $success_message; ?></div>
+                <?php endif; ?>
+
+                <?php if ($error_message): ?>
+                    <div style="color: red;"><?php echo $error_message; ?></div>
+                <?php endif; ?>
+                
                 <h3 class="section-title">RECENT USER ACTIVITIES</h3>
                 <table>
                     <thead>

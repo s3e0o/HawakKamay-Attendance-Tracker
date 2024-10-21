@@ -385,7 +385,7 @@ if (isset($_GET['logout'])) {
                             <label for="student_id">StudentID:</label>
                             <input type="text" id="student_id" name="student_id" required
                                 placeholder="Enter StudentID (e.g., 03-1234-56789)"
-                                pattern="^\d{2}-\d{4}-\d{5-6}$" 
+                                pattern="^\d{2}-\d{4}-\d{5,6}$" 
                                 title="Format must be: 00-0000-00000 (two digits, dash, four digits, dash, five to six digits)">
                         </div>
                         <div class="form-group">
@@ -428,9 +428,9 @@ if (isset($_GET['logout'])) {
                         <div class="form-group">
                             <label for="email">Email:</label>
                             <input type="email" id="email" name="email" required
-                                placeholder="Enter email of student" 
-                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                                title="Please enter a valid email address.">
+                                placeholder="e.g., ab.cd.up@phinmaed.com" 
+                                pattern="^[a-z.]+\.up@phinmaed\.com$" 
+                                title="Please enter a valid email address ending with .up@phinmaed.com and containing only lowercase letters and dots">
                         </div>
                         <button type="submit" class="submit-button" name="save">Save</button>
                     </form>

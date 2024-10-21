@@ -68,13 +68,19 @@ if (isset($_GET['delete_id'])) {
     $delete_stmt->bind_param("i", $delete_id);
     
     if ($delete_stmt->execute()) {
-        echo "<script>alert('Student deleted successfully.'); window.location.href = 'student-list.php';</script>";
+        // echo "<script>alert('Student deleted successfully.'); window.location.href = 'student-list.php';</script>";
+        $_SESSION['success_message'] = "Student deleted successfully.";
+        header("Location: student-list.php");
+        exit();
     } else {
-        echo "<script>alert('Failed to delete student.'); window.location.href = 'student-list.php';</script>";
+        // echo "<script>alert('Failed to delete student.'); window.location.href = 'student-list.php';</script>";
+        $_SESSION['error_message'] = "Failed to update student.";
+        header("Location: student-list.php");
+        exit();
     }
     
-    $delete_stmt->close();
-    exit();
+    // $delete_stmt->close();
+    // exit();
 }
 
 // Export functionality
@@ -124,6 +130,20 @@ if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: multi-login.php");
     exit();
+}
+
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    // Destroy the session
+    session_destroy();
+    // Redirect to the login page
+    header("Location: multi-login.php");
+    exit(); // Exit after header redirection
 }
 
 $conn->close();
@@ -221,7 +241,7 @@ $conn->close();
             font-weight: bold;
         }
         .main-content {
-
+            width: 100%;
             padding: 20px;
             color: white;
             overflow-y: auto;
@@ -362,8 +382,7 @@ $conn->close();
             padding: 10px 15px;
             font-size: 16px;
             outline: none;
-            }
-
+        }
         .search-bar input[type="submit"] {
             background-color: #4a5d29;
             color: white;
@@ -425,13 +444,19 @@ $conn->close();
                     <button class="add-new" onclick="location.href='student-add.php';">Add New</button>
                 </div>
 
-                <!-- Search Bar -->
                 <form class="search-bar" action="student-list.php" method="GET">
                     <input type="text" name="searchQuery" placeholder="Search by Name, Email, Course, or HK Percent" required>
                     <input type="submit" value="Search">
                     <button class="btn-clear" type="button" onclick="clearSearch()">Clear</button>
                 </form>
 
+                <?php if ($success_message): ?>
+                    <div style="color: yellow;"><?php echo $success_message; ?></div>
+                <?php endif; ?>
+
+                <?php if ($error_message): ?>
+                    <div style="color: red;"><?php echo $error_message; ?></div>
+                <?php endif; ?>
                 <?php if (!empty($students)): ?>
                     <h3>RECENT USER ACTIVITIES</h3>
                     <table>
@@ -445,7 +470,7 @@ $conn->close();
                             <th>Required Hours</th>
                             <th>Total Hours Remaining</th>
                             <th>Status</th>
-                            <th></th>
+                            <th>Actions</th>
                         </tr>
                         <?php foreach ($students as $row): ?>
                             <tr>
@@ -496,7 +521,7 @@ $conn->close();
                             <th>Required Hours</th>
                             <th>Total Hours Remaining</th>
                             <th>Status</th>
-                            <th></th>
+                            <th>Actions</th>
                         </tr>
                         <?php foreach ($_SESSION['searchResults'] as $row): ?>
                             <tr>
