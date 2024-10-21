@@ -287,7 +287,7 @@ $conn->close();
             <?php if ($result && $result->num_rows > 0): ?>
                 <table>
                     <tr>
-                        <th>Schedule ID</th>
+                        <th>ScheduleID</th>
                         <th>Student Name</th>
                         <th>Date</th>
                         <th>Start Time</th>

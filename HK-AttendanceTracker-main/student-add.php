@@ -37,20 +37,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     $total_hours = 0;
     switch ($hk_status) {
         case 'HK25':
-            $total_hours = 25; // Corrected to 25 hours
-            $hk_equivalent_hours = 45; // Fixed equivalent hours for HK25
+            $total_hours = 50;
+            $hk_equivalent_hours = 50; 
             break;
         case 'HK50':
             $total_hours = 90;
-            $hk_equivalent_hours = 90; // Fixed equivalent hours for HK50
+            $hk_equivalent_hours = 90; 
             break;
         case 'HK75':
             $total_hours = 120;
-            $hk_equivalent_hours = 120; // Fixed equivalent hours for HK75
+            $hk_equivalent_hours = 120; 
             break;
         case 'HK100':
             $total_hours = 150;
-            $hk_equivalent_hours = 150; // Fixed equivalent hours for HK100
+            $hk_equivalent_hours = 150; 
             break;
     }
 

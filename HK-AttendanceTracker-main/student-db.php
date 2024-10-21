@@ -388,7 +388,7 @@ if (isset($_GET['logout'])) {
                     </div>
                     
                     <div class="info-box">
-                        <h3>HK Status Equivalent Hours</h3>
+                        <h3>HK Equivalent Hours</h3>
                         <p>
                             <?php 
                            

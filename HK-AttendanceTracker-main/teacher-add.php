@@ -330,14 +330,14 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                         <div class="form-group">
                             <label for="teacher_id">FacultyID:</label>
                             <input type="text" id="teacher_id" name="teacher_id" required
-                            placeholder="Enter Teacher/Instructor ID:"
-                            pattern="^[0-9-]+$" 
+                            placeholder="Enter Teacher/Instructor ID (e.g., 03-20211)"
+                            pattern="^\d{2}-\d{4,6}$" 
                             title="Only numbers and dashes are allowed, with no spaces.">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>
                             <input type="text" id="name" name="name" required
-                            placeholder="Enter Teacher/Instructor Name:"
+                            placeholder="Enter Teacher/Instructor Name"
                             pattern="^[A-Za-z\s]+$" 
                             title="Please enter letters only." 
                             maxlength="30" required

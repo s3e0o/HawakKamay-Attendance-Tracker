@@ -32,7 +32,7 @@ if (isset($_GET['searchQuery'])) {
     $searchQuery = $conn->real_escape_string($_GET['searchQuery']);
     
     // Prepare SQL query based on search
-    $sql = "SELECT user_id, name, student_id, email, course, level, hk_status, total_hours, status 
+    $sql = "SELECT user_id, name, student_id, email, course, level, hk_status, total_hours, hk_equivalent_hours, status 
             FROM students 
             WHERE name LIKE '%$searchQuery%' OR student_id LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%' OR course LIKE '%$searchQuery%' OR hk_status LIKE '%$searchQuery%'";
     $result = $conn->query($sql);
@@ -47,7 +47,7 @@ if (isset($_GET['searchQuery'])) {
     }
 } else {
     // Fetch recent users if there's no search query
-    $sql = "SELECT user_id, name, student_id, email, course, level, hk_status, total_hours, status 
+    $sql = "SELECT user_id, name, student_id, email, course, level, hk_status, total_hours, hk_equivalent_hours, status 
             FROM students 
             ORDER BY user_id ASC";
     $result = $conn->query($sql);
@@ -64,7 +64,7 @@ if (isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
     
     // Prepare delete statement
-    $delete_stmt = $conn->prepare("DELETE FROM students WHERE user_id = ?");
+    $delete_stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
     $delete_stmt->bind_param("i", $delete_id);
     
     if ($delete_stmt->execute()) {
@@ -461,13 +461,13 @@ $conn->close();
                     <h3>RECENT USER ACTIVITIES</h3>
                     <table>
                         <tr>
-                            <th>Student No.</th>
+                            <th>StudentID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Course</th>
                             <th>Year Level</th>
                             <th>HK Status</th>
-                            <th>Required Hours</th>
+                            <th>HK Equivalent Hours</th>
                             <th>Total Hours Remaining</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -480,8 +480,8 @@ $conn->close();
                                 <td><?= htmlspecialchars($row["course"]) ?></td>
                                 <td><?= htmlspecialchars($row["level"]) ?></td>
                                 <td><?= htmlspecialchars($row["hk_status"]) ?></td>
+                                <td><?= htmlspecialchars($row["hk_equivalent_hours"]) ?> hours</td>
                                 <td><?= htmlspecialchars($row["total_hours"]) ?> hours</td>
-                                <td>80</td>
                                 <td><?= htmlspecialchars($row["status"]) ?></td>
                                 <td class="actions">
                                     <!-- <form action="update-student.php" method="GET">
@@ -518,7 +518,7 @@ $conn->close();
                             <th>Course</th>
                             <th>Year Level</th>
                             <th>HK Status</th>
-                            <th>Required Hours</th>
+                            <th>HK Equivalent Hours</th>
                             <th>Total Hours Remaining</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -531,8 +531,8 @@ $conn->close();
                                 <td><?= htmlspecialchars($row["course"]) ?></td>
                                 <td><?= htmlspecialchars($row["level"]) ?></td>
                                 <td><?= htmlspecialchars($row["hk_status"]) ?></td>
+                                <td><?= htmlspecialchars($row["hk_equivalent_hours"]) ?> hours</td>
                                 <td><?= htmlspecialchars($row["total_hours"]) ?> hours</td>
-                                <td>80</td>
                                 <td><?= htmlspecialchars($row["status"]) ?></td>
                                 <td class="actions">
                                     <button class="edit" onclick="location.href='update-student.php?user_id=<?= urlencode($row['user_id']) ?>'">

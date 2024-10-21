@@ -31,25 +31,41 @@ if ($result->num_rows > 0) {
 // Handle delete request
 if (isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
-    
-    // Prepare delete statement
-    $delete_stmt = $conn->prepare("DELETE FROM teachers WHERE id = ?");
-    $delete_stmt->bind_param("i", $delete_id);
-    
-    if ($delete_stmt->execute()) {
-        // echo "<script>alert('Teacher deleted successfully.'); window.location.href = 'teacher-list.php';</script>";
-        $_SESSION['success_message'] = "Teacher deleted successfully.";
+
+    // Prepare to get the user_id associated with the teacher
+    $getUserIdStmt = $conn->prepare("SELECT user_id FROM teachers WHERE id = ?");
+    $getUserIdStmt->bind_param("i", $delete_id);
+    $getUserIdStmt->execute();
+    $userIdResult = $getUserIdStmt->get_result();
+
+    if ($userIdResult->num_rows > 0) {
+        $userIdRow = $userIdResult->fetch_assoc();
+        $user_id = $userIdRow['user_id'];
+
+        // Prepare delete statement for the teacher
+        $delete_teacher_stmt = $conn->prepare("DELETE FROM teachers WHERE id = ?");
+        $delete_teacher_stmt->bind_param("i", $delete_id);
+        $teacherDeleted = $delete_teacher_stmt->execute();
+
+        // Prepare delete statement for the user
+        $delete_user_stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $delete_user_stmt->bind_param("i", $user_id);
+        $userDeleted = $delete_user_stmt->execute();
+
+        if ($teacherDeleted && $userDeleted) {
+            $_SESSION['success_message'] = "Teacher and associated user deleted successfully.";
             header("Location: teacher-list.php");
             exit();
+        } else {
+            $_SESSION['error_message'] = "Failed to delete teacher or associated user.";
+            header("Location: teacher-list.php");
+            exit();
+        }
     } else {
-        // echo "<script>alert('Failed to delete teacher.'); window.location.href = 'teacher-list.php';</script>";
-        $_SESSION['error_message'] = "Failed to delete teacher";
-            header("Location: teacher-list.php");
-            exit();
+        $_SESSION['error_message'] = "Teacher not found.";
+        header("Location: teacher-list.php");
+        exit();
     }
-    
-    // $delete_stmt->close();
-    // exit();
 }
 
 // Check for success/error message
@@ -375,12 +391,12 @@ if (isset($_GET['logout'])) {
                 <?php if ($error_message): ?>
                     <div style="color: red;"><?php echo $error_message; ?></div>
                 <?php endif; ?>
-                
+
                 <h3 class="section-title">RECENT USER ACTIVITIES</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <!-- <th>ID</th> -->
                             <th>FacultyID</th>
                             <th>Name</th>
                             <th>Department</th>
@@ -391,7 +407,7 @@ if (isset($_GET['logout'])) {
                     <tbody>
                         <?php foreach ($teachers as $teacher): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($teacher['id']); ?></td>
+                                <!-- <td><?php echo htmlspecialchars($teacher['id']); ?></td> -->
                                 <td><?php echo htmlspecialchars($teacher['teacher_id']); ?></td>
                                 <td><?php echo htmlspecialchars($teacher['name']); ?></td>
                                 <td><?php echo htmlspecialchars($teacher['department']); ?></td>
