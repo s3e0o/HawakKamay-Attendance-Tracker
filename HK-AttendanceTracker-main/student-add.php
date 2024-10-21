@@ -135,52 +135,42 @@ if (isset($_GET['logout'])) {
     <title>Admin Add Scholar - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
-        .message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            color: white;
-            background-color: red; /* Change as needed */
-        }
         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Path to the uploaded image */
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s; /* Animation for sidebar toggle */
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; /* Animation for container */
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; /* Animation for sidebar */
             position: relative;
-            z-index: 2; /* Ensure sidebar is above main content */
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            width: 0; /* Remove width when hidden */
-            padding: 0; /* Remove padding when hidden */
-            opacity: 0; /* Make sidebar invisible */
+            transform: translateX(-100%);
+            opacity: 0;
         }
         .logo {
-            width: 150px;  /* Adjust size */
-            height: 150px; /* Ensure it's square */
-            background-image: url('hk_logo.png'); /* Background image path */
-            background-size: cover;  /* Makes sure the image covers the entire div */
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
-            border-radius: 50%; /* Make it a circle */
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -188,8 +178,6 @@ if (isset($_GET['logout'])) {
             margin: 5px 0;
         }
         .nav-item:hover {
-            padding: 10px;
-            margin: 5px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -207,29 +195,29 @@ if (isset($_GET['logout'])) {
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px;
             margin: 5px 0;
-            background-color: #ff4c4c;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
         }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
-            transition: background-color 0.3s ease;
-        }
         main {
             flex-grow: 1;
-            /* background-color: #556b2f; */
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
         }
-        h1 {
-            margin-top: 0;
-            font-size: 24px;
+        main.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        main:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .content-box {
             /*background-color: #4a5d29;*/
@@ -306,6 +294,43 @@ if (isset($_GET['logout'])) {
         .submit-button:hover {
             background-color: #BFA93B;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            main {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
     <script>
         function updateTotalHours() {
@@ -347,6 +372,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <main>
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <h1 class="title">ADD SCHOLAR</h1>
 
             <!-- <div class="content-box">
@@ -429,6 +455,13 @@ if (isset($_GET['logout'])) {
                 .toUpperCase() // Convert entire string to lowercase first
                 .split(' ') // Split into words
                 .join(' '); // Join words back into a string
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('main');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
     </script>
 </body>
