@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Check for duplicates in the students table
+    // Check for duplicates in the scholars table
     $check_student_sql = "SELECT * FROM students WHERE student_id = ? OR name = ?";
     $stmt_check_student = $conn->prepare($check_student_sql);
     $stmt_check_student->bind_param("ss", $studentId, $name);
@@ -78,15 +78,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
 
     // If duplicates are found, set a session message and redirect back
     if ($result_student->num_rows > 0) {
-        $_SESSION['error'] = "A student with this ID or name already exists.";
+        $_SESSION['error_message'] = "A scholar with this ID or name already exists.";
         header("Location: student-add.php");
         exit();
     } elseif ($result_email->num_rows > 0) {
-        $_SESSION['error'] = "This email is already registered.";
+        $_SESSION['error_message'] = "This email is already registered.";
         header("Location: student-add.php");
         exit();
     } else {
-        // Hash the student ID to use as the default password
+        // Hash the scholar ID to use as the default password
         $hashed_password = password_hash($studentId, PASSWORD_DEFAULT);
 
         // First, insert the new user into the 'users' table
@@ -96,24 +96,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         $stmt_user->execute();
         $user_id = $stmt_user->insert_id; // Get the ID of the inserted user
 
-        // Insert the student data into the 'students' table
+        // Insert the scholar data into the 'scholars' table
         $insert_student_sql = "INSERT INTO students (student_id, name, email, course, level, hk_status, total_hours, hk_equivalent_hours, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_student = $conn->prepare($insert_student_sql);
         $stmt_student->bind_param("ssssssiii", $studentId, $name, $email, $course, $level, $hk_status, $total_hours, $hk_equivalent_hours, $user_id);
         $stmt_student->execute();
 
-        // Redirect back to the student list page after saving
+        // Redirect back to the scholar list page after saving
+        $_SESSION['success_message'] = "Scholar added successfully.";
         header("Location: student-list.php");
         exit();
     }
 }
 
-
-// Display error message if set
-if (isset($_SESSION['error'])) {
-    echo "<script>alert('" . $_SESSION['error'] . "');</script>";
-    unset($_SESSION['error']); // Clear the message after displaying
-}
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
@@ -341,7 +340,7 @@ if (isset($_GET['logout'])) {
             var hours = 0;
             switch (selectedHK) {
                 case 'HK25':
-                    hours = 45;
+                    hours = 50;
                     break;
                 case 'HK50':
                     hours = 90;
@@ -391,7 +390,7 @@ if (isset($_GET['logout'])) {
                         <div class="form-group">
                             <label for="name">Name:</label>
                             <input type="text" id="name" name="name"  
-                                placeholder="Enter name of student (e.g., John Doe)"
+                                placeholder="Enter name of scholar (e.g., John Doe)"
                                 pattern="^[A-Za-z\s]+$" 
                                 title="Please enter letters only." 
                                 maxlength="50" required
@@ -400,7 +399,7 @@ if (isset($_GET['logout'])) {
                         <div class="form-group">
                             <label for="course">Course:</label>
                             <input type="text" id="course" name="course" 
-                                placeholder="Enter course of student (e.g., BSIT)"
+                                placeholder="Enter course of scholar (e.g., BSIT)"
                                 pattern="^[A-Za-z\s]+$" 
                                 title="Please enter letters only." 
                                 minlength="3"
@@ -411,7 +410,7 @@ if (isset($_GET['logout'])) {
                             <label for="level">Year Level:</label>
                             <input type="number" id="level" name="level" 
                                 min="1" max="5" 
-                                placeholder="Enter year level of student"
+                                placeholder="Enter year level of scholar"
                                 title="Please enter a number between 1 and 5."
                                 required>
                         </div>
@@ -435,6 +434,13 @@ if (isset($_GET['logout'])) {
                         <button type="submit" class="submit-button" name="save">Save</button>
                     </form>
 
+                    <?php if ($success_message): ?>
+                        <div style="color: yellow;"><?php echo $success_message; ?></div>
+                    <?php endif; ?>
+
+                    <?php if ($error_message): ?>
+                        <div style="color: red;"><?php echo $error_message; ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
         </main>

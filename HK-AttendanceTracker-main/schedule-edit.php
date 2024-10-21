@@ -11,14 +11,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch students for the dropdown
-$students = $conn->query("SELECT user_id, name FROM students");
-
-// Fetch existing schedule details for editing
+// Fetch schedule details for editing
 $schedule_id = $_GET['schedule_id'] ?? null;
 
 if ($schedule_id) {
-    $schedule_query = $conn->query("SELECT * FROM schedule WHERE schedule_id = $schedule_id");
+    $schedule_query = $conn->query(
+        "SELECT s.schedule_id, s.user_id, s.date, s.start_time, s.end_time, s.subject, s.classroom, st.name 
+         FROM schedule s 
+         JOIN students st ON s.user_id = st.user_id 
+         WHERE s.schedule_id = $schedule_id"
+    );
     $schedule = $schedule_query->fetch_assoc();
 }
 
@@ -27,44 +29,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date = $_POST['date'];
     $start_time = $_POST['start_time'];
     $end_time = $_POST['end_time'];
-    $user_id = $_POST['student_id']; // Use hidden input
+    $user_id = $_POST['user_id'];  // Correct hidden input usage
     $subject = $_POST['subject'];
     $classroom = $_POST['classroom'];
 
-    // Fetch the current schedule details for comparison
-    $current_schedule = $conn->query("SELECT * FROM schedule WHERE schedule_id = $schedule_id")->fetch_assoc();
-
-    // Prepare the update statement
+    // Validate times
     if ($start_time >= $end_time) {
-        // echo "<script>alert('Error: Start time must be earlier than end time.');</script>";
         $_SESSION['error_message'] = "Start time must be earlier than end time.";
-        header("Location: schedule-edit.php");
+        header("Location: schedule-edit.php?schedule_id=$schedule_id");
+        exit();
+    }
+
+    // Prepare the update query
+    $stmt = $conn->prepare(
+        "UPDATE schedule 
+         SET user_id = ?, date = ?, start_time = ?, end_time = ?, subject = ?, classroom = ? 
+         WHERE schedule_id = ?"
+    );
+    $stmt->bind_param("isssssi", $user_id, $date, $start_time, $end_time, $subject, $classroom, $schedule_id);
+
+    if ($stmt->execute()) {
+        $_SESSION['success_message'] = "Schedule updated successfully.";
+        header("Location: schedule-edit.php?schedule_id=$schedule_id&success=1");
         exit();
     } else {
-        $stmt = $conn->prepare(
-            "UPDATE schedule 
-            SET user_id = ?, `date` = ?, start_time = ?, end_time = ?, subject = ?, classroom = ?
-            WHERE schedule_id = ?"
-        );
-        $stmt->bind_param("isssssi", $user_id, $date, $start_time, $end_time, $subject, $classroom, $schedule_id);
-
-        // Execute the update and check for success
-        if ($stmt->execute()) {
-            // Log the changes
-            logChanges($conn, $schedule_id, $current_schedule, $user_id, $date, $start_time, $end_time, $subject, $classroom);
-            
-            // Redirect to the edit page or a summary page
-            $_SESSION['success_message'] = "Schedule updated successfully.";
-            // header("Location: schedule-edit.php");
-            header("Location: schedule-edit.php?schedule_id=$schedule_id&success=1");
-            exit();
-        } else {
-            // echo "<script>alert('Error: " . $stmt->error . "');</script>";
-            $_SESSION['error_message'] = "An error occurred while updating the schedule.";
-            header("Location: schedule-edit.php");
-            exit();
-        }
-        // $stmt->close();
+        $_SESSION['error_message'] = "An error occurred while updating the schedule.";
+        header("Location: schedule-edit.php?schedule_id=$schedule_id");
+        exit();
     }
 }
 
@@ -305,13 +296,11 @@ $conn->close();
             <h1 class="title">EDIT SCHOLAR ASSIGNMENT INFORMATION</h1>
             <div class="content-box">
                 <?php if ($schedule): ?>
-                    <form method="POST">
+                    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?schedule_id=' . htmlspecialchars($schedule_id); ?>">
                         <div class="form-group">
-                            <label for="student">Student:</label>
-                            <input type="text" name="student" 
-                                value="<?php echo htmlspecialchars($students->fetch_assoc()['name']); ?>" 
-                                readonly>
-                            <input type="hidden" name="student_id" value="<?php echo $schedule['user_id']; ?>">
+                            <label for="student">Student Name:</label>
+                            <input type="text" value="<?php echo htmlspecialchars($schedule['name']); ?>" readonly>
+                            <input type="hidden" name="user_id" value="<?php echo $schedule['user_id']; ?>">
                         </div>
                         <div class="form-group">
                             <label for="date">Select Date:</label>

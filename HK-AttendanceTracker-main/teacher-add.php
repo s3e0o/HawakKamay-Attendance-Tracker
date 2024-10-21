@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Check for duplicates in the teachers table
+    // Check for duplicates in the faculties table
     $check_teacher_sql = "SELECT * FROM teachers WHERE teacher_id = ? OR name = ?";
     $stmt_check_teacher = $conn->prepare($check_teacher_sql);
     $stmt_check_teacher->bind_param("ss", $teacherId, $name);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
 
     // If duplicates are found, set a session message and redirect back
     if ($result_teacher->num_rows > 0) {
-        $_SESSION['error_message'] = "A teacher with this ID or name already exists.";
+        $_SESSION['error_message'] = "A faculty with this ID or name already exists.";
         header("Location: teacher-add.php");
         exit();
     } elseif ($result_email->num_rows > 0) {
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         header("Location: teacher-add.php");
         exit();
     } else {
-        // Hash the teacher ID to use as the default password
+        // Hash the faculty ID to use as the default password
         $hashed_password = password_hash($teacherId, PASSWORD_DEFAULT);
 
         // First, insert the new user into the 'users' table
@@ -68,19 +68,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
         $stmt_user->execute();
         $user_id = $stmt_user->insert_id; // Get the ID of the inserted user
 
-        // Insert the teacher data into the 'teachers' table
+        // Insert the faculty data into the 'teachers' table
         $insert_teacher_sql = "INSERT INTO teachers (teacher_id, name, department, user_id) VALUES (?, ?, ?, ?)";
         $stmt_teacher = $conn->prepare($insert_teacher_sql);
         $stmt_teacher->bind_param("sssi", $teacherId, $name, $department, $user_id);
         $stmt_teacher->execute();
 
-        // Redirect back to the teacher list page after saving
-        $_SESSION['success_message'] = "Teacher added successfully.";
+        // Redirect back to the faculty list page after saving
+        $_SESSION['success_message'] = "Faculty added successfully.";
         header("Location: teacher-list.php");
         exit();
     }
 
-}
+}       
 
 // Check for success/error message
 $success_message = $_SESSION['success_message'] ?? '';
@@ -330,14 +330,14 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                         <div class="form-group">
                             <label for="teacher_id">FacultyID:</label>
                             <input type="text" id="teacher_id" name="teacher_id" required
-                            placeholder="Enter Teacher/Instructor ID (e.g., 03-20211)"
+                            placeholder="Enter FacultyID (e.g., 03-20211)"
                             pattern="^\d{2}-\d{4,6}$" 
                             title="Only numbers and dashes are allowed, with no spaces.">
                         </div>
                         <div class="form-group">
                             <label for="name">Name:</label>
                             <input type="text" id="name" name="name" required
-                            placeholder="Enter Teacher/Instructor Name"
+                            placeholder="Enter Faculty Name"
                             pattern="^[A-Za-z\s]+$" 
                             title="Please enter letters only." 
                             maxlength="30" required
@@ -363,6 +363,13 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                         </div>
                         <button type="submit" name="save" class="submit-button">Add</button>
                     </form>
+                    <?php if ($success_message): ?>
+                        <div style="color: yellow;"><?php echo $success_message; ?></div>
+                    <?php endif; ?>
+
+                    <?php if ($error_message): ?>
+                        <div style="color: red;"><?php echo $error_message; ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
         </main>

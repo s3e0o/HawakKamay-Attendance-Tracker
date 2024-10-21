@@ -69,12 +69,12 @@ if (isset($_GET['delete_id'])) {
     
     if ($delete_stmt->execute()) {
         // echo "<script>alert('Student deleted successfully.'); window.location.href = 'student-list.php';</script>";
-        $_SESSION['success_message'] = "Student deleted successfully.";
+        $_SESSION['success_message'] = "Scholar deleted successfully.";
         header("Location: student-list.php");
         exit();
     } else {
         // echo "<script>alert('Failed to delete student.'); window.location.href = 'student-list.php';</script>";
-        $_SESSION['error_message'] = "Failed to update student.";
+        $_SESSION['error_message'] = "Failed to update scholar.";
         header("Location: student-list.php");
         exit();
     }
@@ -512,7 +512,7 @@ $conn->close();
                     <h2 class="section-title">SEARCH RESULTS</h2>
                     <table>
                         <tr>
-                            <th>Student No.</th>
+                            <th>StudentID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Course</th>
@@ -555,7 +555,7 @@ $conn->close();
                     </table>
 
                 <?php else: ?>
-                    <div class="no-results">No students found.</div>
+                    <div class="no-results">No scholars found.</div>
                 <?php endif; ?>
             </div>
         </div>
@@ -568,7 +568,7 @@ $conn->close();
         }
 
         function confirmDelete(userId) {
-            if (confirm('Are you sure you want to delete this student?')) {
+            if (confirm('Are you sure you want to delete this scholar?')) {
                 window.location.href = '?delete_id=' + encodeURIComponent(userId);
             }
         }

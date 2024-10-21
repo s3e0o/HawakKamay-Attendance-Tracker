@@ -105,8 +105,6 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
 
     // Calculate remaining hours accurately
     $remaining_hours = max(0, $hk_equivalent_hours - $hours_rendered);
-
-    // Ensure remaining hours never exceed the HK equivalent hours
     $remaining_hours = min($hk_equivalent_hours, $remaining_hours);
 
     // Update the schedule with new rendered hours and status
@@ -129,10 +127,10 @@ if (isset($_POST['schedule_id']) && isset($_POST['status'])) {
     $update_student_stmt->execute();
     $update_student_stmt->close();
 
-    // Return success message
-    // echo json_encode(['message' => 'Attendance status and hours updated successfully.']);
+    // Send JSON response to avoid frontend errors
     $_SESSION['success_message'] = "Attendance status and hours updated successfully.";
-    exit(); // Prevent further execution
+    echo json_encode(['message' => 'Attendance status and hours updated successfully.']);
+    exit();
 }
 
 // Handle delete request
@@ -429,6 +427,14 @@ $conn->close();
             <input type="date" name="searchDate" value="<?php echo $searchDate; ?>" required>
             <input type="submit" value="Search">
         </form>
+
+        <?php if ($success_message): ?>
+            <div style="color: yellow;"><?php echo $success_message; ?></div>
+        <?php endif; ?>
+
+        <?php if ($error_message): ?>
+            <div style="color: red;"><?php echo $error_message; ?></div>
+        <?php endif; ?>
         
         <?php if (empty($scheduleList)): ?>
             <div class="no-results">No schedules found for this date.</div>
@@ -484,13 +490,6 @@ $conn->close();
                 </tbody>
             </table>
         <?php endif; ?>
-        <?php if ($success_message): ?>
-            <div style="color: yellow;"><?php echo $success_message; ?></div>
-        <?php endif; ?>
-
-        <?php if ($error_message): ?>
-            <div style="color: red;"><?php echo $error_message; ?></div>
-        <?php endif; ?>
     </div>
 </div>
 
@@ -504,7 +503,7 @@ $conn->close();
     }
 
     document.querySelectorAll('.status-select').forEach(select => {
-        select.addEventListener('change', function() {
+        select.addEventListener('change', function () {
             const scheduleId = this.dataset.scheduleId;
             const status = this.value;
 
@@ -512,24 +511,33 @@ $conn->close();
                 fetch('instructor-db.php', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: new URLSearchParams({
                         schedule_id: scheduleId,
                         status: status
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    alert(data.message); // Show success message
-                    location.reload(); // Refresh the page
+                    if (data.message) {
+                        alert(data.message);  // Use alert to show the success message
+                        location.reload();  // Refresh to show updated status
+                    }
                 })
                 .catch(error => {
-                    alert('Error updating attendance status.');
+                    console.error('Error:', error);
+                    alert('Failed to update attendance status. Please try again.');
                 });
             }
         });
     });
+
     
     function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');

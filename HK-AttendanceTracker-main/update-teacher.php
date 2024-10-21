@@ -41,14 +41,14 @@ if (isset($_GET['id'])) {
     die("User ID not provided.");
 }
 
-// Check if a teacher is being updated
+// Check if a faculty is being updated
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $teacherId = $_POST['teacher_id']; // Ensure this matches the hidden field
     $name = $_POST['name'];
     $department = $_POST['department'];
     $email = $_POST['email'];
 
-    // Check if teacher exists
+    // Check if faculty exists
     $stmt = $conn->prepare("SELECT * FROM teachers WHERE id = ?");
     $stmt->bind_param("i", $teacherId);
     if (!$stmt->execute()) {
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $teacherExists = $stmt->get_result();
 
     if ($teacherExists->num_rows === 0) {
-        $_SESSION['error_message'] = "No teacher found with this ID.";
+        $_SESSION['error_message'] = "No faculty found with this ID.";
         header("Location: teacher-list.php");
         exit();
     }
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         exit();
     }
 
-    // Update teacher details
+    // Update faculty details
     $stmt = $conn->prepare(
         "UPDATE teachers SET name = ?, department = ? WHERE id = ?"
     );
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         exit();
     }
 
-    $_SESSION['success_message'] = "Teacher information updated successfully.";
+    $_SESSION['success_message'] = "Faculty information updated successfully.";
     header("Location: teacher-list.php");
     exit();
 }
@@ -409,7 +409,7 @@ if (isset($_GET['logout'])) {
         </div>
         <main>
         <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
-            <h1 class="title">EDIT TEACHER INFORMATION</h1>
+            <h1 class="title">EDIT FACULTY INFORMATION</h1>
             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . htmlspecialchars($teacherId); ?>">
                 <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>">
                 <div class="form-group">

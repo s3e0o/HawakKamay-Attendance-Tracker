@@ -61,8 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $update_stmt->execute();
 
     if ($update_stmt->affected_rows > 0) {
-        // $message = "User updated successfully.";
-        $_SESSION['success_message'] = "User updated succesfully.";
+        // $message = "Scholar updated successfully.";
+        $_SESSION['success_message'] = "Scholar updated succesfully.";
         header("Location: student-list.php");
         exit();
     } else {
@@ -87,7 +87,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Edit Student - UPang HK Attendance Tracker</title>
+    <title>Admin Edit Scholar - UPang HK Attendance Tracker</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
         body, html {
@@ -306,7 +306,7 @@ $conn->close();
             var hours = 0;
             switch (selectedHK) {
                 case 'HK25':
-                    hours = 45;
+                    hours = 50;
                     break;
                 case 'HK50':
                     hours = 90;
@@ -348,7 +348,7 @@ $conn->close();
 
         <form action="" method="POST">
             <div class="form-group">
-                <label for="student_id">Student No.:</label>
+                <label for="student_id">StudentID:</label>
                 <input type="text" name="student_id" 
                     value="<?php echo htmlspecialchars($student['student_id']); ?>" readonly>
             </div>
@@ -405,7 +405,7 @@ $conn->close();
             </div>
 
             <div class="form-group">
-                <label for="student_status">Student Status:</label>
+                <label for="student_status">Scholar Status:</label>
                 <select name="status" required>
                     <option value="Active" <?php echo ($student['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
                     <option value="Inactive" <?php echo ($student['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
