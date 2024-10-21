@@ -78,7 +78,7 @@ if (isset($_GET['delete_id'])) {
 }
 
 // Export functionality
-/*if (isset($_POST['export'])) {
+if (isset($_POST['export'])) {
     require 'vendor/autoload.php'; // Load PHPSpreadsheet
 
     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -117,7 +117,7 @@ if (isset($_GET['delete_id'])) {
     $writer = PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save('php://output');
     exit();
-}*/
+}
 
 
 if (isset($_GET['logout'])) {
@@ -147,27 +147,20 @@ $conn->close();
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s; 
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: auto;
-            transition: margin-left .5s; 
+            height: 100%;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; 
-        }
-        .sidebar.hidden {
-            transform: translateX(-100%); 
-            width: 0; 
-            padding: 0; 
-            opacity: 0; 
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .logo {
             width: 150px;  
@@ -196,36 +189,50 @@ $conn->close();
             text-decoration: none;
             color: white;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
         .sidebar h2 {
             text-align: center;
             color: #4a5d29;
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px;
             margin: 5px 0;
-            background-color: #ff4c4c;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
         }
-        .logout-btn {
-            margin-top: auto; 
-            padding: 10px; 
-            text-align: center; 
-            color: white; 
-            background-color: #f44336; 
-            border: none; 
-            cursor: pointer; 
-            transition: background-color 0.3s ease; 
-        }
         .main-content {
-            flex-grow: 1;
+
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.sidebar-hidden {
+            margin-left: -170px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -318,19 +325,10 @@ $conn->close();
             background-color: #3e4d22;
         }
         
-        th:nth-child(1) { width: 5%; }  /* Adjust these widths as needed */
-        th:nth-child(2) { width: 10%; }
-        th:nth-child(3) { width: 20%; }
-        th:nth-child(4) { width: 20%; }
-        th:nth-child(5) { width: 10%; }
-        th:nth-child(6) { width: 10%; }
-        th:nth-child(7) { width: 10%; }
-        th:nth-child(8) { width: 10%; }
-        th:nth-child(9) { width: 10%; }
-        th:nth-child(10) { width: 10%; }
-        th:nth-child(11) { width: 10%; }
-        th:nth-child(12) { width: 10%; }
-
+        th:nth-child(1) { width: 12%; }  /* Adjust these widths as needed */
+        th:nth-child(2) { width: 18%; }
+        th:nth-child(3) { width: 22%; }
+        th:nth-child(4) { width: 5%; }
         .search-results-container {
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>;
             margin-top: 20px;
@@ -379,29 +377,28 @@ $conn->close();
         .search-bar input[type="submit"]:hover {
         background-color: #45a049;
         }
-
-        @media (max-width: 600px) {
-        .search-bar {
-            flex-direction: column;
-            border-radius: 15px;
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
         }
-
-        .search-bar input[type="text"] {
-            border-bottom: 1px solid #e0e0e0;
-            border-radius: 15px 15px 0 0;
-        }
-
-        .search-bar input[type="submit"] {
-            border-radius: 0 0 15px 15px;
-        }
-        }
-
-        .search-bar input[type="text"]::placeholder {
-        color: #999;
-        }
-
-        .search-bar input[type="text"]:focus {
-        box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -420,6 +417,7 @@ $conn->close();
             </div>  
         </div>
         <div class="main-content">
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <!-- <div class="content-box"> -->
             <h1 class="title">SCHOLARS</h1>
 
@@ -438,7 +436,6 @@ $conn->close();
                     <h3>RECENT USER ACTIVITIES</h3>
                     <table>
                         <tr>
-                            <th>ID</th>
                             <th>Student No.</th>
                             <th>Name</th>
                             <th>Email</th>
@@ -446,14 +443,12 @@ $conn->close();
                             <th>Year Level</th>
                             <th>HK Status</th>
                             <th>Required Hours</th>
-                            <th>Total Hours Rendered</th>
                             <th>Total Hours Remaining</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th></th>
                         </tr>
                         <?php foreach ($students as $row): ?>
                             <tr>
-                                <td><?= htmlspecialchars($row["user_id"]) ?></td>
                                 <td><?= htmlspecialchars($row["student_id"]) ?></td>
                                 <td><?= htmlspecialchars($row["name"]) ?></td>
                                 <td><?= htmlspecialchars($row["email"]) ?></td>
@@ -461,7 +456,6 @@ $conn->close();
                                 <td><?= htmlspecialchars($row["level"]) ?></td>
                                 <td><?= htmlspecialchars($row["hk_status"]) ?></td>
                                 <td><?= htmlspecialchars($row["total_hours"]) ?> hours</td>
-                                <td>10</td>
                                 <td>80</td>
                                 <td><?= htmlspecialchars($row["status"]) ?></td>
                                 <td class="actions">
@@ -493,7 +487,6 @@ $conn->close();
                     <h2 class="section-title">SEARCH RESULTS</h2>
                     <table>
                         <tr>
-                        <th>Id</th>
                             <th>Student No.</th>
                             <th>Name</th>
                             <th>Email</th>
@@ -501,14 +494,12 @@ $conn->close();
                             <th>Year Level</th>
                             <th>HK Status</th>
                             <th>Required Hours</th>
-                            <th>Total Hours Rendered</th>
                             <th>Total Hours Remaining</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th></th>
                         </tr>
                         <?php foreach ($_SESSION['searchResults'] as $row): ?>
                             <tr>
-                                <td><?= htmlspecialchars($row["user_id"]) ?></td>
                                 <td><?= htmlspecialchars($row["student_id"]) ?></td>
                                 <td><?= htmlspecialchars($row["name"]) ?></td>
                                 <td><?= htmlspecialchars($row["email"]) ?></td>
@@ -516,7 +507,6 @@ $conn->close();
                                 <td><?= htmlspecialchars($row["level"]) ?></td>
                                 <td><?= htmlspecialchars($row["hk_status"]) ?></td>
                                 <td><?= htmlspecialchars($row["total_hours"]) ?> hours</td>
-                                <td>10</td>
                                 <td>80</td>
                                 <td><?= htmlspecialchars($row["status"]) ?></td>
                                 <td class="actions">
@@ -558,5 +548,14 @@ $conn->close();
             }
         }
     </script>
+   <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
+        }
+    </script>
+    
 </body>
 </html>
