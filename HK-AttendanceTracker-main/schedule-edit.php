@@ -6,13 +6,6 @@ $dbname = 'hk-management';
 $username = 'root';
 $password = '';
 
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    session_destroy(); // Destroy the session
-    header("Location: multi-login.php"); // Redirect to login page
-    exit(); // Exit after redirection
-}
-
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -43,7 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Prepare the update statement
     if ($start_time >= $end_time) {
-        echo "<script>alert('Error: Start time must be earlier than end time.');</script>";
+        // echo "<script>alert('Error: Start time must be earlier than end time.');</script>";
+        $_SESSION['error_message'] = "Start time must be earlier than end time.";
+        header("Location: schedule-edit.php");
+        exit();
     } else {
         $stmt = $conn->prepare(
             "UPDATE schedule 
@@ -58,13 +54,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             logChanges($conn, $schedule_id, $current_schedule, $user_id, $date, $start_time, $end_time, $subject, $classroom);
             
             // Redirect to the edit page or a summary page
+            $_SESSION['success_message'] = "Schedule updated successfully.";
+            // header("Location: schedule-edit.php");
             header("Location: schedule-edit.php?schedule_id=$schedule_id&success=1");
             exit();
         } else {
-            echo "<script>alert('Error: " . $stmt->error . "');</script>";
+            // echo "<script>alert('Error: " . $stmt->error . "');</script>";
+            $_SESSION['error_message'] = "An error occurred while updating the schedule.";
+            header("Location: schedule-edit.php");
+            exit();
         }
-        $stmt->close();
+        // $stmt->close();
     }
+}
+
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    session_destroy(); // Destroy the session
+    header("Location: multi-login.php"); // Redirect to login page
+    exit(); // Exit after redirection
 }
 
 // Function to log changes
@@ -108,43 +121,37 @@ $conn->close();
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg'); /* Use the same background */
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
-            background-attachment: fixed;
             background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
-        .sidebar .logout-btn {
-            text-decoration: none;
-            color: white;
-            display: block;
-            padding: 10px;
-            margin: 5px 0;
-            background-color: #ff4c4c;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
-            transition: background-color 0.3s ease;
+        .sidebar.hidden {
+            transform: translateX(-100%);
+            opacity: 0;
         }
         .logo {
-            width: 150px;
-            height: 150px;
-            background-image: url('hk_logo.png');
-            background-size: cover;
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
-            border-radius: 50%;
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -163,10 +170,35 @@ $conn->close();
             text-decoration: none;
             color: white;
         }
+        .sidebar h2 {
+            text-align: center;
+            color: #4a5d29;
+            font-size: medium;
+        }
+        .sidebar .logout-btn {
+            background-color: #f44336; 
+            text-decoration: none;
+            color: white;
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -216,6 +248,43 @@ $conn->close();
             color: #4a5d29;
             font-size: medium;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -232,6 +301,7 @@ $conn->close();
             <!-- Add other menu items as needed -->
         </div>
         <div class="main-content">
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <h1 class="title">EDIT SCHOLAR ASSIGNMENT INFORMATION</h1>
             <div class="content-box">
                 <?php if ($schedule): ?>
@@ -258,6 +328,7 @@ $conn->close();
                             <input 
                                 type="time" 
                                 name="start_time" 
+                                min="07:00"
                                 value="<?php echo $schedule['start_time']; ?>" 
                                 required 
                                 onchange="validateEndTime()"
@@ -268,20 +339,26 @@ $conn->close();
                             <input 
                                 type="time" 
                                 name="end_time" 
+                                max="18:30"
                                 value="<?php echo $schedule['end_time']; ?>" 
                                 required
                             >
                         </div>
                         <div class="form-group">
-                            <label for="subject">Subject:</label>
+                            <label for="subject">Subject Code:</label>
                             <input type="text" name="subject" value="<?php echo $schedule['subject']; ?>" required
                             pattern="[A-Z0-9 ]+" 
+                            maxlength="6"
+                            oninput="uppercaseInput(this)"
                             title="Only uppercase letters and numbers are allowed.">
                         </div>
+
                         <div class="form-group">
                             <label for="classroom">Classroom:</label>
                             <input type="text" name="classroom" value="<?php echo $schedule['classroom']; ?>" required
                             pattern="[A-Z0-9 ]+" 
+                            maxlength="6"
+                            oninput="uppercaseInput(this)"
                             title="Only uppercase letters and numbers are allowed.">
                         </div>
                         <button type="submit" class="submit-button">Update</button>
@@ -289,20 +366,29 @@ $conn->close();
                 <?php else: ?>
                     <p>Schedule not found.</p>
                 <?php endif; ?>
+
+                <?php if ($success_message): ?>
+                <div style="color: yellow;"><?php echo $success_message; ?></div>
+            <?php endif; ?>
+
+            <?php if ($error_message): ?>
+                <div style="color: red;"><?php echo $error_message; ?></div>
+            <?php endif; ?>
+
             </div>
         </div>
     </div>
 
     <script>
         // Display success or error alerts based on URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('success')) {
-            alert('Schedule updated successfully!');
-            // window.location.href('instructor-db.php');
-        }
-        if (urlParams.has('error')) {
-            alert('An error occurred while updating the schedule.');
-        }
+        // const urlParams = new URLSearchParams(window.location.search);
+        // if (urlParams.has('success')) {
+        //     alert('Schedule updated successfully!');
+        //     // window.location.href('instructor-db.php');
+        // }
+        // if (urlParams.has('error')) {
+        //     alert('An error occurred while updating the schedule.');
+        // }
         function setMinStartTime() {
             const dateInput = document.querySelector('input[name="date"]');
             const startTimeInput = document.querySelector('input[name="start_time"]');
@@ -321,6 +407,21 @@ $conn->close();
             const endTimeInput = document.querySelector('input[name="end_time"]');
 
             endTimeInput.min = startTimeInput.value;
+        }
+
+        function uppercaseInput(input) {
+            // Split the input value by spaces, capitalize each word, and join them back together
+            input.value = input.value
+                .toUpperCase() // Convert entire string to lowercase first
+                .split(' ') // Split into words
+                .join(' '); // Join words back into a string
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
     </script>
 </body>

@@ -50,10 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     $stmt->bind_param("si", $name, $student_id);
 
     if ($stmt->execute()) {
+        $_SESSION['success_message'] = "Profile updated successfully.";
         header("Location: student-profile.php"); // Reload the profile page
         exit();
     } else {
-        echo "Error updating student: " . $stmt->error;
+        // echo "Error updating student: " . $stmt->error;
+        $_SESSION['error_message'] = "Error updating student";
+        header("Location: student-profile.php");
+        exit();
     }
 }
 
@@ -75,18 +79,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
             $stmt->bind_param("ss", $hashed_new_password, $username); // Assuming you want to update based on the username
 
             if ($stmt->execute()) {
-                echo "Password changed successfully.";
+                // echo "Password changed successfully.";
+                $_SESSION['success_message'] = "Password changed successfully.";
+                header("Location: student-profile.php");
+                exit();
             } else {
-                echo "Error updating password: " . $stmt->error;
+                // echo "Error updating password: " . $stmt->error;
+                $_SESSION['error_message'] = "Error updating password.";
+                header("Location: student-profile.php");
+                exit();
             }
         } else {
-            echo "New passwords do not match.";
+            // echo "New passwords do not match.";
+            $_SESSION['error_message'] = "New passwords do not match.";
+            header("Location: student-profile.php");
+            exit();
         }
     } else {
-        echo "Current password is incorrect.";
+        // echo "Current password is incorrect.";
+        $_SESSION['error_message'] = "Current password is incorrect.";
+        header("Location: student-profile.php");
+        exit();
+    
     }
 }
 
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // Logout logic
 if (isset($_GET['logout'])) {
@@ -114,34 +135,30 @@ if (isset($_GET['logout'])) {
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s; 
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
-            height: auto;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease;
             position: relative;
             z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
             transform: translateX(-100%);
-            width: 0;
-            padding: 0;
             opacity: 0;
         }
         .logo {
             width: 150px;  
             height: 150px; 
             background-image: url('hk_logo.png'); 
-            background-size: cover;
+            background-size: cover;  
             background-position: center;
             border-radius: 50%; 
             margin: 0 auto 10px;
@@ -168,22 +185,35 @@ if (isset($_GET['logout'])) {
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
+            text-decoration: none;
             color: white;
-            background-color: #ff4c4c;
-            text-align: center;
-            padding: 10px;
-            margin-top: 10px;
             display: block;
+            padding: 10px;
+            margin: 5px 0;
             border-radius: 10px;
-        }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
+            text-align: center;
+            font-weight: bold;
         }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
-            margin-left: 0px; 
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+        }
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #b8860b;
+            padding-bottom: 10px;
         }
         .toggle-btn {
             background-color: #A98D00;
@@ -211,13 +241,7 @@ if (isset($_GET['logout'])) {
             background-color: white;
             color: black;
             margin-top: 5px;
-        }
-        .title {
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #b8860b;
-            padding-bottom: 10px;
-        }
+        }   
         form {
             display: grid;
             grid-template-columns: repeat(3, 1fr); 
@@ -244,6 +268,43 @@ if (isset($_GET['logout'])) {
         .save-button:hover {
             background-color: #BFA93B;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -259,6 +320,7 @@ if (isset($_GET['logout'])) {
         </div>
         <div class="main-content">
             <h1 class="title">Student Profile</h1>
+            <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <form method="POST" action="student-profile.php">
                 <div class="input-group">
                     <label for="studentId">Student ID:</label>
@@ -299,7 +361,23 @@ if (isset($_GET['logout'])) {
 
                 <button type="submit" name="change_password" class="save-button">Change Password</button>
             </form>
+            <?php if ($success_message): ?>
+                <div style="color: yellow;"><?php echo $success_message; ?></div>
+            <?php endif; ?>
+
+            <?php if ($error_message): ?>
+                <div style="color: red;"><?php echo $error_message; ?></div>
+            <?php endif; ?>
         </div>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
+        }
+    </script>
 </body>
 </html>

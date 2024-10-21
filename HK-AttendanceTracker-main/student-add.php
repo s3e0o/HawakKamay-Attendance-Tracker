@@ -377,7 +377,8 @@ if (isset($_GET['logout'])) {
                                 placeholder="Enter course of student (e.g., BSIT)"
                                 pattern="^[A-Za-z\s]+$" 
                                 title="Please enter letters only." 
-                                maxlength="30" required
+                                minlength="3"
+                                maxlength="4" required
                                 oninput="uppercaseInput(this)">
                         </div>
                         <div class="form-group">

@@ -176,36 +176,32 @@ $conn->close();
             background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
             background-repeat: no-repeat;
-            transition: margin-left .5s; 
+            background-attachment: fixed;
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
-            height: auto;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease;
             position: relative;
             z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
             transform: translateX(-100%);
-            width: 0;
-            padding: 0;
             opacity: 0;
         }
         .logo {
             width: 150px;  
             height: 150px; 
             background-image: url('hk_logo.png'); 
-            background-size: cover;
+            background-size: cover;  
             background-position: center;
             border-radius: 50%; 
             margin: 0 auto 10px;
@@ -232,26 +228,29 @@ $conn->close();
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
+            text-decoration: none;
             color: white;
-            background-color: #ff4c4c;
-            text-align: center;
-            padding: 10px;
-            margin-top: 10px;
             display: block;
+            padding: 10px;
+            margin: 5px 0;
             border-radius: 10px;
-        }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
+            text-align: center;
+            font-weight: bold;
         }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
-            transition: margin-left .5s;
-            margin-left: 0px;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
         }
-        .main-content.hidden {
-            margin-left: 0;
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -357,6 +356,43 @@ $conn->close();
             color: white; 
             font-weight: bold;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -373,6 +409,7 @@ $conn->close();
             </div> 
     </div>
     <div class="main-content" id="main-content">
+    <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
         <h1 class="title">SCHEDULE FOR <?php echo $searchDate; ?></h1>
         
         <form method="GET" action="" class="schedule-form">
@@ -473,6 +510,13 @@ $conn->close();
             }
         });
     });
+    
+    function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
+        }
 </script>
 
 </body>

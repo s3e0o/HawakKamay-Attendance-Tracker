@@ -92,27 +92,24 @@ $conn->close(); // Close the database connection
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s; 
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; 
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
-            transform: translateX(-100%); 
-            width: 0; 
-            padding: 0; 
-            opacity: 0; 
+            transform: translateX(-100%);
+            opacity: 0;
         }
         .logo {
             width: 150px;  
@@ -128,8 +125,6 @@ $conn->close(); // Close the database connection
             margin: 5px 0;
         }
         .nav-item:hover {
-            padding: 10px;
-            margin: 5px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -147,43 +142,29 @@ $conn->close(); // Close the database connection
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px;
             margin: 5px 0;
-            background-color: #ff4c4c;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
-        }
-        .logout-btn {
-            margin-top: auto; 
-            padding: 10px; 
-            text-align: center; 
-            color: white; 
-            background-color: #f44336; 
-            border: none; 
-            cursor: pointer; 
-            transition: background-color 0.3s ease; 
         }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
-            margin-left: 0px; 
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
         }
-        .main-content.hidden {
-            margin-left: 0; 
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
         }
-        .toggle-btn {
-            background-color: #A98D00; 
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -231,6 +212,43 @@ $conn->close(); // Close the database connection
             font-size: 18px;
             margin: 20px 0 10px;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -248,6 +266,8 @@ $conn->close(); // Close the database connection
             </div>  
         </div> 
         <div class="main-content" id="main-content">
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
+
             <!-- <button class="toggle-btn" onclick="toggleSidebar()">&#9776;</button> -->
             <!-- <h1>Welcome, <?php echo htmlspecialchars($username); ?></h1> Display logged-in user's name -->
             <h1 class="title">ADMIN DASHBOARD</h1>
@@ -281,19 +301,11 @@ $conn->close(); // Close the database connection
     </div>
     <script>
         function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const container = document.getElementById('container');
-
-        // Toggle the sidebar class to show/hide it
-        sidebar.classList.toggle('hidden');
-
-        // If the sidebar is hidden, reduce the container margin
-        if (sidebar.classList.contains('hidden')) {
-            container.style.marginLeft = '0'; // Sidebar hidden, no margin
-        } else {
-            container.style.marginLeft = '200px'; // Sidebar visible, add margin
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
-    }
     </script>
 </body>
 </html>

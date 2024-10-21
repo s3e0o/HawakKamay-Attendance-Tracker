@@ -105,33 +105,30 @@ if (isset($_SESSION['error'])) {
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s;
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; 
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
-            transform: translateX(-100%); 
-            width: 0;
-            padding: 0; 
+            transform: translateX(-100%);
             opacity: 0;
         }
         .logo {
             width: 150px;  
-            height: 150px;
-            background-image: url('hk_logo.png');
-            background-size: cover;
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
             border-radius: 50%; 
             margin: 0 auto 10px;
@@ -141,8 +138,6 @@ if (isset($_SESSION['error'])) {
             margin: 5px 0;
         }
         .nav-item:hover {
-            padding: 10px;
-            margin: 5px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -160,25 +155,29 @@ if (isset($_SESSION['error'])) {
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px;
             margin: 5px 0;
-            background-color: #ff4c4c;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
         }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
-            transition: background-color 0.3s ease;
-        }
         main {
             flex-grow: 1;
-            /* background-color: #556b2f; */
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        main.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        main:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -264,6 +263,43 @@ if (isset($_SESSION['error'])) {
         .submit-button:hover{
             background-color: #BFA93B;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            main {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -281,6 +317,7 @@ if (isset($_SESSION['error'])) {
             </div>  
         </div>
         <main>
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
         <h1 class="title">ADD FACULTY</h1>
 
             <!-- <div class="content-box">
@@ -336,6 +373,13 @@ if (isset($_SESSION['error'])) {
                 .split(' ') // Split into words
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter
                 .join(' '); // Join words back into a string
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('main');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
     </script>
 </body>

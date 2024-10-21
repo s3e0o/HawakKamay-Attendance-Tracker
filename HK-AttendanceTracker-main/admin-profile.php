@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 require 'db-connection.php'; 
 
 $username = '';
@@ -8,27 +7,26 @@ $name = '';
 $email = '';
 $username_error = '';
 
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Fetch admin data based on session
 if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
 
-    // Query to fetch admin details based on username
-    $sql = "SELECT a.admin_id, a.name, u.email 
+    $sql = "SELECT a.admin_id, a.name, u.email, u.password
             FROM admins a 
             JOIN users u ON a.user_id = u.id 
-            WHERE u.username = ?"; // Change to use username
-
+            WHERE u.username = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('s', $username); // Use username for binding
+    $stmt->bind_param('s', $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Check if the admin exists
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
-        $admin_id = $admin['admin_id']; // Keep admin_id for updates
-        $name = $admin['name'];
-        $email = $admin['email'];
     } else {
         header("Location: multi-login.php");
         exit();
@@ -38,33 +36,73 @@ if (isset($_SESSION['username'])) {
     exit();
 }
 
-// Save changes when form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+// Save profile changes
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fullName'])) {
     $name = $_POST['fullName'];
     $email = $_POST['email'];
 
-    // Update the admins table
-    $update_admin_sql = "UPDATE admins SET name = ?, email = ? WHERE admin_id = ?";
+    $update_admin_sql = "UPDATE admins SET name = ? WHERE admin_id = ?";
     $stmt = $conn->prepare($update_admin_sql);
-    $stmt->bind_param("ssi", $name, $email, $admin_id);
+    $stmt->bind_param("si", $name, $admin['admin_id']);
 
     if ($stmt->execute()) {
-        header("Location: admin-profile.php");
-        exit();
+        $update_email_sql = "UPDATE users SET email = ? WHERE id = (SELECT user_id FROM admins WHERE admin_id = ?)";
+        $stmt_email = $conn->prepare($update_email_sql);
+        $stmt_email->bind_param("si", $email, $admin['admin_id']);
+
+        if ($stmt_email->execute()) {
+            $_SESSION['success_message'] = "Profile successfully saved!";
+        } else {
+            $_SESSION['error_message'] = "Error updating email.";
+        }
     } else {
-        echo "Error updating admin: " . $stmt->error;
+        $_SESSION['error_message'] = "Error updating admin.";
     }
-}
-// PHP logout logic
-if (isset($_GET['logout'])) {
-    // Destroy the session
-    session_destroy();
-    // Redirect to the login page
-    header("Location: multi-login.php");
-    exit(); // Exit after header redirection
+    header("Location: admin-profile.php");
+    exit();
 }
 
+// Change password
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['current_password'])) {
+    $current_password = $_POST['current_password'];
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if (password_verify($current_password, $admin['password'])) {
+        if ($new_password === $confirm_password) {
+            $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+            $update_password_sql = "UPDATE users SET password = ? WHERE id = (SELECT user_id FROM admins WHERE admin_id = ?)";
+            $stmt = $conn->prepare($update_password_sql);
+            $stmt->bind_param("si", $hashed_new_password, $admin['admin_id']);
+
+            if ($stmt->execute()) {
+                $_SESSION['success_message'] = "Password changed successfully.";
+            } else {
+                $_SESSION['error_message'] = "Error updating password.";
+            }
+        } else {
+            $_SESSION['error_message'] = "New passwords do not match.";
+        }
+    } else {
+        $_SESSION['error_message'] = "Current password is incorrect.";
+    }
+    header("Location: admin-profile.php");
+    exit();
+}
+
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
+
+// PHP logout logic
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: multi-login.php");
+    exit();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,27 +121,24 @@ if (isset($_GET['logout'])) {
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s; 
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; 
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
-            transform: translateX(-100%); 
-            width: 0; 
-            padding: 0; 
-            opacity: 0; 
+            transform: translateX(-100%);
+            opacity: 0;
         }
         .logo {
             width: 150px;  
@@ -119,8 +154,6 @@ if (isset($_GET['logout'])) {
             margin: 5px 0;
         }
         .nav-item:hover {
-            padding: 10px;
-            margin: 5px 0;
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -138,40 +171,29 @@ if (isset($_GET['logout'])) {
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px;
             margin: 5px 0;
-            background-color: #ff4c4c;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
-        }
-        .logout-btn {
-            margin-top: auto; 
-            padding: 10px; 
-            text-align: center; 
-            color: white; 
-            background-color: #f44336; 
-            border: none; 
-            cursor: pointer; 
-            transition: background-color 0.3s ease; 
         }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
-            margin-left: 0px; 
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
         }
-        .toggle-btn {
-            background-color: #A98D00;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -180,7 +202,8 @@ if (isset($_GET['logout'])) {
             padding-bottom: 10px;
         }
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            margin-right: 20px;
         }
         .input-group label {
             display: block;
@@ -188,13 +211,24 @@ if (isset($_GET['logout'])) {
             color: white;
         }
         .input-group input {
-            width: 70%;
+            width: 100%;
             padding: 10px;
             border: none;
             border-radius: 5px;
             background-color: white;
             color: black;
             margin-top: 5px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            grid-column: span 3;  
+            display: flex;
+            justify-content: flex-start; 
         }
         .save-button {
             background-color: #b8860b;
@@ -205,9 +239,47 @@ if (isset($_GET['logout'])) {
             cursor: pointer;
             transition: background-color 0.3s;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
         .save-button:hover {
             background-color: #BFA93B;
+        }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -226,26 +298,62 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <div class="main-content" id="main-content">
-            <div>
-                <h1 class="title">ADMIN PROFILE</h1>
-            </div>
-
-            <form id="adminProfileForm" method="POST" action="admin-profile.php">
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
+            <h1 class="title">ADMIN PROFILE</h1>
+            <form id="adminProfileForm" method="POST">
+                <div class="input-group">
+                    <label for="adminId">Admin ID:</label>
+                    <input type="text" id="adminId" value="<?php echo $admin['admin_id']; ?>" readonly>
+                </div>
                 <div class="input-group">
                     <label for="fullName">Full Name:</label>
                     <input type="text" id="fullName" name="fullName" value="<?php echo htmlspecialchars($admin['name']); ?>" required>
                 </div>
                 <div class="input-group">
-                    <label for="adminId">Admin ID:</label>
-                    <input type="text" id="adminId" name="adminId" value="<?php echo $admin['admin_id']; ?>" readonly>
-                </div>
-                <div class="input-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($admin['email']); ?>" required>
                 </div>
-                <button type="submit" class="save-button">Save</button>
+                <div class="button-container">
+                    <button type="submit" class="save-button">Save</button>
+                </div>
             </form>
+
+            <h2 class="title">CHANGE PASSWORD</h2>
+            <form method="POST">
+                <div class="input-group">
+                    <label for="current_password">Current Password:</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                <div class="input-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
+                <div class="input-group">
+                    <label for="confirm_password">Confirm New Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+                <div class="button-container">
+                    <button type="submit" class="save-button">Change Password</button>
+                </div>
+            </form>
+
+            <?php if ($success_message): ?>
+                <div style="color: yellow;"><?php echo $success_message; ?></div>
+            <?php endif; ?>
+
+            <?php if ($error_message): ?>
+                <div style="color: red;"><?php echo $error_message; ?></div>
+            <?php endif; ?>
+
         </div>
     </div>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
+        }
+    </script>
 </body>
 </html>

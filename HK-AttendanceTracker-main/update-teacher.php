@@ -134,7 +134,7 @@ if (isset($_GET['logout'])) {
     <title>UPang HK Attendance Tracker - Admin</title>
     <link rel="icon" type="image" href="hk_logo.png">
     <style>
-        body, html {
+         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
@@ -144,21 +144,24 @@ if (isset($_GET['logout'])) {
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s; 
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease; 
             position: relative;
-            z-index: 2; 
+            z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+            opacity: 0;
         }
         .logo {
             width: 150px;
@@ -209,6 +212,15 @@ if (isset($_GET['logout'])) {
             flex-grow: 1;
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        main.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        main:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -337,6 +349,43 @@ if (isset($_GET['logout'])) {
             background-color: white;
             color: black;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            main {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -354,6 +403,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <main>
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <h1 class="title">EDIT TEACHER INFORMATION</h1>
             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . htmlspecialchars($teacherId); ?>">
                 <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>">
@@ -380,5 +430,13 @@ if (isset($_GET['logout'])) {
             </form>
         </main>
     </div>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('main');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
+        }
+    </script>
 </body>
 </html>

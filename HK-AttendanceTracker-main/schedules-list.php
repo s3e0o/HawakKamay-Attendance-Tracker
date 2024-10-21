@@ -262,7 +262,6 @@ $conn->close();
                 font-size: 12px;
             }
         }
-        
     </style>
 </head>
 <body>
@@ -281,7 +280,7 @@ $conn->close();
             </div> 
         <div class="main-content">
         <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
-            <div class="title">Instructor Dashboard: Schedules List</div>
+            <H1 class="title">SCHOLAR ASSIGNMENT SCHEDULE INFORMATION</H1>
             <form method="post">
                 <button type="submit" name="export">Export as Excel</button>
             </form>

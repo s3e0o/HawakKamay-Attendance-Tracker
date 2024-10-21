@@ -59,7 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $total_duration = $_POST['total_duration']; // Get the total duration
 
     if ($start_time >= $end_time) {
-        echo "Error: Start time must be earlier than end time.";
+        // echo "Error: Start time must be earlier than end time.";
+        $_SESSION['error_message'] = "Start time must be earlier than end time";
+        header("Location: schedule-assign.php");
+        exit();
     } else {
         $stmt = $conn->prepare(
             "INSERT INTO schedule (user_id, `date`, start_time, end_time, subject, classroom, assigned_by, total_duration) 
@@ -69,13 +72,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("isssssss", $user_id, $date, $start_time, $end_time, $subject, $classroom, $assigned_by, $total_duration);
 
         if ($stmt->execute()) {
-            echo "Schedule assigned successfully.";
+            // echo "Schedule assigned successfully.";
+            $_SESSION['success_message'] = "Schedule assigned successfully";
+            header("Location: schedule-assign.php");
+            exit();
         } else {
-            echo "Error: " . $stmt->error;
+            // echo "Error: " . $stmt->error;
+            $_SESSION['error_message'] = "Error";
+            header("Location: schedule-assign.php");
+            exit();
         }
-        $stmt->close();
+        // $stmt->close();
     }
 }
+
+// Check for success/error message
+$success_message = $_SESSION['success_message'] ?? '';
+$error_message = $_SESSION['error_message'] ?? '';
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
 // PHP logout logic
 if (isset($_GET['logout'])) {
@@ -105,34 +119,30 @@ $conn->close();
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s; 
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s; 
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
-            height: auto;
             background-color: #A98D00;
             color: white;
             padding: 20px;
-            transition: transform 0.3s ease;
             position: relative;
             z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .sidebar.hidden {
             transform: translateX(-100%);
-            width: 0;
-            padding: 0;
             opacity: 0;
         }
         .logo {
             width: 150px;  
             height: 150px; 
             background-image: url('hk_logo.png'); 
-            background-size: cover;
+            background-size: cover;  
             background-position: center;
             border-radius: 50%; 
             margin: 0 auto 10px;
@@ -159,21 +169,29 @@ $conn->close();
             font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
+            text-decoration: none;
             color: white;
-            background-color: #ff4c4c;
-            text-align: center;
-            padding: 10px;
-            margin-top: 10px;
             display: block;
+            padding: 10px;
+            margin: 5px 0;
             border-radius: 10px;
-        }
-        .sidebar .logout-btn:hover {
-            background-color: #ff3333;
+            text-align: center;
+            font-weight: bold;
         }
         .main-content {
             flex-grow: 1;
             padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        .main-content:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -219,6 +237,43 @@ $conn->close();
             background-color: #BFA93B;
 
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -234,6 +289,7 @@ $conn->close();
             </div>
         </div>
         <div class="main-content">
+            <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <h1 class="title">ADD SCHOLAR SCHEDULE ASSIGNMENT</h1>
             <div class="content-box">
                 <form method="POST" action="">
@@ -279,10 +335,11 @@ $conn->close();
                         <input type="text" name="total_duration" id="total_duration" readonly>
                     </div>
                     <div class="form-group">
-                        <label for="subject">Subject:</label>
+                        <label for="subject">Subject Code:</label>
                         <input type="text" name="subject" required
                         placeholder="e.g., ITE314"
                         pattern="[A-Z0-9 ]+" 
+                        maxlength="6"
                         title="Only uppercase letters and numbers are allowed."
                         oninput="uppercaseInput(this)">
                     </div>
@@ -290,6 +347,7 @@ $conn->close();
                         <label for="classroom">Classroom:</label>
                         <input type="text" name="classroom" required
                         placeholder="e.g., ITS201"
+                        maxlength="6"
                         pattern="[A-Z0-9 ]+" 
                         title="Only uppercase letters and numbers are allowed."
                         oninput="uppercaseInput(this)">
@@ -304,9 +362,15 @@ $conn->close();
                     <div>
                         <button type="submit" class="submit-button">Assign</button>
                     </div>
-                    
                 </form> 
             </div>
+            <?php if ($success_message): ?>
+                <div style="color: yellow;"><?php echo $success_message; ?></div>
+            <?php endif; ?>
+
+            <?php if ($error_message): ?>
+                <div style="color: red;"><?php echo $error_message; ?></div>
+            <?php endif; ?>
           </div>
         </div>
     </div>
@@ -355,6 +419,12 @@ $conn->close();
             } else {
                 totalDurationInput.value = ''; // Clear the value if times are invalid
             }
+        }
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
     </script>
 </body>

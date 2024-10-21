@@ -93,17 +93,16 @@ if (isset($_GET['logout'])) {
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            background-image: url('hkat-upang.jpg');
+            background-image: url('hkat-upang.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            transition: margin-left .5s;
+            overflow: hidden;
         }
         .container {
             display: flex;
-            height: 100%;
-            transition: margin-left .5s;
+            height: 100vh;
         }
         .sidebar {
             width: 200px;
@@ -112,14 +111,19 @@ if (isset($_GET['logout'])) {
             padding: 20px;
             position: relative;
             z-index: 2;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+            opacity: 0;
         }
         .logo {
-            width: 150px;
-            height: 150px;
-            background-image: url('hk_logo.png');
-            background-size: cover;
+            width: 150px;  
+            height: 150px; 
+            background-image: url('hk_logo.png'); 
+            background-size: cover;  
             background-position: center;
-            border-radius: 50%;
+            border-radius: 50%; 
             margin: 0 auto 10px;
         }
         .nav-item {
@@ -140,16 +144,16 @@ if (isset($_GET['logout'])) {
         }
         .sidebar h2 {
             text-align: center;
-            font-size: medium;
             color: #4a5d29;
+            font-size: medium;
         }
         .sidebar .logout-btn {
+            background-color: #f44336; 
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px;
             margin: 5px 0;
-            background-color: #ff4c4c;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
@@ -158,7 +162,15 @@ if (isset($_GET['logout'])) {
             flex-grow: 1;
             padding: 20px;
             color: white;
-            position: relative; 
+            overflow-y: auto;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        main.sidebar-hidden {
+            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+        }
+        main:not(.sidebar-hidden) {
+            margin-left: 10px; /* When sidebar is visible, keep content shifted */
         }
         .title {
             font-size: 24px;
@@ -228,6 +240,7 @@ if (isset($_GET['logout'])) {
 
         .notification-tray h2 {
             margin: 0; 
+            margin-bottom: 2px;
             padding: 10px; 
             font-size: 18px; 
             color: #333; 
@@ -235,7 +248,7 @@ if (isset($_GET['logout'])) {
         .notification-tray ul {
             list-style-type: none; 
             padding: 0; 
-            margin: 0; 
+            margin-bottom: 2px; 
         }
         .info-grid {
             display: grid;
@@ -280,6 +293,43 @@ if (isset($_GET['logout'])) {
             text-align: center;
             font-weight: bold;
         }
+        .toggle-btn {
+            background-color: #6b8e23;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            z-index: 3;
+            transition: left 0.3s ease;
+        }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; /* Adjust toggle button when sidebar is hidden */
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -295,12 +345,16 @@ if (isset($_GET['logout'])) {
             <div class="nav-item"><a class="logout-btn" href="?logout=true">Logout</a></div>
         </div>
         <main>
+        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
+
             <div class="content-box">
             <h1 class="title">Welcome, <?php echo htmlspecialchars($username); ?></h1>
 
                 <div class="notification-icon" onclick="toggleNotificationTray()">
                     <img src="notification.png" alt="Notifications" style="width: 24px; height: 24px;">
-                    <span class="notification-count"><?php echo count($notifications); ?></span>
+                    <span class="notification-count" style="display: <?php echo count($notifications) > 0 ? 'inline' : 'none'; ?>;">
+                        <?php echo count($notifications); ?>
+                    </span>
                 </div>
 
                 <div class="notification-tray" id="notificationTray">
@@ -320,6 +374,7 @@ if (isset($_GET['logout'])) {
                         <p>No notifications.</p>
                     <?php endif; ?>
                 </div>
+
 
                 <div class="info-grid">
                     <div class="info-box">
@@ -406,13 +461,36 @@ if (isset($_GET['logout'])) {
         </main>
     </div>
     <script>
+        // function toggleNotificationTray() {
+        //     const tray = document.getElementById('notificationTray');
+        //     if (tray.style.display === 'none' || tray.style.display === '') {
+        //         tray.style.display = 'block'; 
+        //     } else {
+        //         tray.style.display = 'none'; 
+        //     }
+        // }
+
         function toggleNotificationTray() {
             const tray = document.getElementById('notificationTray');
+            const notificationCount = document.querySelector('.notification-count');
+
+            // Toggle the display of the notification tray
             if (tray.style.display === 'none' || tray.style.display === '') {
                 tray.style.display = 'block'; 
+
+                // Reset the notification count to 0 and hide the badge
+                notificationCount.textContent = '0';
+                notificationCount.style.display = 'none'; 
             } else {
                 tray.style.display = 'none'; 
             }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('main');
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('sidebar-hidden');
         }
     </script>
 </body>
