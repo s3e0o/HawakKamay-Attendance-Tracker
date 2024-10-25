@@ -130,7 +130,6 @@ if (isset($_GET['logout'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -234,10 +233,8 @@ if (isset($_GET['logout'])) {
             padding-bottom: 10px;
         }
         .content-box {
-            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
-            /*box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); */
         }
         .header {
             display: flex;
@@ -257,7 +254,6 @@ if (isset($_GET['logout'])) {
             border-radius: 5px;
             cursor: pointer;
         }
-        /* Form styles */
         .form-group {
             margin-bottom: 15px;
         }
@@ -266,8 +262,9 @@ if (isset($_GET['logout'])) {
             margin-bottom: 5px;
         }
         input[type="text"],
-        input[type="email"] {
-            width: 58%;
+        input[type="email"],
+        select {
+            width: calc(100% - 50px);
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -328,7 +325,7 @@ if (isset($_GET['logout'])) {
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; 
             margin-top: 20px;
         }
-    
+
         .form-group {
             display: flex;
             flex-direction: column;
@@ -346,19 +343,12 @@ if (isset($_GET['logout'])) {
         .form-group input::placeholder {
             color: gray;
         }
-        select {
-            width: 60%;
-            padding: 8px;
-            border: none;
-            border-radius: 4px;
-            background-color: white;
-            color: black;
-        }
+        
         .toggle-btn {
             background-color: #6b8e23;
             position: absolute;
-            top: 0;
-            left: 0px;
+            top: 10px;
+            left: 10px;
             padding: 10px;
             color: white;
             cursor: pointer;
@@ -366,7 +356,7 @@ if (isset($_GET['logout'])) {
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 220px;
         }
         @media (max-width: 768px) {
             .container {
@@ -375,12 +365,22 @@ if (isset($_GET['logout'])) {
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 10px;
             }
             main {
                 padding: 10px;
+                margin-left: 0;
             }
             .toggle-btn {
                 left: 10px;
+                top: 10px;
+            }
+            .nav-item {
+                padding: 8px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -408,7 +408,7 @@ if (isset($_GET['logout'])) {
             </div>  
         </div>
         <main>
-        <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
+            <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <h1 class="title">EDIT FACULTY INFORMATION</h1>
             <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . htmlspecialchars($teacherId); ?>">
                 <input type="hidden" name="teacher_id" value="<?php echo htmlspecialchars($teacherId); ?>">
