@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db-connection.php'; // Include the connection file
+require 'db-connection.php';
 $username = '';
 $name = '';
 $email = '';
@@ -14,20 +14,20 @@ if (isset($_SESSION['username'])) {
     $sql = "SELECT t.teacher_id, t.name, u.email, u.password 
             FROM teachers t 
             JOIN users u ON t.user_id = u.id 
-            WHERE u.username = ?"; // Change to use username
+            WHERE u.username = ?"; 
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('s', $username); // Use username for binding
+    $stmt->bind_param('s', $username); 
     $stmt->execute();
     $result = $stmt->get_result();
 
     // Check if the teacher exists
     if ($result->num_rows > 0) {
         $teacher = $result->fetch_assoc();
-        $teacher_id = $teacher['teacher_id']; // Keep teacher_id for updates
+        $teacher_id = $teacher['teacher_id']; 
         $name = $teacher['name'];
         $email = $teacher['email'];
-        $hashed_password = $teacher['password']; // Fetch the hashed password
+        $hashed_password = $teacher['password']; 
     } else {
         header("Location: multi-login.php");
         exit();
@@ -45,13 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     // Update the teachers table
     $update_teacher_sql = "UPDATE teachers SET name = ? WHERE teacher_id = ?";
     $stmt = $conn->prepare($update_teacher_sql);
-    $stmt->bind_param("si", $name, $teacher_id); // Bind only name and teacher_id
+    $stmt->bind_param("si", $name, $teacher_id);
 
     if ($stmt->execute()) {
         // Update the email in the users table
         $update_email_sql = "UPDATE users SET email = ? WHERE id = (SELECT user_id FROM teachers WHERE teacher_id = ?)";
         $stmt = $conn->prepare($update_email_sql);
-        $stmt->bind_param("si", $email, $teacher_id); // Bind email and teacher_id
+        $stmt->bind_param("si", $email, $teacher_id); 
 
         if ($stmt->execute()) {
             $_SESSION['success_message'] = "Profile successfully saved!";
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
             // Update the password in the database
             $update_password_sql = "UPDATE users SET password = ? WHERE username = ?";
             $stmt = $conn->prepare($update_password_sql);
-            $stmt->bind_param("ss", $hashed_new_password, $username); // Assuming you want to update based on the username
+            $stmt->bind_param("ss", $hashed_new_password, $username); 
 
             if ($stmt->execute()) {
                 $_SESSION['success_message'] = "Password changed successfully.";
@@ -213,10 +213,10 @@ if (isset($_GET['logout'])) {
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px;
         }
         .title {
             font-size: 24px;
@@ -280,7 +280,7 @@ if (isset($_GET['logout'])) {
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -289,12 +289,17 @@ if (isset($_GET['logout'])) {
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {

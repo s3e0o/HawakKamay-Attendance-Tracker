@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require 'db-connection.php'; // Ensure this includes a working DB connection setup
+require 'db-connection.php'; 
 
 
 // Initialize variables
@@ -9,7 +9,7 @@ $teacherId = $name = $department = $email = "";
 
 // Check if an ID was provided
 if (isset($_GET['id'])) {
-    $teacherId = $_GET['id']; // Use a consistent variable name
+    $teacherId = $_GET['id'];
 
     // Query to get the user data
     $stmt = $conn->prepare(
@@ -111,18 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     exit();
 }
 
-// Display error message if set
-// if (isset($_SESSION['error'])) {
-//     echo "<script>alert('" . $_SESSION['error'] . "');</script>";
-//     unset($_SESSION['error']);
-// }
-
 // Check for success/error message
 $success_message = $_SESSION['success_message'] ?? '';
 $error_message = $_SESSION['error_message'] ?? '';
 unset($_SESSION['success_message'], $_SESSION['error_message']);
 
-// Handle logout
+
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: multi-login.php");
@@ -221,10 +215,10 @@ if (isset($_GET['logout'])) {
             transition: margin-left 0.3s ease;
         }
         main.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         main:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -365,7 +359,7 @@ if (isset($_GET['logout'])) {
             .sidebar {
                 width: 100%;
                 height: auto;
-                padding: 10px;
+                padding: 5px;
             }
             main {
                 padding: 10px;

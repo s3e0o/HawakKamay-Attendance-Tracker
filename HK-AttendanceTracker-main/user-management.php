@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $course = trim($_POST['Course']);
     $year_level = trim($_POST['year_level']);
     $hk_number = trim($_POST['hk_number']);
-    $student_id = trim($_POST['student_id']); // Collecting student ID
+    $student_id = trim($_POST['student_id']); 
 
     // Set the total hours based on HK number
     switch ($hk_number) {
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $total_hours = 150;
             break;
         default:
-            $total_hours = 0; // Default in case of invalid HK
+            $total_hours = 0; 
             break;
     }
 
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ':year_level' => $year_level,
                 ':hk_number' => $hk_number,
                 ':student_id' => $student_id,
-                ':total_hours' => $total_hours // Inserting the calculated total hours
+                ':total_hours' => $total_hours
             ]);
 
             $message = "User successfully added!";

@@ -4,7 +4,7 @@ session_start();
 require 'db-connection.php';
 
 if ($_SESSION['role'] !== 'teacher') {
-    header("Location: multi-login.php"); // Redirect if not an admin
+    header("Location: multi-login.php"); 
     exit();
 }
 
@@ -26,12 +26,12 @@ $students = $conn->query("SELECT user_id, name FROM students");
 $teacher_name = null;
 $teacher_id = null;
 
-$logged_in_user_id = $_SESSION['id']; // Assuming this holds the logged-in user's ID
+$logged_in_user_id = $_SESSION['id']; 
 if ($logged_in_user_id) {
     $sqlTeacher = "SELECT u.id AS teacher_id, t.name AS teacher_name 
                    FROM users u 
                    INNER JOIN teachers t ON u.id = t.user_id 
-                   WHERE u.id = ? LIMIT 1"; // Adjust as necessary
+                   WHERE u.id = ? LIMIT 1"; 
 
     $stmt = $conn->prepare($sqlTeacher);
     $stmt->bind_param("i", $logged_in_user_id);
@@ -55,8 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_POST['student'];
     $subject = $_POST['subject'];
     $classroom = $_POST['classroom'];
-    $assigned_by = $teacher_name; // Use the teacher's name directly
-    $total_duration = $_POST['total_duration']; // Get the total duration
+    $assigned_by = $teacher_name; 
+    $total_duration = $_POST['total_duration']; 
 
     if ($start_time >= $end_time) {
         // echo "Error: Start time must be earlier than end time.";
@@ -188,10 +188,10 @@ $conn->close();
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -249,7 +249,7 @@ $conn->close();
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -258,12 +258,17 @@ $conn->close();
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -385,15 +390,15 @@ $conn->close();
 
             if (startTime && endTime && startTime >= endTime) {
                 alert("Error: Start time must be earlier than end time.");
-                endTimeInput.value = ""; // Reset end time if invalid
+                endTimeInput.value = ""; 
             }
         }
         function uppercaseInput(input) {
                     // Split the input value by spaces, capitalize each word, and join them back together
                     input.value = input.value
-                        .toUpperCase() // Convert entire string to lowercase first
-                        .split(' ') // Split into words
-                        .join(' '); // Join words back into a string
+                        .toUpperCase() 
+                        .split(' ') 
+                        .join(' '); 
                 }
         function calculateDuration() {
             const startTimeInput = document.querySelector('input[name="start_time"]');
@@ -415,9 +420,9 @@ $conn->close();
                 const totalHours = durationMs / 3600000;
 
                 // Set the total_duration hidden input value
-                totalDurationInput.value = totalHours.toFixed(2); // Save up to 2 decimal places
+                totalDurationInput.value = totalHours.toFixed(2); 
             } else {
-                totalDurationInput.value = ''; // Clear the value if times are invalid
+                totalDurationInput.value = ''; 
             }
         }
         function toggleSidebar() {

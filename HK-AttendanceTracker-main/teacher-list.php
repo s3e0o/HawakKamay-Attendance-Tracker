@@ -13,10 +13,10 @@ $sql = "SELECT t.id, t.teacher_id, t.name, t.department, u.email
         FROM teachers t
         JOIN users u ON t.user_id = u.id
         WHERE t.name LIKE ? OR t.teacher_id LIKE ? OR t.department LIKE ? OR u.email LIKE ?
-        ORDER BY t.id ASC"; // Order by the latest updated record
+        ORDER BY t.id ASC";
 
 $stmt = $conn->prepare($sql);
-$searchWildcard = "%$searchTerm%"; // Adding wildcards for partial matching
+$searchWildcard = "%$searchTerm%";
 $stmt->bind_param("ssss", $searchWildcard, $searchWildcard, $searchWildcard, $searchWildcard);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -119,8 +119,8 @@ if (isset($_GET['logout'])) {
             z-index: 2; 
         }
         .sidebar.hidden {
-            transform: translateX(-100%); /* Move sidebar out of view */
-            opacity: 0; /* Make sidebar invisible */
+            transform: translateX(-100%); 
+            opacity: 0; 
         }
         .logo {
             width: 150px;  
@@ -178,10 +178,10 @@ if (isset($_GET['logout'])) {
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px;
         }
         .title {
             font-size: 24px;
@@ -190,7 +190,6 @@ if (isset($_GET['logout'])) {
             padding-bottom: 10px;
         }
         .content-box {
-            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
         }
@@ -207,7 +206,6 @@ if (isset($_GET['logout'])) {
         input[type="text"] {
             width: 50%;
             padding: 10px;
-            /*border-radius: 25px;*/
         }
         input[type="submit"] {
             padding: 10px;
@@ -261,8 +259,16 @@ if (isset($_GET['logout'])) {
         .edit-icon {
             color: #4a90e2;
         }
+        .edit-icon:hover {
+            color: #88bffd;
+            transform: scale(1.2);
+        }
         .delete-icon {
-            color: #e24a4a;
+            color: #ff0000;
+        }
+        .delete-icon:hover {
+            color: #ff8077;
+            transform: scale(1.2);
         }
         .search-results-container {
             display: <?php echo !empty($searchResults) ? 'block' : 'none'; ?>; 
@@ -276,6 +282,9 @@ if (isset($_GET['logout'])) {
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+        }
+        .btn-clear:hover{
+            background-color: #ad0c00;
         }
         input[type="submit"].update-button {
             border-radius: 25px;
@@ -299,7 +308,7 @@ if (isset($_GET['logout'])) {
             outline: none;
         }
             .search-bar input[type="submit"] {
-                background-color: #4a5d29;
+                background-color: #338a41;
                 color: white;
                 border: none;
                 padding: 10px 20px;
@@ -309,33 +318,12 @@ if (isset($_GET['logout'])) {
             }
 
             .search-bar input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: #1c551e;
             }
 
-
-            /* Responsive design */
-            @media (max-width: 600px) {
-            .search-bar {
-                flex-direction: column;
-                border-radius: 15px;
-            }
-
-            .search-bar input[type="text"] {
-                border-bottom: 1px solid #e0e0e0;
-                border-radius: 15px 15px 0 0;
-            }
-
-            .search-bar input[type="submit"] {
-                border-radius: 0 0 15px 15px;
-            }
-            }
-
-            
             .search-bar input[type="text"]::placeholder {
             color: #999;
             }
-
-            
             .search-bar input[type="text"]:focus {
             box-shadow: inset 0 0 5px rgba(81, 203, 238, 0.5);
             }
@@ -350,6 +338,38 @@ if (isset($_GET['logout'])) {
             z-index: 3;
             transition: left 0.3s ease;
         }
+        .sidebar-hidden + .toggle-btn {
+            left: 200px; 
+        }
+            @media (max-width: 575px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 5px;
+            }
+            .main-content {
+                padding: 10px;
+            }
+            .toggle-btn {
+                left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            th, td {
+                font-size: 12px;
+            }
+        }
+        
     </style>
 </head>
 <body>
@@ -445,8 +465,8 @@ if (isset($_GET['logout'])) {
     <script>
         function clearSearch() {
             // Clear the search input and reload the page
-            document.querySelector("input[name='search']").value = ""; // Clear the input field
-            window.location.href = "teacher-list.php"; // Redirect to the same page
+            document.querySelector("input[name='search']").value = ""; 
+            window.location.href = "teacher-list.php"; 
         }
 
         function confirmDelete(id) {

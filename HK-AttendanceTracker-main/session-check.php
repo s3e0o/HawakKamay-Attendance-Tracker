@@ -21,7 +21,7 @@ function redirectToRolePage($role) {
 
 // Check if user is logged in and has a role
 if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
-    $role = $_SESSION['role']; // Assuming you store user role in the session
+    $role = $_SESSION['role']; 
 } else {
     // If not logged in, redirect to login
     header("Location: multi-login.php");

@@ -190,10 +190,10 @@ if (isset($_GET['logout'])) {
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -256,7 +256,7 @@ if (isset($_GET['logout'])) {
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -265,12 +265,17 @@ if (isset($_GET['logout'])) {
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {

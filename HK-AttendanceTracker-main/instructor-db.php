@@ -257,10 +257,10 @@ $conn->close();
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -334,8 +334,16 @@ $conn->close();
         .edit-icon {
             color: #4a90e2;
         }
+        .edit-icon:hover {
+            color: #88bffd;
+            transform: scale(1.2);
+        }
         .delete-icon {
             color: #e24a4a;
+        }
+        .delete-icon:hover {
+            color: #ff8077;
+            transform: scale(1.2);
         }
         input[type="date"]{
             padding: 10px;
@@ -379,7 +387,7 @@ $conn->close();
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -388,12 +396,17 @@ $conn->close();
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -526,8 +539,8 @@ $conn->close();
                 })
                 .then(data => {
                     if (data.message) {
-                        alert(data.message);  // Use alert to show the success message
-                        location.reload();  // Refresh to show updated status
+                        alert(data.message);  
+                        location.reload();  
                     }
                 })
                 .catch(error => {

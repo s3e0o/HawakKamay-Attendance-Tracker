@@ -78,14 +78,11 @@ if (isset($_GET['delete_id'])) {
         header("Location: student-list.php");
         exit();
     }
-    
-    // $delete_stmt->close();
-    // exit();
 }
 
 // Export functionality
 if (isset($_POST['export'])) {
-    require 'vendor/autoload.php'; // Load PHPSpreadsheet
+    require 'vendor/autoload.php'; 
 
     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
@@ -117,7 +114,6 @@ if (isset($_POST['export'])) {
         $rowNumber++;
     }
 
-    // Set headers for download
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment; filename="students.xlsx"');
     $writer = PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
@@ -249,10 +245,10 @@ $conn->close();
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -170px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -170px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -261,7 +257,6 @@ $conn->close();
             padding-bottom: 10px;
         }
         .content-box {
-            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
         }
@@ -278,16 +273,16 @@ $conn->close();
         input[type="text"] {
             width: 50%;
             padding: 10px;
-            /*border-radius: 25px;*/
+            border-radius: 25px;
         }
         input[type="submit"] {
             padding: 10px;
             border-radius: 0 0 0 0;
         }
-        /* button[type="button"]{
+        button[type="button"]{
             padding: 10px;
             border-radius: 0 0 20px;
-        } */
+        }
         .actions {
             display: flex;
             gap: 10px;
@@ -306,8 +301,16 @@ $conn->close();
         .edit-icon {
             color: #4a90e2;
         }
+        .edit-icon:hover {
+            color: #88bffd;
+            transform: scale(1.2);
+        }
         .delete-icon {
-            color: #e24a4a;
+            color: #ff0000;
+        }
+        .delete-icon:hover {
+            color: #ff8077;
+            transform: scale(1.2);
         }
         .export{
             background-color: #b8860b;
@@ -345,7 +348,7 @@ $conn->close();
             background-color: #3e4d22;
         }
         
-        th:nth-child(1) { width: 12%; }  /* Adjust these widths as needed */
+        th:nth-child(1) { width: 12%; }  
         th:nth-child(2) { width: 18%; }
         th:nth-child(3) { width: 22%; }
         th:nth-child(4) { width: 5%; }
@@ -361,6 +364,9 @@ $conn->close();
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+        }
+        .btn-clear:hover {
+            background-color: #ad0c00;
         }
         input[type="submit"].update-button {
             border-radius: 25px;
@@ -384,7 +390,7 @@ $conn->close();
             outline: none;
         }
         .search-bar input[type="submit"] {
-            background-color: #4a5d29;
+            background-color: #338a41;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -394,7 +400,7 @@ $conn->close();
         }
 
         .search-bar input[type="submit"]:hover {
-        background-color: #45a049;
+        background-color: #1c551e;
         }
         @media (max-width: 768px) {
             .container {
@@ -403,12 +409,17 @@ $conn->close();
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {

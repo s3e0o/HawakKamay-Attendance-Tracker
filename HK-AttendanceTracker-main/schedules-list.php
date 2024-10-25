@@ -1,7 +1,7 @@
 <?php
 session_start();
-require 'db-connection.php'; // Your database connection
-require 'vendor/autoload.php'; // Ensure PHPSpreadsheet is available
+require 'db-connection.php'; 
+require 'vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -181,10 +181,10 @@ $conn->close();
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -237,7 +237,7 @@ $conn->close();
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -246,12 +246,17 @@ $conn->close();
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -282,7 +287,7 @@ $conn->close();
         <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
             <H1 class="title">SCHOLAR ASSIGNMENT SCHEDULE INFORMATION</H1>
             <form method="post">
-                <button type="submit" name="export">Export as Excel</button>
+                <button type="submit" name="export">Download</button>
             </form>
             <?php if ($result && $result->num_rows > 0): ?>
                 <table>

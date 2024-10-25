@@ -167,10 +167,10 @@ if (isset($_GET['logout'])) {
             transition: margin-left 0.3s ease;
         }
         main.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         main:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -180,16 +180,8 @@ if (isset($_GET['logout'])) {
         }
         .content-box {
             border-radius: 10px;
-            /* padding: 0 10px; */
             position: relative; 
         }
-        /* .content-box2 {
-            border-radius: 10px;
-            padding: 0 20px;
-        } */
-        /* .content-box h2 {
-            margin-top: 50px;
-        } */
         .notification-icon {
             position: absolute; 
             top: 0px; 
@@ -305,7 +297,7 @@ if (isset($_GET['logout'])) {
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -314,12 +306,17 @@ if (isset($_GET['logout'])) {
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -461,14 +458,6 @@ if (isset($_GET['logout'])) {
         </main>
     </div>
     <script>
-        // function toggleNotificationTray() {
-        //     const tray = document.getElementById('notificationTray');
-        //     if (tray.style.display === 'none' || tray.style.display === '') {
-        //         tray.style.display = 'block'; 
-        //     } else {
-        //         tray.style.display = 'none'; 
-        //     }
-        // }
 
         function toggleNotificationTray() {
             const tray = document.getElementById('notificationTray');

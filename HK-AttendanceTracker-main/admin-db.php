@@ -1,11 +1,10 @@
 <?php
-session_start(); // Start the session at the very beginning
-// include 'session-check.php';
+session_start();
 
 require 'db-connection.php';
 
 if ($_SESSION['role'] !== 'admin') {
-    header("Location: multi-login.php"); // Redirect if not an admin
+    header("Location: multi-login.php"); 
     exit();
 }
 
@@ -32,7 +31,7 @@ $total_hk50 = 0;
 $total_hk75 = 0;
 $total_hk100 = 0;
 
-$conn = new mysqli("localhost", "root", "", "hk-management"); // Update with your actual database credentials
+$conn = new mysqli("localhost", "root", "", "hk-management"); 
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -71,7 +70,7 @@ if ($result_hk100) {
     $total_hk100 = $result_hk100->fetch_assoc()['total'];
 }
 
-$conn->close(); // Close the database connection
+$conn->close(); 
 ?>
 
 <!DOCTYPE html>
@@ -161,10 +160,10 @@ $conn->close(); // Close the database connection
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -179,12 +178,12 @@ $conn->close(); // Close the database connection
             margin-bottom: 20px;
         }
         .info-box {
-            background-color: #A98D00;
+            background-color: hsl(50, 100%, 27%);
             padding: 15px;
             border-radius: 5px;
         }
         .info-box:hover {
-            background-color: #BFA93B;
+            background-color: #b1981b;
         }
         .info-box h3 {
             margin: 0 0 10px 0;
@@ -224,7 +223,7 @@ $conn->close(); // Close the database connection
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -233,12 +232,17 @@ $conn->close(); // Close the database connection
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {

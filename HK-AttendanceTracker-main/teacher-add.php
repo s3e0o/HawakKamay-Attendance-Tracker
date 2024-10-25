@@ -175,10 +175,10 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
             transition: margin-left 0.3s ease;
         }
         main.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         main:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -187,7 +187,6 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
             padding-bottom: 10px;
         }
         .content-box {
-            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
             width: 80%;
@@ -276,7 +275,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -285,12 +284,17 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             main {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -379,10 +383,10 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
         function capitalizeName(input) {
             // Split the input value by spaces, capitalize each word, and join them back together
             input.value = input.value
-                .toLowerCase() // Convert entire string to lowercase first
-                .split(' ') // Split into words
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter
-                .join(' '); // Join words back into a string
+                .toLowerCase() 
+                .split(' ') 
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) 
+                .join(' '); 
         }
 
         function toggleSidebar() {

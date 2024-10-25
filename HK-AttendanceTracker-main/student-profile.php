@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require 'db-connection.php'; // Include the connection file
+require 'db-connection.php'; 
 
 $name = '';
 $email = '';
@@ -19,23 +19,23 @@ if (isset($_SESSION['username'])) {
             WHERE u.username = ?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('s', $username); // Bind username
+    $stmt->bind_param('s', $username); 
     $stmt->execute();
     $result = $stmt->get_result();
 
     // Check if the student exists
     if ($result->num_rows > 0) {
         $student = $result->fetch_assoc();
-        $student_id = $student['student_id']; // Store student ID for updates
+        $student_id = $student['student_id']; 
         $name = $student['name'];
         $email = $student['email'];
-        $hashed_password = $student['password']; // Store the hashed password for verification
+        $hashed_password = $student['password']; 
     } else {
-        header("Location: multi-login.php"); // Redirect if student not found
+        header("Location: multi-login.php"); 
         exit();
     }
 } else {
-    header("Location: multi-login.php"); // Redirect if not logged in
+    header("Location: multi-login.php"); 
     exit();
 }
 
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
 
     if ($stmt->execute()) {
         $_SESSION['success_message'] = "Profile updated successfully.";
-        header("Location: student-profile.php"); // Reload the profile page
+        header("Location: student-profile.php"); 
         exit();
     } else {
         // echo "Error updating student: " . $stmt->error;
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
             // Update the password in the database
             $update_password_sql = "UPDATE users SET password = ? WHERE username = ?";
             $stmt = $conn->prepare($update_password_sql);
-            $stmt->bind_param("ss", $hashed_new_password, $username); // Assuming you want to update based on the username
+            $stmt->bind_param("ss", $hashed_new_password, $username); 
 
             if ($stmt->execute()) {
                 // echo "Password changed successfully.";
@@ -204,10 +204,10 @@ if (isset($_GET['logout'])) {
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -258,12 +258,13 @@ if (isset($_GET['logout'])) {
             background-color: #b8860b;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 10px 0px;
+            font-size: 15px;
             cursor: pointer;
             transition: background-color 0.3s;
             border-radius: 5px;
             margin-bottom: 10px;
+            text-align: center;
         }
         .save-button:hover {
             background-color: #BFA93B;
@@ -280,7 +281,7 @@ if (isset($_GET['logout'])) {
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -289,12 +290,17 @@ if (isset($_GET['logout'])) {
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {

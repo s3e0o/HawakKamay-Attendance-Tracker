@@ -1,8 +1,8 @@
 <?php 
-session_start(); // Start the session
+session_start(); 
 
-// Include your database connection file
-include 'db-connection.php'; // Adjust the path if necessary
+
+include 'db-connection.php'; 
 
 // Create a connection
 $conn = new mysqli('localhost', 'root', '', 'hk-management');
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verify the password
         if (password_verify($password, $user['password'])) {
             // Password is correct, store session variables
-            $_SESSION['username'] = htmlspecialchars($user['username']); // Escaping output
+            $_SESSION['username'] = htmlspecialchars($user['username']); 
             $_SESSION['role'] = $user['role'];
             $_SESSION['id'] = $user['id']; 
                 
@@ -161,18 +161,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-top: 20px;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .login-container {
                 flex-direction: column;
                 max-width: 90%;
-                height: auto;
+                padding: 20px 10px;
+            }
+            .logo {
+                width: 40%;
             }
             .logo-container {
-                border-radius: 10px 10px 0 0;
+                border-radius: 10px 10px 10px 10px;
             }
             .form-container {
-                padding: 30px 20px;
+                padding: 20px 20px;
+                width: 80%;
+                margin: 0 auto;
             }
             h1 {
                 font-size: 1.5rem;
@@ -181,7 +185,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 font-size: 1.5rem;
             }
             input[type="submit"] {
-                width: 100%;
+                width: 50%;
+                margin: 0 auto;
+            }
+            .login-container {
+                max-width: 90%;
+                width: auto;
+                padding: 50px;
             }
         }
 

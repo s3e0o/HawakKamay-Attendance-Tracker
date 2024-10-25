@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $course = $_POST['course'];
     $year_level = $_POST['year_level'];
     $hk_status = $_POST['hk_status'];
-    $total_hours = $_POST['total_hours']; // Get total_hours from form submission
+    $total_hours = $_POST['total_hours'];
     $status = $_POST['status'];
 
     // Update the user data, including total_hours and status
@@ -61,12 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $update_stmt->execute();
 
     if ($update_stmt->affected_rows > 0) {
-        // $message = "Scholar updated successfully.";
         $_SESSION['success_message'] = "Scholar updated succesfully.";
         header("Location: student-list.php");
         exit();
     } else {
-        // $message = "No changes made or update failed.";
         $_SESSION['success_message'] = "No changes made or update failed.";
         header("Location: student-list.php");
         exit();
@@ -169,10 +167,10 @@ $conn->close();
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px;
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -180,11 +178,6 @@ $conn->close();
             border-bottom: 2px solid #b8860b;
             padding-bottom: 10px;
         }
-        /* form {
-            background-color: #b8860b;
-            padding: 20px;
-            border-radius: 5px
-        } */
         form {
             padding: 10px 20px;
             display: grid;
@@ -271,7 +264,7 @@ $conn->close();
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -280,12 +273,17 @@ $conn->close();
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -319,7 +317,7 @@ $conn->close();
                     break;
             }
 
-            totalHoursInput.value = hours; // Update total hours input
+            totalHoursInput.value = hours; 
         }
     </script>
 </head>
@@ -423,11 +421,10 @@ $conn->close();
         updateTotalHours();
     });
     function uppercaseInput(input) {
-        // Split the input value by spaces, capitalize each word, and join them back together
         input.value = input.value
-            .toUpperCase() // Convert entire string to lowercase first
-            .split(' ') // Split into words
-            .join(' '); // Join words back into a string
+            .toUpperCase() 
+            .split(' ') 
+            .join(' '); 
     }
 
     function toggleSidebar() {

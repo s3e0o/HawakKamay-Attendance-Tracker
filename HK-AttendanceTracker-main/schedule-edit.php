@@ -186,10 +186,10 @@ $conn->close();
             transition: margin-left 0.3s ease;
         }
         .main-content.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         .main-content:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .title {
             font-size: 24px;
@@ -198,7 +198,6 @@ $conn->close();
             padding-bottom: 10px;
         }
         .content-box {
-            /*background-color: #4a5d29;*/
             border-radius: 10px;
             padding: 20px;
             width: 80%;
@@ -251,7 +250,7 @@ $conn->close();
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -260,12 +259,17 @@ $conn->close();
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             .main-content {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -289,7 +293,6 @@ $conn->close();
             <div class="nav-item">
             <a href="?logout=true" class="logout-btn">Log Out</a>
             </div>
-            <!-- Add other menu items as needed -->
         </div>
         <div class="main-content">
         <div class="toggle-btn" onclick="toggleSidebar()">☰</div>
@@ -369,15 +372,6 @@ $conn->close();
     </div>
 
     <script>
-        // Display success or error alerts based on URL parameters
-        // const urlParams = new URLSearchParams(window.location.search);
-        // if (urlParams.has('success')) {
-        //     alert('Schedule updated successfully!');
-        //     // window.location.href('instructor-db.php');
-        // }
-        // if (urlParams.has('error')) {
-        //     alert('An error occurred while updating the schedule.');
-        // }
         function setMinStartTime() {
             const dateInput = document.querySelector('input[name="date"]');
             const startTimeInput = document.querySelector('input[name="start_time"]');
@@ -401,9 +395,9 @@ $conn->close();
         function uppercaseInput(input) {
             // Split the input value by spaces, capitalize each word, and join them back together
             input.value = input.value
-                .toUpperCase() // Convert entire string to lowercase first
-                .split(' ') // Split into words
-                .join(' '); // Join words back into a string
+                .toUpperCase() 
+                .split(' ') 
+                .join(' '); 
         }
 
         function toggleSidebar() {

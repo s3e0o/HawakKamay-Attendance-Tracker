@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     // Collect form data
     $studentId = $_POST['student_id'];
     $name = $_POST['name'];
-    $course = strtoupper($_POST['course']); // Capitalize course field strtoupper
+    $course = strtoupper($_POST['course']); 
     $level = $_POST['level'];
     $hk_status = $_POST['hk_status'];
     $email = $_POST['email'];
@@ -213,13 +213,12 @@ if (isset($_GET['logout'])) {
             transition: margin-left 0.3s ease;
         }
         main.sidebar-hidden {
-            margin-left: -220px; /* When sidebar is hidden, extend content to full width */
+            margin-left: -220px; 
         }
         main:not(.sidebar-hidden) {
-            margin-left: 10px; /* When sidebar is visible, keep content shifted */
+            margin-left: 10px; 
         }
         .content-box {
-            /*background-color: #4a5d29;*/
             border-radius: 20px;
             padding: 5px 10px 5px 10px;
             width: 80%
@@ -305,7 +304,7 @@ if (isset($_GET['logout'])) {
             transition: left 0.3s ease;
         }
         .sidebar-hidden + .toggle-btn {
-            left: 200px; /* Adjust toggle button when sidebar is hidden */
+            left: 200px; 
         }
         @media (max-width: 768px) {
             .container {
@@ -314,12 +313,17 @@ if (isset($_GET['logout'])) {
             .sidebar {
                 width: 100%;
                 height: auto;
+                padding: 5px;
             }
             main {
                 padding: 10px;
             }
             .toggle-btn {
                 left: 10px;
+            }
+            .logo {
+                width: 100px;
+                height: 100px;
             }
         }
         @media (max-width: 480px) {
@@ -449,18 +453,18 @@ if (isset($_GET['logout'])) {
         function capitalizeName(input) {
             // Split the input value by spaces, capitalize each word, and join them back together
             input.value = input.value
-                .toLowerCase() // Convert entire string to lowercase first
-                .split(' ') // Split into words
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter
-                .join(' '); // Join words back into a string
+                .toLowerCase() 
+                .split(' ') 
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) 
+                .join(' '); 
         }
 
         function uppercaseInput(input) {
             // Split the input value by spaces, capitalize each word, and join them back together
             input.value = input.value
-                .toUpperCase() // Convert entire string to lowercase first
-                .split(' ') // Split into words
-                .join(' '); // Join words back into a string
+                .toUpperCase() 
+                .split(' ') 
+                .join(' '); 
         }
 
         function toggleSidebar() {
