@@ -99,11 +99,15 @@ Potential enhancements include:
 
 ## 👩‍💻 Developer
 
-**Richa Andrea Aliado**
+**Richa Aliado**
 
 Information Technology graduate interested in web development, application security, and building practical digital solutions.
 
 - GitHub: [@s3e0o](https://github.com/s3e0o)
+
+Other Developers who contributed to the project:
+https://github.com/KristelJeanneB
+https://github.com/Arvin-Lim
 
 ---
 
